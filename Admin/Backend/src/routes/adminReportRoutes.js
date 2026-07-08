@@ -17,21 +17,21 @@ const router = Router();
 router.use(authMiddleware);
 
 // Attendance Report
-router.get("/attendance", getAttendanceReport);
+router.get("/getAttendanceReport", getAttendanceReport);
 
 // Payroll Report
-router.get("/payroll", getPayrollReport);
+router.get("/getPayrollReport", getPayrollReport);
 
 // Leave Report
-router.get("/leave", getLeaveReport);
+router.get("/getLeaveReport", getLeaveReport);
 
 // Employee Report
-router.get("/employee", getEmployeeReport);
+router.get("/getEmployeeReport", getEmployeeReport);
 
 // Monthly Report
-router.get("/monthly", getMonthlyReport);
+router.get("/getMonthlyReport", getMonthlyReport);
 
 // Custom Report
-router.get("/custom", getCustomReport);
+router.get("/getCustomReport", getCustomReport);
 
 export default router;

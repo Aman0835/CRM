@@ -20,19 +20,19 @@ const router = Router();
 router.use(authMiddleware);
 
 // Get all attendance
-router.get("/", getAttendanceList);
+router.get("/getAttendanceList", getAttendanceList);
 
 // Today's attendance
-router.get("/today", getTodayAttendance);
+router.get("/getTodayAttendance", getTodayAttendance);
 
 // Attendance Report
-router.get("/report", getAttendanceReport);
+router.get("/getAttendanceReport", getAttendanceReport);
 
 // Employee Attendance
-router.get("/employee/:employeeId", getAttendanceByEmployee);
+router.get("/getAttendanceByEmployee/:employeeId", getAttendanceByEmployee);
 
 // Create Attendance
-router.post("/", createAttendance);
+router.post("/createAttendance", createAttendance);
 
 // Check In
 router.post("/check-in", checkIn);
@@ -41,9 +41,9 @@ router.post("/check-in", checkIn);
 router.post("/check-out", checkOut);
 
 // Update Attendance
-router.put("/:id", updateAttendance);
+router.put("/updateAttendance/:id", updateAttendance);
 
 // Delete Attendance
-router.delete("/:id", deleteAttendance);
+router.delete("/deleteAttendance/:id", deleteAttendance);
 
 export default router;

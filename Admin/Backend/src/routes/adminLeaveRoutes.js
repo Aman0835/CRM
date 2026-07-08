@@ -18,24 +18,24 @@ const router = Router();
 router.use(authMiddleware);
 
 // Get all leave requests
-router.get("/", getLeaves);
+router.get("/getLeaves", getLeaves);
 
 // Get leave by ID
-router.get("/:id", getLeaveById);
+router.get("/getLeaveById/:id", getLeaveById);
 
 // Apply Leave
-router.post("/", createLeave);
+router.post("/createLeave", createLeave);
 
 // Update Leave
-router.put("/:id", updateLeave);
+router.put("/updateLeave/:id", updateLeave);
 
 // Approve Leave
-router.patch("/:id/approve", approveLeave);
+router.patch("/approveLeave/:id", approveLeave);
 
 // Reject Leave
-router.patch("/:id/reject", rejectLeave);
+router.patch("/rejectLeave/:id", rejectLeave);
 
 // Delete Leave
-router.delete("/:id", deleteLeave);
+router.delete("/deleteLeave/:id", deleteLeave);
 
 export default router;

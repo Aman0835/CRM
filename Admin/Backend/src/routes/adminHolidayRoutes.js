@@ -16,18 +16,18 @@ const router = Router();
 router.use(authMiddleware);
 
 // Get all holidays
-router.get("/", getHolidays);
+router.get("/getHolidays", getHolidays);
 
 // Get holiday by ID
-router.get("/:id", getHolidayById);
+router.get("/getHolidayById/:id", getHolidayById);
 
 // Create holiday
-router.post("/", createHoliday);
+router.post("/createHoliday", createHoliday);
 
 // Update holiday
-router.put("/:id", updateHoliday);
+router.put("/updateHoliday/:id", updateHoliday);
 
 // Delete holiday
-router.delete("/:id", deleteHoliday);
+router.delete("/deleteHoliday/:id", deleteHoliday);
 
 export default router;

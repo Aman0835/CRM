@@ -18,24 +18,24 @@ const router = Router();
 router.use(authMiddleware);
 
 // Generate Payroll
-router.post("/generate", generatePayroll);
+router.post("/generatePayroll", generatePayroll);
 
 // Get All Payrolls
-router.get("/", getPayrolls);
+router.get("/getPayrolls", getPayrolls);
 
 // Get Payroll By Month & Year
-router.get("/month/:month/:year", getPayrollByMonthYear);
+router.get("/getPayrollByMonthYear/:month/:year", getPayrollByMonthYear);
 
 // Get Payroll By Employee
-router.get("/employee/:employeeId", getPayrollByEmployee);
+router.get("/getPayrollByEmployee/:employeeId", getPayrollByEmployee);
 
 // Get Payroll By ID
-router.get("/:id", getPayrollById);
+router.get("/getPayrollById/:id", getPayrollById);
 
 // Update Payroll
-router.put("/:id", updatePayroll);
+router.put("/updatePayroll/:id", updatePayroll);
 
 // Delete Payroll
-router.delete("/:id", deletePayroll);
+router.delete("/deletePayroll/:id", deletePayroll);
 
 export default router;
