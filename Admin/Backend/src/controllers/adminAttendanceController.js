@@ -47,7 +47,7 @@ export const checkIn = async (req, res) => {
       employeeId,
       date: today,
       checkIn: new Date(),
-      status: "present",
+      status: "Present",
     });
 
     res.status(201).json({
