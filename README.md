@@ -1,4 +1,4 @@
-# 💈 Barber Staff Management System
+# CRM Admin 
 
 A production-ready **Employee Management & Payroll System** built specifically for barber shops and salons. The platform enables employees to manage their daily attendance, leave requests, and salary information through a mobile application, while administrators can efficiently manage employees, monitor attendance, approve leave requests, and generate monthly payroll from a centralized dashboard.
 
