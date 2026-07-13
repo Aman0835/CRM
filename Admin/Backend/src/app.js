@@ -40,7 +40,7 @@ app.use(
 app.get("/", (req, res) => {
   res.status(200).json({
     status: "OK",
-    message: "CRM Backend Live  && Healthy",
+    message: "CRM Backend Live && Healthy working fine",
   });
 });
 
