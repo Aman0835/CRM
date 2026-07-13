@@ -15,11 +15,23 @@ export const getEmployees = async (req, res) => {
     const query = {};
 
     if (search) {
-      query.$or = [
-        { fullName: { $regex: search, $options: "i" } },
-        { employeeId: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
-      ];
+      const words = search.trim().split(/\s+/);
+      if (words.length === 1) {
+        query.$or = [
+          { firstName: { $regex: search, $options: "i" } },
+          { lastName: { $regex: search, $options: "i" } },
+          { employeeId: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } },
+        ];
+      } else {
+        
+        query.$and = words.map((word) => ({
+          $or: [
+            { firstName: { $regex: word, $options: "i" } },
+            { lastName: { $regex: word, $options: "i" } },
+          ],
+        }));
+      }
     }
 
     if (status) {

@@ -92,7 +92,7 @@ const employeeSchema = new mongoose.Schema(
       type: String,
       default: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.M2B4Q0iKZaV9vrcrbzLbVgHaHa%3Fr%3D0%26pid%3DApi&f=1&ipt=3d0c93a2eb5e001259e2c1b02a0971ed7122e60c002edf9057268433569d5cd4",
       validate(value) {
-        if (value && !validator.isURL(value)) {
+        if (value && !value.startsWith("data:image/") && !validator.isURL(value)) {
           throw new Error("Invalid image URL");
         }
       },
