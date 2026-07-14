@@ -1,15 +1,20 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import { FiMail, FiLock, FiScissors } from "react-icons/fi";
 
 export default function Login() {
-    const { login } = useAuth();
+    const { login, admin, loading: authLoading } = useAuth();
     const navigate = useNavigate();
     const [email, setEmail] = useState("admin@gmail.com");
     const [password, setPassword] = useState("Admin@123");
     const [loading, setLoading] = useState(false);
+
+    // Already logged in → go straight to dashboard
+    if (!authLoading && admin) {
+        return <Navigate to="/dashboard" replace />;
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
