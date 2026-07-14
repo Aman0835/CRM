@@ -2,29 +2,27 @@ import jwt from "jsonwebtoken";
 
 const authMiddleware = (req, res, next) => {
   try {
-    const token = req.cookies.token;
+    // 1. Try Authorization: Bearer <token> (localStorage approach)
+    const authHeader = req.headers["authorization"];
+    let token = null;
 
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.slice(7);
+    } else {
+      // 2. Fallback: cookie
+      token = req.cookies?.token || null;
     }
 
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
 
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
-
     next();
   } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: "Invalid Token",
-    });
+    res.status(401).json({ success: false, message: "Invalid Token" });
   }
 };
 
-export default authMiddleware;
+export default authMiddleware;

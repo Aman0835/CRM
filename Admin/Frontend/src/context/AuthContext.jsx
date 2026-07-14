@@ -9,13 +9,22 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const checkSession = async () => {
+            // If no token in localStorage, skip the API call entirely
+            const token = localStorage.getItem("token");
+            if (!token) {
+                setLoading(false);
+                return;
+            }
             try {
                 const data = await authService.getMe();
                 if (data && data.success) {
                     setAdmin(data.admin);
+                } else {
+                    localStorage.removeItem("token");
                 }
             } catch (error) {
-                console.log("Not logged in or token expired");
+                console.log("Token invalid or expired");
+                localStorage.removeItem("token");
                 setAdmin(null);
             } finally {
                 setLoading(false);
@@ -29,6 +38,10 @@ export const AuthProvider = ({ children }) => {
         try {
             const data = await authService.login(email, password);
             if (data && data.success) {
+                // Save token to localStorage so it persists across refreshes
+                if (data.token) {
+                    localStorage.setItem("token", data.token);
+                }
                 setAdmin(data.admin);
                 return data;
             }
@@ -47,6 +60,8 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error("Logout failed on server, cleaning client state anyway", error);
         } finally {
+            // Remove token from localStorage
+            localStorage.removeItem("token");
             setAdmin(null);
             setLoading(false);
         }

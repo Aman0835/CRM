@@ -5,9 +5,18 @@ const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// Helper: extract token from cookie OR Authorization header
+const extractToken = (req) => {
+  // 1. Try Authorization: Bearer <token>
+  const authHeader = req.headers["authorization"];
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return authHeader.slice(7);
+  }
+  // 2. Fallback: cookie (works if same-site)
+  return req.cookies?.token || null;
+};
 
 // Login
-
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -23,72 +32,49 @@ router.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign(
-      {
-        email,
-        role: "admin",
-      },
+      { email, role: "admin" },
       JWT_SECRET,
-      {
-        expiresIn: "7d",
-      }
+      { expiresIn: "7d" }
     );
 
+    // Still set cookie as fallback for same-site setups
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,        // required for SameSite=None
-      sameSite: "none",   // allows cross-origin cookies (frontend & backend on different domains)
+      secure: true,
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    // Also return token in body so frontend can store in localStorage
     res.status(200).json({
       success: true,
       message: "Login Successful",
-      admin: {
-        email,
-        role: "admin",
-      },
+      token,                          // ← frontend stores this
+      admin: { email, role: "admin" },
     });
   } catch (error) {
     console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
-
-// Current Admin
-
+// Current Admin — accepts Authorization header OR cookie
 router.get("/me", (req, res) => {
   try {
-    const token = req.cookies.token;
+    const token = extractToken(req);
 
     if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
+      return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
     const decoded = jwt.verify(token, JWT_SECRET);
-
-    res.status(200).json({
-      success: true,
-      admin: decoded,
-    });
+    res.status(200).json({ success: true, admin: decoded });
   } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: "Invalid Token",
-    });
+    res.status(401).json({ success: false, message: "Invalid Token" });
   }
 });
 
-
 // Logout
-
 router.post("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
@@ -96,10 +82,8 @@ router.post("/logout", (req, res) => {
     sameSite: "none",
   });
 
-  res.status(200).json({
-    success: true,
-    message: "Logout Successful",
-  });
+  // Client is responsible for removing the localStorage token
+  res.status(200).json({ success: true, message: "Logout Successful" });
 });
 
 export default router;
