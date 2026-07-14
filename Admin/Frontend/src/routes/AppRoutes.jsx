@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import Dashboard from "../pages/Dashboard";
 import Employees from "../pages/Employees";
@@ -17,110 +17,112 @@ import AdminProfile from "../pages/Profile";
 import ProtectedRoute from "./ProtectedRoute";
 
 export default function AppRoutes() {
-    return (
-        <Routes>
-            <Route path="/login" element={<Login />} />
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate to="/login" replace />} />
 
-            <Route
-                path="/dashboard"
-                element={
-                    <ProtectedRoute>
-                        <Dashboard />
-                    </ProtectedRoute>
-                }
-            />
+      <Route path="/login" element={<Login />} />
 
-            <Route
-                path="/employees"
-                element={
-                    <ProtectedRoute>
-                        <Employees />
-                    </ProtectedRoute>
-                }
-            />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
 
-            <Route
-                path="/employees/:id"
-                element={
-                    <ProtectedRoute>
-                        <EmployeeDetail />
-                    </ProtectedRoute>
-                }
-            />
+      <Route
+        path="/employees"
+        element={
+          <ProtectedRoute>
+            <Employees />
+          </ProtectedRoute>
+        }
+      />
 
-            <Route
-                path="/attendance"
-                element={
-                    <ProtectedRoute>
-                        <Attendance />
-                    </ProtectedRoute>
-                }
-            />
+      <Route
+        path="/employees/:id"
+        element={
+          <ProtectedRoute>
+            <EmployeeDetail />
+          </ProtectedRoute>
+        }
+      />
 
-            <Route
-                path="/leave"
-                element={
-                    <ProtectedRoute>
-                        <Leave />
-                    </ProtectedRoute>
-                }
-            />
+      <Route
+        path="/attendance"
+        element={
+          <ProtectedRoute>
+            <Attendance />
+          </ProtectedRoute>
+        }
+      />
 
-            <Route
-                path="/holidays"
-                element={
-                    <ProtectedRoute>
-                        <Holidays />
-                    </ProtectedRoute>
-                }
-            />
+      <Route
+        path="/leave"
+        element={
+          <ProtectedRoute>
+            <Leave />
+          </ProtectedRoute>
+        }
+      />
 
-            <Route
-                path="/payroll"
-                element={
-                    <ProtectedRoute>
-                        <Payroll />
-                    </ProtectedRoute>
-                }
-            />
+      <Route
+        path="/holidays"
+        element={
+          <ProtectedRoute>
+            <Holidays />
+          </ProtectedRoute>
+        }
+      />
 
-            <Route
-                path="/payroll/:id"
-                element={
-                    <ProtectedRoute>
-                        <PayrollDetail />
-                    </ProtectedRoute>
-                }
-            />
+      <Route
+        path="/payroll"
+        element={
+          <ProtectedRoute>
+            <Payroll />
+          </ProtectedRoute>
+        }
+      />
 
-            <Route
-                path="/reports"
-                element={
-                    <ProtectedRoute>
-                        <Reports />
-                    </ProtectedRoute>
-                }
-            />
+      <Route
+        path="/payroll/:id"
+        element={
+          <ProtectedRoute>
+            <PayrollDetail />
+          </ProtectedRoute>
+        }
+      />
 
-            <Route
-                path="/settings"
-                element={
-                    <ProtectedRoute>
-                        <Settings />
-                    </ProtectedRoute>
-                }
-            />
+      <Route
+        path="/reports"
+        element={
+          <ProtectedRoute>
+            <Reports />
+          </ProtectedRoute>
+        }
+      />
 
-            <Route
-                path="/profile"
-                element={
-                    <ProtectedRoute>
-                        <AdminProfile />
-                    </ProtectedRoute>
-                }
-            />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <Settings />
+          </ProtectedRoute>
+        }
+      />
 
-            <Route path="*" element={<NotFound />} />
-        </Routes>
-    );
-}
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <AdminProfile />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
