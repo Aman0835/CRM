@@ -1,5 +1,6 @@
 import Employee from "../models/Employee.js";
 
+const generateEmployeeId = () => `EMP-${Math.floor(1000 + Math.random() * 9000)}`;
 
 // Get All Employees
 
@@ -131,13 +132,28 @@ export const getEmployeeById = async (req, res) => {
 
 export const createEmployee = async (req, res) => {
   try {
+    const rawPassword = typeof req.body.password === "string" ? req.body.password.trim() : "";
+    const finalPassword = rawPassword || "Pass1234!";
+    const finalEmployeeId = (req.body.employeeId || "").trim() || generateEmployeeId();
 
-    const employee = await Employee.create(req.body);
+    const employeeData = {
+      ...req.body,
+      employeeId: finalEmployeeId,
+      password: finalPassword,
+    };
+
+    const employee = await Employee.create(employeeData);
+    const employeeResponse = employee.toObject();
+    delete employeeResponse.password;
 
     res.status(201).json({
       success: true,
       message: "Employee created successfully",
-      data: employee,
+      data: employeeResponse,
+      credentials: {
+        employeeId: employeeResponse.employeeId,
+        password: finalPassword,
+      },
     });
 
   } catch (error) {

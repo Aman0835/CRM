@@ -1,5 +1,5 @@
-import React from "react";
-import { FiX, FiUpload, FiLink, FiImage } from "react-icons/fi";
+import React, { useState } from "react";
+import { FiX, FiUpload, FiLink, FiImage, FiEye, FiEyeOff } from "react-icons/fi";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function EmployeeFormModal({
@@ -10,6 +10,8 @@ export default function EmployeeFormModal({
     monthlySalary, setMonthlySalary, profileImage, setProfileImage,
     address, setAddress, status, setStatus,
 }) {
+    const [showPassword, setShowPassword] = useState(false);
+
     return (
         <AnimatePresence>
             {isOpen && (
@@ -30,16 +32,16 @@ export default function EmployeeFormModal({
                             </button>
                         </div>
 
-                        <form onSubmit={onSubmit} className="mt-5 space-y-4 text-xs">
+                        <form onSubmit={onSubmit} autoComplete="off" className="mt-5 space-y-4 text-xs">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">First Name</label>
-                                    <input type="text" required value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Marcus"
+                                    <input type="text" required autoComplete="off" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Marcus"
                                         className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150" />
                                 </div>
                                 <div>
                                     <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Last Name</label>
-                                    <input type="text" required value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Rivera"
+                                    <input type="text" required autoComplete="off" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Rivera"
                                         className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150" />
                                 </div>
                             </div>
@@ -52,7 +54,7 @@ export default function EmployeeFormModal({
                                 </div>
                                 <div>
                                     <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Email Address</label>
-                                    <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="marcus@clipper.co"
+                                    <input type="email" required autoComplete="off" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="marcus@clipper.co"
                                         className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150" />
                                 </div>
                             </div>
@@ -62,7 +64,7 @@ export default function EmployeeFormModal({
                                     <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Phone Number</label>
                                     <div className="relative mt-1.5 flex items-center">
                                         <span className="absolute left-3.5 text-xs font-bold text-slate-450 dark:text-slate-500 select-none">+91</span>
-                                        <input type="tel" required maxLength={10} value={phone}
+                                        <input type="tel" required autoComplete="off" maxLength={10} value={phone}
                                             onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))} placeholder="98765 43210"
                                             className="w-full h-10 pl-11 pr-3 rounded-xl border border-slate-200 bg-slate-50 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150" />
                                     </div>
@@ -98,8 +100,25 @@ export default function EmployeeFormModal({
                             {formMode === "create" && (
                                 <div>
                                     <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Password</label>
-                                    <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password for system log-ins"
-                                        className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150" />
+                                    <div className="relative mt-1.5">
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            required
+                                            autoComplete="new-password"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            placeholder="Password for system log-ins"
+                                            className="w-full h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 pr-11 text-xs text-slate-800 outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150 placeholder:text-slate-350 dark:placeholder:text-slate-500"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword((prev) => !prev)}
+                                            className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-slate-400 transition hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-200"
+                                            aria-label={showPassword ? "Hide password" : "Show password"}
+                                        >
+                                            {showPassword ? <FiEyeOff className="text-sm" /> : <FiEye className="text-sm" />}
+                                        </button>
+                                    </div>
                                 </div>
                             )}
 
@@ -164,7 +183,7 @@ export default function EmployeeFormModal({
 
                             <div>
                                 <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Home Address</label>
-                                <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Downtown Chair 01, Barber Shop lounge"
+                                <input type="text" autoComplete="off" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Downtown Chair 01, Barber Shop lounge"
                                     className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150" />
                             </div>
 

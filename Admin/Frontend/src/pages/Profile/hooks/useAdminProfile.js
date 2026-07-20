@@ -5,8 +5,6 @@ export function useAdminProfile(logout, theme, toggleTheme) {
     const [photo, setPhoto] = useState(
         localStorage.getItem("admin_profile_photo") || ""
     );
-    const [uploadProgress, setUploadProgress] = useState(0);
-    const [uploading, setUploading] = useState(false);
 
     const [personalInfo, setPersonalInfo] = useState(() => {
         const saved = localStorage.getItem("admin_personal_info");
@@ -66,38 +64,25 @@ export function useAdminProfile(logout, theme, toggleTheme) {
         const file = e.target.files[0];
         if (!file) return;
 
-        setUploading(true);
-        setUploadProgress(10);
-
-        const interval = setInterval(() => {
-            setUploadProgress(prev => {
-                if (prev >= 100) {
-                    clearInterval(interval);
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        setPhoto(reader.result);
-                        localStorage.setItem("admin_profile_photo", reader.result);
-                        setUploading(false);
-                        toast.success("Profile photo uploaded successfully!");
-                    };
-                    reader.readAsDataURL(file);
-                    return 100;
-                }
-                return prev + 30;
-            });
-        }, 150);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const result = reader.result;
+            setPhoto(result);
+            localStorage.setItem("admin_profile_photo", result);
+            toast.success("Profile photo uploaded successfully!");
+        };
+        reader.readAsDataURL(file);
     };
 
     const handleRemovePhoto = () => {
+        if (!window.confirm("Are you sure you want to remove your profile photo?")) return;
         setPhoto("");
         localStorage.removeItem("admin_profile_photo");
         toast.success("Profile photo removed");
     };
 
     return {
-        photo,
-        uploadProgress,
-        uploading,
+        photo, personalInfo,
         personalInfo,
         setPersonalInfo,
         prefs,

@@ -48,6 +48,17 @@ textarea {
     font: inherit;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+    -webkit-text-fill-color: #1f2937 !important;
+    -webkit-box-shadow: 0 0 0 1000px #f8fafc inset !important;
+    caret-color: #1f2937;
+    transition: background-color 9999s ease-in-out 0s;
+}
+
 #root {
     min-height: 100vh;
 }
@@ -92,6 +103,16 @@ html.dark {
         radial-gradient(circle at top right, rgba(128, 44, 24, 0.12), transparent 32%),
         linear-gradient(180deg, #090a0d 0%, #07080a 100%);
     background-color: #090a0d;
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark textarea:-webkit-autofill,
+.dark select:-webkit-autofill {
+    -webkit-text-fill-color: #f3f4f6 !important;
+    -webkit-box-shadow: 0 0 0 1000px #1e293b inset !important;
+    caret-color: #f3f4f6;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */

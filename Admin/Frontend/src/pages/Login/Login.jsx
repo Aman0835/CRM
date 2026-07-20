@@ -2,19 +2,24 @@ import React, { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
-import { FiMail, FiLock, FiScissors } from "react-icons/fi";
+import { FiMail, FiLock, FiScissors, FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function Login() {
     const { login, admin, loading: authLoading } = useAuth();
     const navigate = useNavigate();
-    const [email, setEmail] = useState("admin@gmail.com");
-    const [password, setPassword] = useState("Admin@123");
+    const [email, setEmail] = useState("admin@diva.com"); // Updated default to .env value
+    const [password, setPassword] = useState("admin123"); // Updated default to .env value
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false); // New state for password visibility
 
     // Already logged in → go straight to dashboard
     if (!authLoading && admin) {
         return <Navigate to="/dashboard" replace />;
     }
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -69,7 +74,7 @@ export default function Login() {
                                 <FiMail className="shrink-0 text-sm" />
                                 <input
                                     type="email"
-                                    placeholder="admin@gmail.com"
+                                    placeholder="admin@diva.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="w-full bg-transparent text-xs text-slate-800 outline-none placeholder:text-slate-400"
@@ -97,13 +102,20 @@ export default function Login() {
                             <div className="relative mt-1.5 flex h-10 items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-slate-400 focus-within:border-blue-500 focus-within:bg-white transition-all">
                                 <FiLock className="shrink-0 text-sm" />
                                 <input
-                                    type="password"
+                                    type={showPassword ? "text" : "password"} // Dynamic type
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="w-full bg-transparent text-xs text-slate-800 outline-none placeholder:text-slate-400"
                                     required
                                 />
+                                <button
+                                    type="button" // Important: type="button" to prevent form submission
+                                    onClick={togglePasswordVisibility}
+                                    className="shrink-0 text-sm focus:outline-none"
+                                >
+                                    {showPassword ? <FiEyeOff /> : <FiEye />}
+                                </button>
                             </div>
                         </div>
 

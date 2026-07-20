@@ -1,12 +1,14 @@
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import validator from "validator";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 
 dotenv.config();
 
 const JWT_SECRET = (process.env.JWT_SECRET || "secretkey").trim();
+
+const generateEmployeeId = () => `EMP-${Math.floor(1000 + Math.random() * 9000)}`;
 
 const employeeSchema = new mongoose.Schema(
   {
@@ -119,6 +121,25 @@ employeeSchema.index({
   email: 1,
 });
 
+employeeSchema.pre("validate", function (next) {
+  if (!this.employeeId || !this.employeeId.trim()) {
+    this.employeeId = generateEmployeeId();
+  }
+  next();
+});
+
+employeeSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
+
+employeeSchema.pre("findOneAndUpdate", async function (next) {
+  const update = this.getUpdate();
+  if (!update || !update.password) return next();
+  update.password = await bcrypt.hash(update.password, 12);
+  next();
+});
 
 employeeSchema.methods.getJWT = async function () {
   const employee = this;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import * as holidayService from "../../../services/holidayService";
 
@@ -10,7 +10,7 @@ export function useSettings() {
     const [overtimeRate, setOvertimeRate] = useState(25);
     const [leaveDeduction, setLeaveDeduction] = useState(100);
 
-    const [holidays, setHolidays] = useState([]);
+    const [upcomingHolidays, setUpcomingHolidays] = useState([]);
     const [hTitle, setHTitle] = useState("");
     const [hDate, setHDate] = useState("");
     const [hDesc, setHDesc] = useState("");
@@ -21,8 +21,10 @@ export function useSettings() {
         try {
             const res = await holidayService.getHolidays();
             if (res.success) {
-                const sorted = res.data.sort((a, b) => new Date(a.date) - new Date(b.date));
-                setHolidays(sorted);
+                const futureHolidays = res.data
+                    .filter(h => new Date(h.date) >= new Date().setHours(0, 0, 0, 0))
+                    .sort((a, b) => new Date(a.date) - new Date(b.date));
+                setUpcomingHolidays(futureHolidays);
             }
         } catch (err) {
             console.error("Failed to load settings holidays:", err);
@@ -69,13 +71,11 @@ export function useSettings() {
         }
     };
 
-    const upcomingHolidays = holidays.filter(h => new Date(h.date) >= new Date().setHours(0, 0, 0, 0));
-
     return {
         shopName, setShopName, contactEmail, setContactEmail,
         checkInTime, setCheckInTime, checkOutTime, setCheckOutTime,
         overtimeRate, setOvertimeRate, leaveDeduction, setLeaveDeduction,
-        holidays, upcomingHolidays, hTitle, setHTitle, hDate, setHDate, hDesc, setHDesc,
+        upcomingHolidays, hTitle, setHTitle, hDate, setHDate, hDesc, setHDesc,
         loadingHolidays, handleSave, handleAddHoliday, handleDeleteHoliday,
     };
 }
