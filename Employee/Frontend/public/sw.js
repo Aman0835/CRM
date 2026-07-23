@@ -1,4 +1,4 @@
-const CACHE_NAME = "diva-emp-v2";
+const CACHE_NAME = "diva-emp-v3";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
@@ -14,29 +14,23 @@ self.addEventListener("activate", (event) => {
           }
         })
       )
-    )
+    ).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener("fetch", (event) => {
-  // Only handle GET requests; ignore API calls
+  // Ignore non-GET requests and API calls
   if (event.request.method !== "GET" || event.request.url.includes("/api/")) {
     return;
   }
 
-  // Network-first strategy: prevents stale JS bundle MIME errors on redeployments
+  // Always force direct network fetch for scripts and styles to eliminate MIME errors
+  if (event.request.destination === "script" || event.request.destination === "style" || event.request.url.endsWith(".js")) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200 && networkResponse.type === "basic") {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-        }
-        return networkResponse;
-      })
-      .catch(() => caches.match(event.request))
+    fetch(event.request).catch(() => caches.match(event.request))
   );
 });
