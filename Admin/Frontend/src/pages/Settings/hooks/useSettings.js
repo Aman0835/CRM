@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import * as holidayService from "../../../services/holidayService";
+import * as settingsService from "../../../services/settingsService";
 
 export function useSettings() {
     const [shopName, setShopName] = useState("Diva The Salon");
@@ -15,6 +16,22 @@ export function useSettings() {
     const [hDate, setHDate] = useState("");
     const [hDesc, setHDesc] = useState("");
     const [loadingHolidays, setLoadingHolidays] = useState(false);
+
+    const loadSettings = async () => {
+        try {
+            const res = await settingsService.getSettings();
+            if (res.success && res.data) {
+                if (res.data.shopName) setShopName(res.data.shopName);
+                if (res.data.contactEmail) setContactEmail(res.data.contactEmail);
+                if (res.data.checkInTime) setCheckInTime(res.data.checkInTime);
+                if (res.data.checkOutTime) setCheckOutTime(res.data.checkOutTime);
+                if (res.data.overtimeRate !== undefined) setOvertimeRate(res.data.overtimeRate);
+                if (res.data.leaveDeduction !== undefined) setLeaveDeduction(res.data.leaveDeduction);
+            }
+        } catch (err) {
+            console.error("Failed to load settings from server:", err);
+        }
+    };
 
     const fetchSettingsHolidays = async () => {
         setLoadingHolidays(true);
@@ -33,11 +50,28 @@ export function useSettings() {
         }
     };
 
-    useEffect(() => { fetchSettingsHolidays(); }, []);
+    useEffect(() => {
+        loadSettings();
+        fetchSettingsHolidays();
+    }, []);
 
-    const handleSave = (e) => {
+    const handleSave = async (e) => {
         e.preventDefault();
-        toast.success("Settings saved successfully!");
+        try {
+            const res = await settingsService.updateSettings({
+                shopName,
+                contactEmail,
+                checkInTime,
+                checkOutTime,
+                overtimeRate: Number(overtimeRate),
+                leaveDeduction: Number(leaveDeduction),
+            });
+            if (res.success) {
+                toast.success("Settings saved successfully!");
+            }
+        } catch (err) {
+            toast.error("Failed to save settings");
+        }
     };
 
     const handleAddHoliday = async (e) => {

@@ -41,8 +41,7 @@ export function useAdminProfile(logout, theme, toggleTheme) {
             payrollNotif: true,
             attendanceAlert: true,
             leaveRequest: true,
-            holidayReminder: true,
-            inventoryAlert: false
+            holidayReminder: true
         };
     });
 

@@ -69,7 +69,12 @@ app.use("/api/admin/payroll", payrollRoutes);
 
 app.use("/api/admin/holidays", holidayRoutes);
 
+import settingsRoutes from "./routes/adminSettingsRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
+
 app.use("/api/admin/reports", reportRoutes);
+app.use("/api/admin/settings", settingsRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 app.use("/api/employee/auth", employeeAuthRoutes);
 app.use("/api/employee", employeeRoutes);

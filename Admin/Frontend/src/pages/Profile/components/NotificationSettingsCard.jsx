@@ -10,8 +10,7 @@ export default function NotificationSettingsCard({ notifs, setNotifs }) {
         { key: "payrollNotif", label: "Payroll Notifications", desc: "Alert when monthly salary statement gets compiled." },
         { key: "attendanceAlert", label: "Attendance Alerts", desc: "Notify when check-ins or check-outs run late." },
         { key: "leaveRequest", label: "Leave Request Updates", desc: "Email alerts for staff leave approvals or denials." },
-        { key: "holidayReminder", label: "Holiday Reminders", desc: "Alert operators 24-hours before shop closure." },
-        { key: "inventoryAlert", label: "Inventory Stock Alerts", desc: "Notify when critical salon products run low." }
+        { key: "holidayReminder", label: "Holiday Reminders", desc: "Alert operators 24-hours before shop closure." }
     ];
 
     return (

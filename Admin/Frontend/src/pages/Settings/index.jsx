@@ -76,12 +76,12 @@ export default function Settings() {
                             </h4>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] uppercase font-bold text-slate-455 dark:text-slate-500">Overtime hourly rate ($/hr)</label>
+                                    <label className="text-[10px] uppercase font-bold text-slate-455 dark:text-slate-500">Overtime hourly rate (₹/hr)</label>
                                     <input type="number" value={overtimeRate} onChange={(e) => setOvertimeRate(Number(e.target.value))} required
                                         className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:focus:bg-slate-855" />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] uppercase font-bold text-slate-455 dark:text-slate-500">Leave deduction daily rate ($/day)</label>
+                                    <label className="text-[10px] uppercase font-bold text-slate-455 dark:text-slate-500">Leave deduction daily rate (₹/day)</label>
                                     <input type="number" value={leaveDeduction} onChange={(e) => setLeaveDeduction(Number(e.target.value))} required
                                         className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:focus:bg-slate-855" />
                                 </div>

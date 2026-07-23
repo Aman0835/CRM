@@ -1,9 +1,9 @@
-import  Employee  from "../models/Employee.js";
+import Employee from "../models/Employee.js";
 import Payroll from "../models/Payroll.js";
-
+import Attendance from "../models/Attendance.js";
+import Settings from "../models/Settings.js";
 
 // Generate Payroll
-
 export const generatePayroll = async (req, res) => {
   try {
     const { month, year } = req.body;
@@ -15,23 +15,57 @@ export const generatePayroll = async (req, res) => {
       });
     }
 
-    const employees = await Employee.find();
+    const settings = (await Settings.findOne()) || {
+      overtimeRate: 25,
+      leaveDeduction: 100,
+    };
 
+    const employees = await Employee.find();
     const payrolls = [];
 
+    // Prefix pattern for dates e.g. "2026-07"
+    const monthFormatted = String(month).padStart(2, "0");
+    const datePrefix = `${year}-${monthFormatted}`;
+
     for (const employee of employees) {
+      // Find all attendance records for this employee for the given month & year
+      const attendanceRecords = await Attendance.find({
+        employeeId: employee.employeeId,
+        date: { $regex: `^${datePrefix}` },
+      });
+
+      // Calculate total overtime hours and total absent days
+      let totalOvertimeHours = 0;
+      let absentDays = 0;
+
+      for (const record of attendanceRecords) {
+        if (record.overtime && record.overtime > 0) {
+          totalOvertimeHours += record.overtime;
+        }
+        if (record.status === "Absent") {
+          absentDays += 1;
+        }
+      }
+
+      const baseSalary = employee.monthlySalary || 0;
+      const overtimeAmount = Math.round(totalOvertimeHours * (settings.overtimeRate || 25));
+      const deductions = Math.round(absentDays * (settings.leaveDeduction || 100));
+      const netSalary = Math.max(0, baseSalary + overtimeAmount - deductions);
+
       const payroll = await Payroll.findOneAndUpdate(
         {
           employeeId: employee.employeeId,
-          month,
-          year,
+          month: Number(month),
+          year: Number(year),
         },
         {
           employeeId: employee.employeeId,
-          month,
-          year,
-          baseSalary: employee.monthlySalary,
-          netSalary: employee.monthlySalary,
+          month: Number(month),
+          year: Number(year),
+          baseSalary,
+          overtimeAmount,
+          deductions,
+          netSalary,
           status: "generated",
         },
         {

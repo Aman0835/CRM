@@ -166,7 +166,7 @@ export default function Settings() {
                             </h4>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] uppercase font-bold text-slate-455 dark:text-slate-500">Overtime hourly rate ($/hr)</label>
+                                    <label className="text-[10px] uppercase font-bold text-slate-455 dark:text-slate-500">Overtime hourly rate (₹/hr)</label>
                                     <input
                                         type="number"
                                         value={overtimeRate}
@@ -176,7 +176,7 @@ export default function Settings() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] uppercase font-bold text-slate-455 dark:text-slate-500">Leave deduction daily rate ($/day)</label>
+                                    <label className="text-[10px] uppercase font-bold text-slate-455 dark:text-slate-500">Leave deduction daily rate (₹/day)</label>
                                     <input
                                         type="number"
                                         value={leaveDeduction}

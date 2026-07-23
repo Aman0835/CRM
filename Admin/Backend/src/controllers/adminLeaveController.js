@@ -1,8 +1,7 @@
 import LeaveRequest from "../models/LeaveRequest.js";
-
+import Notification from "../models/Notification.js";
 
 // Get All Leave Requests
-
 export const getLeaves = async (req, res) => {
   try {
     const leaves = await LeaveRequest.find().sort({
@@ -16,7 +15,6 @@ export const getLeaves = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-
     res.status(500).json({
       success: false,
       message: error.message,
@@ -24,9 +22,7 @@ export const getLeaves = async (req, res) => {
   }
 };
 
-
 // Get Leave By ID
-
 export const getLeaveById = async (req, res) => {
   try {
     const leave = await LeaveRequest.findById(req.params.id);
@@ -44,7 +40,6 @@ export const getLeaveById = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-
     res.status(500).json({
       success: false,
       message: error.message,
@@ -52,12 +47,18 @@ export const getLeaveById = async (req, res) => {
   }
 };
 
-
 // Create Leave Request
-
 export const createLeave = async (req, res) => {
   try {
     const leave = await LeaveRequest.create(req.body);
+
+    // Notify Admin of new leave request
+    await Notification.create({
+      recipientRole: "admin",
+      title: "New Leave Request",
+      message: `Employee (${leave.employeeId}) requested leave from ${leave.startDate} to ${leave.endDate}.`,
+      type: "leave",
+    });
 
     res.status(201).json({
       success: true,
@@ -66,7 +67,6 @@ export const createLeave = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-
     res.status(500).json({
       success: false,
       message: error.message,
@@ -74,9 +74,7 @@ export const createLeave = async (req, res) => {
   }
 };
 
-
 // Approve Leave
-
 export const approveLeave = async (req, res) => {
   try {
     const leave = await LeaveRequest.findByIdAndUpdate(
@@ -98,6 +96,15 @@ export const approveLeave = async (req, res) => {
       });
     }
 
+    // Notify Employee of Approval
+    await Notification.create({
+      recipientRole: "employee",
+      employeeId: leave.employeeId,
+      title: "Leave Request Approved",
+      message: `Your leave request for ${leave.startDate} to ${leave.endDate} has been approved.`,
+      type: "leave",
+    });
+
     res.status(200).json({
       success: true,
       message: "Leave approved successfully",
@@ -105,7 +112,6 @@ export const approveLeave = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-
     res.status(500).json({
       success: false,
       message: error.message,
@@ -113,9 +119,7 @@ export const approveLeave = async (req, res) => {
   }
 };
 
-
 // Reject Leave
-
 export const rejectLeave = async (req, res) => {
   try {
     const leave = await LeaveRequest.findByIdAndUpdate(
@@ -137,6 +141,15 @@ export const rejectLeave = async (req, res) => {
       });
     }
 
+    // Notify Employee of Rejection
+    await Notification.create({
+      recipientRole: "employee",
+      employeeId: leave.employeeId,
+      title: "Leave Request Rejected",
+      message: `Your leave request for ${leave.startDate} to ${leave.endDate} was rejected.`,
+      type: "leave",
+    });
+
     res.status(200).json({
       success: true,
       message: "Leave rejected successfully",
@@ -144,7 +157,6 @@ export const rejectLeave = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-
     res.status(500).json({
       success: false,
       message: error.message,
@@ -152,9 +164,7 @@ export const rejectLeave = async (req, res) => {
   }
 };
 
-
 // Update Leave
-
 export const updateLeave = async (req, res) => {
   try {
     const leave = await LeaveRequest.findByIdAndUpdate(
@@ -180,7 +190,6 @@ export const updateLeave = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-
     res.status(500).json({
       success: false,
       message: error.message,
@@ -188,14 +197,10 @@ export const updateLeave = async (req, res) => {
   }
 };
 
-
 // Delete Leave
-
 export const deleteLeave = async (req, res) => {
   try {
-    const leave = await LeaveRequest.findByIdAndDelete(
-      req.params.id
-    );
+    const leave = await LeaveRequest.findByIdAndDelete(req.params.id);
 
     if (!leave) {
       return res.status(404).json({
@@ -210,7 +215,6 @@ export const deleteLeave = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-
     res.status(500).json({
       success: false,
       message: error.message,
