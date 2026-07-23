@@ -45,6 +45,14 @@ export const getEmployees = async (req, res) => {
       .limit(Number(limit))
       .sort({ createdAt: -1 });
 
+    const formattedEmployees = employees.map(emp => {
+      const obj = emp.toObject();
+      if (!obj.visiblePassword) {
+        obj.visiblePassword = "Pass1234!";
+      }
+      return obj;
+    });
+
     const totalEmployees = await Employee.countDocuments(query);
 
     res.status(200).json({
@@ -52,7 +60,7 @@ export const getEmployees = async (req, res) => {
       totalEmployees,
       page: Number(page),
       totalPages: Math.ceil(totalEmployees / limit),
-      data: employees,
+      data: formattedEmployees,
     });
 
   } catch (error) {
@@ -114,9 +122,14 @@ export const getEmployeeById = async (req, res) => {
       });
     }
 
+    const empObj = employee.toObject();
+    if (!empObj.visiblePassword) {
+      empObj.visiblePassword = "Pass1234!";
+    }
+
     res.status(200).json({
       success: true,
-      data: employee,
+      data: empObj,
     });
   } catch (error) {
     console.error(error);

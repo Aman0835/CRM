@@ -252,7 +252,7 @@ export default function EmployeeDetail() {
                             <span className="text-xs text-slate-400 dark:text-slate-500">Login Password</span>
                             <div className="flex items-center gap-2">
                                 <span className="text-xs font-mono font-bold text-blue-600 dark:text-blue-400">
-                                    {showPassword ? (employee.visiblePassword || "Not Set") : "••••••••"}
+                                    {showPassword ? (employee.visiblePassword || "Pass1234!") : "••••••••"}
                                 </span>
                                 <button
                                     type="button"
