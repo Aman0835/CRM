@@ -67,11 +67,13 @@ router.patch("/profile/me", async (req, res) => {
 // GET /api/employee/leaves/my/:employeeId — own leave requests
 router.get("/leaves/my/:employeeId", async (req, res) => {
     try {
-        // Ensure employee can only see their own leaves
-        if (req.params.employeeId !== req.employee.employeeId) {
+        // Ensure employee can only see their own leaves (case-insensitive comparison)
+        if ((req.params.employeeId || "").toLowerCase() !== (req.employee.employeeId || "").toLowerCase()) {
             return res.status(403).json({ success: false, message: "Forbidden" });
         }
-        const leaves = await LeaveRequest.find({ employeeId: req.params.employeeId }).sort({ createdAt: -1 });
+        const leaves = await LeaveRequest.find({
+            employeeId: { $regex: new RegExp(`^${req.params.employeeId.trim()}$`, "i") }
+        }).sort({ createdAt: -1 });
         res.status(200).json({ success: true, count: leaves.length, data: leaves });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -91,11 +93,14 @@ router.get("/holidays", async (req, res) => {
 // GET /api/employee/attendance/today/:employeeId
 router.get("/attendance/today/:employeeId", async (req, res) => {
     try {
-        if (req.params.employeeId !== req.employee.employeeId) {
+        if ((req.params.employeeId || "").toLowerCase() !== (req.employee.employeeId || "").toLowerCase()) {
             return res.status(403).json({ success: false, message: "Forbidden" });
         }
         const today = new Date().toISOString().split("T")[0];
-        const record = await Attendance.findOne({ employeeId: req.params.employeeId, date: today });
+        const record = await Attendance.findOne({
+            employeeId: { $regex: new RegExp(`^${req.params.employeeId.trim()}$`, "i") },
+            date: today
+        });
         res.status(200).json({ success: true, data: record });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

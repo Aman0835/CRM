@@ -23,6 +23,7 @@ const router = Router();
 router.post("/check-in", checkIn);
 router.post("/check-out", checkOut);
 router.post("/request-early-checkout", requestEarlyCheckout);
+router.get("/getAttendanceByEmployee/:employeeId", getAttendanceByEmployee);
 
 // Protect admin management routes
 router.use(authMiddleware);
