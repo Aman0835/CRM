@@ -4,12 +4,20 @@ import * as authService from "../services/authService";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    const [admin, setAdmin] = useState(null);
+    const [admin, setAdmin] = useState(() => {
+        try {
+            const token = localStorage.getItem("token");
+            const cached = localStorage.getItem("admin_data");
+            if (token && cached) {
+                return JSON.parse(cached);
+            }
+        } catch {}
+        return null;
+    });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const checkSession = async () => {
-            // If no token in localStorage, skip the API call entirely
             const token = localStorage.getItem("token");
             if (!token) {
                 setLoading(false);
@@ -17,15 +25,20 @@ export const AuthProvider = ({ children }) => {
             }
             try {
                 const data = await authService.getMe();
-                if (data && data.success) {
+                if (data && data.success && data.admin) {
                     setAdmin(data.admin);
-                } else {
+                    localStorage.setItem("admin_data", JSON.stringify(data.admin));
+                } else if (data && data.status === 401) {
                     localStorage.removeItem("token");
+                    localStorage.removeItem("admin_data");
+                    setAdmin(null);
                 }
             } catch (error) {
-                console.log("Token invalid or expired");
-                localStorage.removeItem("token");
-                setAdmin(null);
+                if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("admin_data");
+                    setAdmin(null);
+                }
             } finally {
                 setLoading(false);
             }
@@ -38,14 +51,18 @@ export const AuthProvider = ({ children }) => {
         try {
             const data = await authService.login(email, password);
             if (data && data.success) {
-                // Save token to localStorage so it persists across refreshes
                 if (data.token) {
                     localStorage.setItem("token", data.token);
+                }
+                if (data.admin) {
+                    localStorage.setItem("admin_data", JSON.stringify(data.admin));
                 }
                 setAdmin(data.admin);
                 return data;
             }
         } catch (error) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("admin_data");
             setAdmin(null);
             throw error;
         } finally {
@@ -60,8 +77,8 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error("Logout failed on server, cleaning client state anyway", error);
         } finally {
-            // Remove token from localStorage
             localStorage.removeItem("token");
+            localStorage.removeItem("admin_data");
             setAdmin(null);
             setLoading(false);
         }

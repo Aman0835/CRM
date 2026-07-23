@@ -45,7 +45,7 @@ router.post("/login", async (req, res) => {
             return res.status(403).json({ success: false, message: "Your account is inactive. Contact admin." });
         }
 
-        // Generate JWT
+        // Generate JWT (7 days persistent session)
         const token = jwt.sign({ _id: employee._id, employeeId: employee.employeeId, role: employee.role }, JWT_SECRET, {
             expiresIn: "7d",
         });

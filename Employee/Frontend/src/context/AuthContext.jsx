@@ -4,7 +4,16 @@ import * as authService from "../services/authService";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    const [employee, setEmployee] = useState(null);
+    const [employee, setEmployee] = useState(() => {
+        try {
+            const token = localStorage.getItem("emp_token");
+            const cached = localStorage.getItem("employee_data");
+            if (token && cached) {
+                return JSON.parse(cached);
+            }
+        } catch {}
+        return null;
+    });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -12,21 +21,29 @@ export const AuthProvider = ({ children }) => {
             const token = localStorage.getItem("emp_token");
             if (!token) {
                 setEmployee(null);
+                localStorage.removeItem("employee_data");
                 setLoading(false);
                 return;
             }
 
             try {
                 const data = await authService.getMe();
-                if (data && data.success) {
+                if (data && data.success && data.employee) {
                     setEmployee(data.employee);
-                } else {
+                    localStorage.setItem("employee_data", JSON.stringify(data.employee));
+                } else if (data && data.status === 401) {
+                    // Token explicitly invalid/expired on server
                     localStorage.removeItem("emp_token");
+                    localStorage.removeItem("employee_data");
                     setEmployee(null);
                 }
             } catch (error) {
-                localStorage.removeItem("emp_token");
-                setEmployee(null);
+                // If temporary network blip or Render cold start error, retain cached user session
+                if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                    localStorage.removeItem("emp_token");
+                    localStorage.removeItem("employee_data");
+                    setEmployee(null);
+                }
             } finally {
                 setLoading(false);
             }
@@ -42,11 +59,15 @@ export const AuthProvider = ({ children }) => {
                 if (data.token) {
                     localStorage.setItem("emp_token", data.token);
                 }
+                if (data.employee) {
+                    localStorage.setItem("employee_data", JSON.stringify(data.employee));
+                }
                 setEmployee(data.employee);
                 return data;
             }
         } catch (error) {
             localStorage.removeItem("emp_token");
+            localStorage.removeItem("employee_data");
             setEmployee(null);
             throw error;
         } finally {
@@ -62,6 +83,7 @@ export const AuthProvider = ({ children }) => {
             console.error("Logout failed on server, cleaning client state anyway", error);
         } finally {
             localStorage.removeItem("emp_token");
+            localStorage.removeItem("employee_data");
             setEmployee(null);
             setLoading(false);
         }
@@ -69,6 +91,9 @@ export const AuthProvider = ({ children }) => {
 
     const updateEmployeeState = (updatedEmployee) => {
         setEmployee(updatedEmployee);
+        if (updatedEmployee) {
+            localStorage.setItem("employee_data", JSON.stringify(updatedEmployee));
+        }
     };
 
     return (
