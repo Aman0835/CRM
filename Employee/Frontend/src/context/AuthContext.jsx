@@ -32,13 +32,11 @@ export const AuthProvider = ({ children }) => {
                     setEmployee(data.employee);
                     localStorage.setItem("employee_data", JSON.stringify(data.employee));
                 } else if (data && data.status === 401) {
-                    // Token explicitly invalid/expired on server
                     localStorage.removeItem("emp_token");
                     localStorage.removeItem("employee_data");
                     setEmployee(null);
                 }
             } catch (error) {
-                // If temporary network blip or Render cold start error, retain cached user session
                 if (error.response && (error.response.status === 401 || error.response.status === 403)) {
                     localStorage.removeItem("emp_token");
                     localStorage.removeItem("employee_data");
@@ -52,7 +50,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (emailOrId, password) => {
-        setLoading(true);
+        // Do not toggle global loading state so Login component state is never unmounted/cleared
         try {
             const data = await authService.login(emailOrId, password);
             if (data && data.success) {
@@ -70,8 +68,6 @@ export const AuthProvider = ({ children }) => {
             localStorage.removeItem("employee_data");
             setEmployee(null);
             throw error;
-        } finally {
-            setLoading(false);
         }
     };
 

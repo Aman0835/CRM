@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const loginAdmin = async (email, password) => {
-        setLoading(true);
+        // Do not toggle global loading state so Login component state is never unmounted/cleared
         try {
             const data = await authService.login(email, password);
             if (data && data.success) {
@@ -65,8 +65,6 @@ export const AuthProvider = ({ children }) => {
             localStorage.removeItem("admin_data");
             setAdmin(null);
             throw error;
-        } finally {
-            setLoading(false);
         }
     };
 
