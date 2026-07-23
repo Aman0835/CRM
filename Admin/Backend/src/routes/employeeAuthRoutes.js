@@ -24,11 +24,11 @@ router.post("/login", async (req, res) => {
             return res.status(400).json({ success: false, message: "Email/ID and password are required" });
         }
 
-        // Find employee by email or employeeId
+        const searchRegex = new RegExp(`^${emailOrId.trim()}$`, "i");
         const employee = await Employee.findOne({
             $or: [
                 { email: emailOrId.toLowerCase().trim() },
-                { employeeId: emailOrId.trim() },
+                { employeeId: searchRegex },
             ],
         });
 
