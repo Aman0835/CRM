@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 
 export function useAdminProfile(logout, theme, toggleTheme) {
     const [photo, setPhoto] = useState(
-        localStorage.getItem("admin_profile_photo") || ""
+        localStorage.getItem("admin_profile_photo") || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400"
     );
 
     const [personalInfo, setPersonalInfo] = useState(() => {
