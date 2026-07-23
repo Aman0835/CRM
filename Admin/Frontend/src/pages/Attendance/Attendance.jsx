@@ -241,7 +241,17 @@ export default function Attendance() {
                                                 {log.checkOut ? new Date(log.checkOut).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "-"}
                                             </td>
                                             <td className="py-3.5 px-4 font-bold text-slate-800 dark:text-slate-200">
-                                                {log.workingHours ? `${log.workingHours.toFixed(1)} hrs` : "-"}
+                                                {(() => {
+                                                    const val = log.workingHours;
+                                                    if (!val || isNaN(val) || val <= 0) return "-";
+                                                    const mins = Math.round(val * 60);
+                                                    if (mins < 1) return "< 1 min";
+                                                    if (mins < 60) return `${mins} mins`;
+                                                    const h = Math.floor(mins / 60);
+                                                    const m = mins % 60;
+                                                    if (m === 0) return `${h} hr${h > 1 ? "s" : ""}`;
+                                                    return `${h} hr${h > 1 ? "s" : ""} ${m} min${m > 1 ? "s" : ""}`;
+                                                })()}
                                             </td>
                                             <td className="py-3.5 px-4">
                                                 <div className="flex flex-col gap-1">

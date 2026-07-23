@@ -15,9 +15,14 @@ function formatTime(value) {
 }
 
 function formatHours(value = 0) {
-    const hours = Math.floor(value);
-    const minutes = Math.round((value - hours) * 60);
-    return `${hours}h ${minutes}m`;
+    if (!value || isNaN(value) || value <= 0) return "—";
+    const totalMinutes = Math.round(value * 60);
+    if (totalMinutes < 1) return "< 1 min";
+    if (totalMinutes < 60) return `${totalMinutes} mins`;
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    if (minutes === 0) return `${hours} hr${hours > 1 ? "s" : ""}`;
+    return `${hours} hr${hours > 1 ? "s" : ""} ${minutes} min${minutes > 1 ? "s" : ""}`;
 }
 
 function sameMonth(date, monthDate) {

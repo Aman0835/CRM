@@ -23,6 +23,17 @@ const attBadge = {
 const fmt = (d) => d ? new Date(d).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true }) : "—";
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString("en-US", { weekday: "short", year: "numeric", month: "short", day: "numeric" }) : "—";
 
+const formatDuration = (hoursVal) => {
+    if (!hoursVal || isNaN(hoursVal) || hoursVal <= 0) return "—";
+    const totalMinutes = Math.round(hoursVal * 60);
+    if (totalMinutes < 1) return "< 1 min";
+    if (totalMinutes < 60) return `${totalMinutes} min${totalMinutes > 1 ? "s" : ""}`;
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+    if (m === 0) return `${h} hr${h > 1 ? "s" : ""}`;
+    return `${h} hr${h > 1 ? "s" : ""} ${m} min${m > 1 ? "s" : ""}`;
+};
+
 export default function EmployeeDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -338,12 +349,12 @@ export default function EmployeeDetail() {
                                                     </span>
                                                 ) : "—"}
                                             </td>
-                                            <td className="px-4 py-3 text-slate-600 dark:text-slate-300 font-semibold">
-                                                {log.workingHours > 0 ? `${log.workingHours}h` : "—"}
+                                            <td className="px-4 py-3 text-slate-600 dark:text-slate-300 font-semibold whitespace-nowrap">
+                                                {formatDuration(log.workingHours)}
                                             </td>
-                                            <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
+                                            <td className="px-4 py-3 text-slate-500 dark:text-slate-400 whitespace-nowrap">
                                                 {log.overtime > 0 ? (
-                                                    <span className="text-amber-600 dark:text-amber-400 font-semibold">+{log.overtime}h</span>
+                                                    <span className="text-amber-600 dark:text-amber-400 font-semibold">+{formatDuration(log.overtime)}</span>
                                                 ) : "—"}
                                             </td>
                                         </tr>
