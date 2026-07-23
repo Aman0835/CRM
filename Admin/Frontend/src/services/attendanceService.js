@@ -20,6 +20,16 @@ export const checkOut = async (employeeId) => {
     return response.data;
 };
 
+export const approveEarlyCheckout = async (id) => {
+    const response = await api.patch(`/admin/attendance/approve-early-checkout/${id}`);
+    return response.data;
+};
+
+export const rejectEarlyCheckout = async (id) => {
+    const response = await api.patch(`/admin/attendance/reject-early-checkout/${id}`);
+    return response.data;
+};
+
 export const deleteAttendance = async (id) => {
     const response = await api.delete(`/admin/attendance/deleteAttendance/${id}`);
     return response.data;

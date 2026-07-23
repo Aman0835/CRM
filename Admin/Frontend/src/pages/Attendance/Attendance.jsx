@@ -58,6 +58,30 @@ export default function Attendance() {
         }
     };
 
+    const handleApproveEarlyCheckout = async (id) => {
+        try {
+            const res = await attendanceService.approveEarlyCheckout(id);
+            if (res.success) {
+                toast.success("Early checkout approved successfully!");
+                fetchAttendance();
+            }
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Failed to approve early checkout");
+        }
+    };
+
+    const handleRejectEarlyCheckout = async (id) => {
+        try {
+            const res = await attendanceService.rejectEarlyCheckout(id);
+            if (res.success) {
+                toast.success("Early checkout request rejected.");
+                fetchAttendance();
+            }
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Failed to reject request");
+        }
+    };
+
     const handleActionSubmit = async (e) => {
         e.preventDefault();
         if (!selectedEmployeeId) {
@@ -220,21 +244,50 @@ export default function Attendance() {
                                                 {log.workingHours ? `${log.workingHours.toFixed(1)} hrs` : "-"}
                                             </td>
                                             <td className="py-3.5 px-4">
-                                                <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
-                                                    log.status === "Present" ? "bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-450 dark:border-emerald-900" :
-                                                    log.status === "Absent" ? "bg-red-50 text-red-600 border border-red-100 dark:bg-red-950/20 dark:text-red-450 dark:border-red-900" :
-                                                    "bg-orange-50 text-orange-600 border border-orange-100 dark:bg-orange-950/20 dark:text-orange-450 dark:border-orange-900"
-                                                }`}>
-                                                    {log.status}
-                                                </span>
+                                                <div className="flex flex-col gap-1">
+                                                    <span className={`w-fit px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
+                                                        log.status === "Present" ? "bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-450 dark:border-emerald-900" :
+                                                        log.status === "Absent" ? "bg-red-50 text-red-600 border border-red-100 dark:bg-red-950/20 dark:text-red-450 dark:border-red-900" :
+                                                        "bg-orange-50 text-orange-600 border border-orange-100 dark:bg-orange-950/20 dark:text-orange-450 dark:border-orange-900"
+                                                    }`}>
+                                                        {log.status}
+                                                    </span>
+                                                    {log.earlyCheckoutStatus === "requested" && (
+                                                        <span className="text-[9px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900">
+                                                            Early Req: {log.earlyCheckoutReason || 'Personal'}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </td>
                                             <td className="py-3.5 px-4 text-center">
-                                                <button
-                                                    onClick={() => handleLogDelete(log._id)}
-                                                    className="p-1.5 rounded-lg border border-red-100 bg-red-50 text-red-500 hover:bg-red-100 dark:border-red-950 dark:bg-red-950/20 dark:text-red-450 transition-colors"
-                                                >
-                                                    <FiTrash2 className="text-xs" />
-                                                </button>
+                                                <div className="flex items-center justify-center gap-2">
+                                                    {log.earlyCheckoutStatus === "requested" && (
+                                                        <>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleApproveEarlyCheckout(log._id)}
+                                                                title="Approve Early Checkout"
+                                                                className="px-2 py-1 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-600 text-[10px] font-bold hover:bg-emerald-100 transition flex items-center gap-1 dark:bg-emerald-950/30 dark:border-emerald-900 dark:text-emerald-400"
+                                                            >
+                                                                <FiCheck className="text-xs" /> Approve
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleRejectEarlyCheckout(log._id)}
+                                                                title="Reject Early Checkout"
+                                                                className="px-2 py-1 rounded-lg border border-red-200 bg-red-50 text-red-600 text-[10px] font-bold hover:bg-red-100 transition flex items-center gap-1 dark:bg-red-950/30 dark:border-red-900 dark:text-red-400"
+                                                            >
+                                                                <FiX className="text-xs" /> Reject
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                    <button
+                                                        onClick={() => handleLogDelete(log._id)}
+                                                        className="p-1.5 rounded-lg border border-red-100 bg-red-50 text-red-500 hover:bg-red-100 dark:border-red-950 dark:bg-red-950/20 dark:text-red-450 transition-colors"
+                                                    >
+                                                        <FiTrash2 className="text-xs" />
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     );

@@ -23,3 +23,9 @@ export const checkOut = async (employeeId) => {
     const response = await api.post("/admin/attendance/check-out", { employeeId });
     return response.data;
 };
+
+// Request Early Checkout
+export const requestEarlyCheckout = async (employeeId, reason) => {
+    const response = await api.post("/admin/attendance/request-early-checkout", { employeeId, reason });
+    return response.data;
+};

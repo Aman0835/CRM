@@ -10,14 +10,26 @@ import {
     getAttendanceReport,
     getTodayAttendance,
     updateAttendance,
+    requestEarlyCheckout,
+    approveEarlyCheckout,
+    rejectEarlyCheckout,
 } from "../controllers/adminAttendanceController.js";
 
-import  authMiddleware  from "../middleware/authMiddleware.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = Router();
 
-// Protect all attendance routes
+// Public / Employee access for check-in/out and early request
+router.post("/check-in", checkIn);
+router.post("/check-out", checkOut);
+router.post("/request-early-checkout", requestEarlyCheckout);
+
+// Protect admin management routes
 router.use(authMiddleware);
+
+// Admin approval/rejection for early checkout
+router.patch("/approve-early-checkout/:id", approveEarlyCheckout);
+router.patch("/reject-early-checkout/:id", rejectEarlyCheckout);
 
 // Get all attendance
 router.get("/getAttendanceList", getAttendanceList);
@@ -33,12 +45,6 @@ router.get("/getAttendanceByEmployee/:employeeId", getAttendanceByEmployee);
 
 // Create Attendance
 router.post("/createAttendance", createAttendance);
-
-// Check In
-router.post("/check-in", checkIn);
-
-// Check Out
-router.post("/check-out", checkOut);
 
 // Update Attendance
 router.put("/updateAttendance/:id", updateAttendance);
