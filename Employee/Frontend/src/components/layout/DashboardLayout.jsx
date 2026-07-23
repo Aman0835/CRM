@@ -1,5 +1,6 @@
 import { FiCalendar, FiClock, FiDollarSign, FiHome, FiUser } from "react-icons/fi";
 import { NavLink, useLocation } from "react-router-dom";
+import PwaInstallPrompt from "../PwaInstallPrompt";
 
 const navItems = [
     { to: "/dashboard", label: "Home", icon: FiHome },
@@ -19,6 +20,7 @@ export default function DashboardLayout({ children }) {
 
     return (
         <div className="min-h-screen w-screen overflow-hidden bg-[linear-gradient(90deg,#030617_0%,#04081b_100%)] px-0 py-0 md:px-6 md:py-5">
+            <PwaInstallPrompt />
             <div className="mx-auto h-screen w-screen overflow-hidden md:h-[calc(100vh-40px)] md:max-h-[900px] md:w-[390px] md:rounded-[42px] md:border-[10px] md:border-[#24324d] md:bg-[#0b1120] md:shadow-[0_60px_120px_-20px_rgba(0,0,0,0.9)]">
                 <div className="relative flex h-full flex-col overflow-hidden bg-[#0b1120] text-white">
                     <main className="employee-shell-scroll flex-1 overflow-y-auto px-4 pb-24 pt-5 md:pt-7">

@@ -1,0 +1,23 @@
+{
+  "short_name": "Diva Employee",
+  "name": "Diva The Salon — Employee Portal",
+  "description": "Employee self-service portal for attendance, shift check-ins, leave requests, and payroll.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0f172a",
+  "theme_color": "#2563eb",
+  "display": "standalone",
+  "orientation": "portrait"
+}
