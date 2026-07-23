@@ -15,11 +15,11 @@ export default function DashboardLayout({
             <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
                 <Navbar />
                 
-                <div className="flex-1 overflow-y-auto px-6 md:px-8 pb-8">
-                    <main className="max-w-[1450px] w-full mx-auto py-6 space-y-6">
+                <div className="flex-1 overflow-y-auto px-4 sm:px-6 md:px-8 pb-8">
+                    <main className="max-w-[1450px] w-full mx-auto py-4 sm:py-6 space-y-6">
                         {/* Page Title & Header row matching Figma */}
                         {(title || subtitle || action) && (
-                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-1 sm:pt-2">
                                 <div>
                                     <h2 className="text-2xl font-extrabold text-slate-800 dark:text-slate-50 tracking-tight">
                                         {title}

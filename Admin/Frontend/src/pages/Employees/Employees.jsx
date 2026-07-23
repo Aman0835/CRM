@@ -360,6 +360,7 @@ export default function Employees() {
                           <img
                             src={barber.profileImage}
                             alt={barber.firstName}
+                            loading="lazy"
                             className="h-14 w-14 rounded-2xl object-cover border border-slate-100 dark:border-slate-800"
                           />
                         ) : (

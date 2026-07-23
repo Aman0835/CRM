@@ -9,7 +9,8 @@ export default defineConfig({
       babel: {
         plugins: [['babel-plugin-react-compiler']],
       },
-    }), tailwindcss()
+    }), 
+    tailwindcss()
   ],
   server: {
     port: 5173,
@@ -18,6 +19,35 @@ export default defineConfig({
         target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
+      },
+    },
+  },
+  build: {
+    target: 'esnext',
+    cssCodeSplit: true,
+    minify: 'esbuild',
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+              return 'react-vendor';
+            }
+            if (id.includes('recharts')) {
+              return 'recharts';
+            }
+            if (id.includes('framer-motion')) {
+              return 'framer';
+            }
+            if (id.includes('react-icons')) {
+              return 'icons';
+            }
+            if (id.includes('html2pdf')) {
+              return 'pdf';
+            }
+            return 'vendor';
+          }
+        },
       },
     },
   },

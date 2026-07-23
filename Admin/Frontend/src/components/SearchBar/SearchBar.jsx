@@ -97,6 +97,7 @@ export default function SearchBar({ placeholder = "Search employees...", classNa
                                 <img
                                     src={emp.profileImage}
                                     alt={emp.firstName}
+                                    loading="lazy"
                                     className="h-8 w-8 rounded-xl object-cover border border-slate-100 dark:border-slate-700 shrink-0"
                                 />
                             ) : (
