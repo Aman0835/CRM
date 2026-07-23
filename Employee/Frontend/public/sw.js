@@ -1,11 +1,7 @@
-const CACHE_NAME = "diva-emp-v1";
-const urlsToCache = ["/", "/index.html", "/manifest.json", "/favicon.svg"];
+const CACHE_NAME = "diva-emp-v2";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
-  );
 });
 
 self.addEventListener("activate", (event) => {
@@ -24,11 +20,23 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  // Let live API network calls bypass cache
-  if (event.request.url.includes("/api/")) {
+  // Only handle GET requests; ignore API calls
+  if (event.request.method !== "GET" || event.request.url.includes("/api/")) {
     return;
   }
+
+  // Network-first strategy: prevents stale JS bundle MIME errors on redeployments
   event.respondWith(
-    caches.match(event.request).then((response) => response || fetch(event.request))
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === "basic") {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+        }
+        return networkResponse;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
