@@ -85,9 +85,13 @@ export default function Login() {
             {/* Right — Login Form */}
             <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
                 <div className="w-full max-w-md">
-                    {/* Mobile logo */}
-                    <div className="lg:hidden flex items-center gap-3 mb-8">
-                        <img src="/favicon.svg" alt="Diva Salon Logo" className="h-8 w-auto dark:invert" />
+                    {/* Mobile logo header */}
+                    <div className="lg:hidden flex items-center gap-3.5 mb-8">
+                        <img src="/favicon.svg" alt="Diva Salon Logo" className="h-10 w-10 shrink-0 dark:invert" />
+                        <div>
+                            <h1 className="text-xl font-light tracking-[0.2em] text-slate-800 dark:text-white uppercase leading-none">Diva</h1>
+                            <p className="text-[10px] font-medium tracking-[0.25em] text-slate-400 dark:text-slate-500 uppercase leading-none mt-1">Salon · Employee Portal</p>
+                        </div>
                     </div>
 
                     <h2 className="text-2xl font-extrabold text-slate-800 dark:text-slate-50 tracking-tight">

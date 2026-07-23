@@ -244,16 +244,14 @@ export default function Navbar() {
                     <aside className="absolute left-0 top-0 h-full w-72 bg-white dark:bg-slate-900 flex flex-col shadow-2xl z-10">
                         {/* Drawer Header */}
                         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-slate-800">
-                            <div className="flex items-center gap-3">
-                                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/10">
-                                    <FiScissors className="text-base rotate-90" />
-                                </div>
+                            <div className="flex items-center gap-3.5">
+                                <img src="/favicon.svg" alt="Diva Salon Logo" className="h-8 w-8 shrink-0 dark:invert" />
                                 <div>
-                                    <h1 className="text-base font-bold text-slate-800 dark:text-slate-100 tracking-wide leading-none">
+                                    <h1 className="text-base font-light tracking-[0.2em] text-slate-800 dark:text-slate-100 uppercase leading-none">
                                         Diva
                                     </h1>
-                                    <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none mt-1">
-                                        The Salon
+                                    <p className="text-[9px] font-medium tracking-[0.25em] text-slate-400 dark:text-slate-500 uppercase leading-none mt-1">
+                                        Salon
                                     </p>
                                 </div>
                             </div>
