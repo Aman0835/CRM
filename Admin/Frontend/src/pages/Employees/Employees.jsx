@@ -151,7 +151,7 @@ export default function Employees() {
     setPhone(p);
     setGender(emp.gender || "male");
     setRole(emp.role);
-    setPassword(""); // don't set password when editing
+    setPassword(emp.visiblePassword || "");
     setJoiningDate(emp.joiningDate ? emp.joiningDate.split("T")[0] : "");
     setMonthlySalary(emp.monthlySalary || 0);
     setProfileImage(emp.profileImage || "");
@@ -191,8 +191,8 @@ export default function Employees() {
       status,
     };
 
-    if (formMode === "create") {
-      payload.password = password;
+    if (password && password.trim()) {
+      payload.password = password.trim();
     }
 
     try {
