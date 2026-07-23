@@ -38,10 +38,43 @@ const adminNavigation = [
     { to: "/settings", label: "Settings", icon: FiSettings },
 ];
 
+const getAdminInfo = () => {
+    try {
+        const saved = localStorage.getItem("admin_personal_info");
+        const photo = localStorage.getItem("admin_profile_photo");
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            const firstName = parsed.firstName || "Alex";
+            const lastName = parsed.lastName || "Rivera";
+            return {
+                name: `${firstName} ${lastName}`.trim(),
+                initials: `${firstName[0] || "A"}${lastName[0] || "R"}`.toUpperCase(),
+                role: "Super Admin",
+                photo: photo || ""
+            };
+        }
+        if (photo) {
+            return { name: "Alex Rivera", initials: "AR", role: "Super Admin", photo };
+        }
+    } catch {}
+    return { name: "Alex Rivera", initials: "AR", role: "Super Admin", photo: "" };
+};
+
 export default function Navbar() {
     const { logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [adminInfo, setAdminInfo] = useState(getAdminInfo);
+
+    useEffect(() => {
+        const handleUpdate = () => setAdminInfo(getAdminInfo());
+        window.addEventListener("admin_profile_updated", handleUpdate);
+        window.addEventListener("storage", handleUpdate);
+        return () => {
+            window.removeEventListener("admin_profile_updated", handleUpdate);
+            window.removeEventListener("storage", handleUpdate);
+        };
+    }, []);
 
     // Notifications state
     const [notifOpen, setNotifOpen] = useState(false);
@@ -319,15 +352,19 @@ export default function Navbar() {
                                 onClick={() => setMobileOpen(false)}
                                 className="flex items-center gap-3 px-2 py-1.5 hover:bg-slate-100/50 dark:hover:bg-slate-800/40 rounded-xl transition cursor-pointer"
                             >
-                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-600 font-semibold text-white text-sm">
-                                    AR
-                                </div>
+                                {adminInfo.photo ? (
+                                    <img src={adminInfo.photo} alt="Profile" className="h-9 w-9 shrink-0 rounded-full object-cover border border-slate-200 dark:border-slate-700" />
+                                ) : (
+                                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-600 font-semibold text-white text-sm">
+                                        {adminInfo.initials}
+                                    </div>
+                                )}
                                 <div className="min-w-0">
                                     <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">
-                                        Alex Rivera
+                                        {adminInfo.name}
                                     </p>
                                     <p className="text-xs text-slate-400 dark:text-slate-500 truncate mt-0.5">
-                                        Super Admin
+                                        {adminInfo.role}
                                     </p>
                                 </div>
                             </Link>

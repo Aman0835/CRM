@@ -49,6 +49,7 @@ export function useAdminProfile(logout, theme, toggleTheme) {
         localStorage.setItem("admin_personal_info", JSON.stringify(personalInfo));
         localStorage.setItem("admin_preferences", JSON.stringify(prefs));
         localStorage.setItem("admin_notifications", JSON.stringify(notifs));
+        window.dispatchEvent(new Event("admin_profile_updated"));
         toast.success("Profile preferences and details saved successfully!");
     };
 
@@ -56,6 +57,8 @@ export function useAdminProfile(logout, theme, toggleTheme) {
         localStorage.removeItem("admin_personal_info");
         localStorage.removeItem("admin_preferences");
         localStorage.removeItem("admin_notifications");
+        localStorage.removeItem("admin_profile_photo");
+        window.dispatchEvent(new Event("admin_profile_updated"));
         window.location.reload();
     };
 
@@ -68,6 +71,7 @@ export function useAdminProfile(logout, theme, toggleTheme) {
             const result = reader.result;
             setPhoto(result);
             localStorage.setItem("admin_profile_photo", result);
+            window.dispatchEvent(new Event("admin_profile_updated"));
             toast.success("Profile photo uploaded successfully!");
         };
         reader.readAsDataURL(file);
@@ -77,6 +81,7 @@ export function useAdminProfile(logout, theme, toggleTheme) {
         if (!window.confirm("Are you sure you want to remove your profile photo?")) return;
         setPhoto("");
         localStorage.removeItem("admin_profile_photo");
+        window.dispatchEvent(new Event("admin_profile_updated"));
         toast.success("Profile photo removed");
     };
 
