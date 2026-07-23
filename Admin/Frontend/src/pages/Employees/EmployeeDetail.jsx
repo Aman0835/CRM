@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiEdit2, FiTrash2, FiCheckCircle, FiXCircle, FiEye, FiEyeOff } from "react-icons/fi";
 import toast from "react-hot-toast";
 import DashboardLayout from "../../components/layout/DashboardLayout";
+import EmployeeFormModal from "./components/EmployeeFormModal";
 import * as employeeService from "../../services/employeeService";
 import * as attendanceService from "../../services/attendanceService";
 
@@ -30,33 +31,104 @@ export default function EmployeeDetail() {
     const [loading, setLoading] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
 
-    useEffect(() => {
-        const load = async () => {
-            try {
-                const [empRes, attRes] = await Promise.all([
-                    employeeService.getEmployeeById(id),
-                    attendanceService.getAttendanceList(),
-                ]);
+    // Edit modal states
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [employeeId, setEmployeeId] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+    const [gender, setGender] = useState("male");
+    const [role, setRole] = useState("barber");
+    const [password, setPassword] = useState("");
+    const [joiningDate, setJoiningDate] = useState("");
+    const [monthlySalary, setMonthlySalary] = useState(0);
+    const [profileImage, setProfileImage] = useState("");
+    const [address, setAddress] = useState("");
+    const [status, setStatus] = useState("active");
 
-                if (empRes.success) {
-                    const found = empRes.data;
-                    setEmployee(found);
-                    // Filter attendance logs for this specific employee
-                    const empLogs = (attRes.success ? attRes.data : [])
-                        .filter(l => l.employeeId === found.employeeId)
-                        .sort((a, b) => new Date(b.date) - new Date(a.date));
-                    setLogs(empLogs);
-                } else {
-                    toast.error("Employee not found");
-                }
-            } catch {
-                toast.error("Failed to load employee");
-            } finally {
-                setLoading(false);
+    const fetchEmployeeData = async () => {
+        try {
+            const [empRes, attRes] = await Promise.all([
+                employeeService.getEmployeeById(id),
+                attendanceService.getAttendanceList(),
+            ]);
+
+            if (empRes.success) {
+                const found = empRes.data;
+                setEmployee(found);
+                const empLogs = (attRes.success ? attRes.data : [])
+                    .filter(l => l.employeeId === found.employeeId)
+                    .sort((a, b) => new Date(b.date) - new Date(a.date));
+                setLogs(empLogs);
+            } else {
+                toast.error("Employee not found");
             }
-        };
-        load();
+        } catch {
+            toast.error("Failed to load employee");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchEmployeeData();
     }, [id]);
+
+    const handleOpenEdit = () => {
+        if (!employee) return;
+        setEmployeeId(employee.employeeId || "");
+        setFirstName(employee.firstName || "");
+        setLastName(employee.lastName || "");
+        setEmail(employee.email || "");
+        let p = employee.phone || "";
+        if (p.startsWith("+91")) p = p.substring(3);
+        setPhone(p);
+        setGender(employee.gender || "male");
+        setRole(employee.role || "barber");
+        setPassword(employee.visiblePassword || "");
+        setJoiningDate(employee.joiningDate ? employee.joiningDate.split("T")[0] : "");
+        setMonthlySalary(employee.monthlySalary || 0);
+        setProfileImage(employee.profileImage || "");
+        setAddress(employee.address || "");
+        setStatus(employee.status || "active");
+        setIsEditOpen(true);
+    };
+
+    const handleEditSubmit = async (e) => {
+        e.preventDefault();
+        const payload = {
+            employeeId,
+            firstName,
+            lastName,
+            email,
+            phone: phone.startsWith("+91") ? phone : `+91${phone}`,
+            gender,
+            role,
+            joiningDate,
+            monthlySalary: Number(monthlySalary),
+            profileImage,
+            address,
+            status,
+        };
+
+        if (password && password.trim()) {
+            payload.password = password.trim();
+        }
+
+        try {
+            const res = await employeeService.updateEmployee(employee._id, payload);
+            if (res.success) {
+                toast.success("Employee updated successfully!");
+                setIsEditOpen(false);
+                fetchEmployeeData();
+            } else {
+                toast.error(res.message || "Failed to update employee");
+            }
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Failed to update employee");
+        }
+    };
 
     const handleDelete = async () => {
         if (!window.confirm(`Delete ${employee.firstName} ${employee.lastName}? This cannot be undone.`)) return;
@@ -109,7 +181,6 @@ export default function EmployeeDetail() {
 
     return (
         <DashboardLayout title="Employee Profile" subtitle={`${employee.firstName} ${employee.lastName}`}>
-            {/* Back button */}
             <button
                 onClick={() => navigate("/employees")}
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition mb-5"
@@ -149,7 +220,7 @@ export default function EmployeeDetail() {
 
                     <div className="flex gap-3 w-full mt-1">
                         <button
-                            onClick={() => navigate("/employees")}
+                            onClick={handleOpenEdit}
                             className="flex-1 h-10 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700 transition flex items-center justify-center gap-1.5"
                         >
                             <FiEdit2 className="text-xs" /> Edit
@@ -164,9 +235,8 @@ export default function EmployeeDetail() {
                     </div>
                 </div>
 
-                {/* Right: Details + Attendance */}
-                <div className="lg:col-span-2 flex flex-col gap-6">
-                    {/* Contact Information */}
+                {/* Right: Contact & Employment details */}
+                <div className="lg:col-span-2 space-y-6">
                     <div className="panel-surface rounded-3xl p-6 shadow-sm">
                         <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4">Contact Information</h3>
                         {infoRow("Email", employee.email)}
@@ -175,7 +245,6 @@ export default function EmployeeDetail() {
                         {infoRow("Address", employee.address)}
                     </div>
 
-                    {/* Employment Details */}
                     <div className="panel-surface rounded-3xl p-6 shadow-sm">
                         <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4">Employment Details</h3>
                         {infoRow("Employee Code", employee.employeeId)}
@@ -183,7 +252,7 @@ export default function EmployeeDetail() {
                             <span className="text-xs text-slate-400 dark:text-slate-500">Login Password</span>
                             <div className="flex items-center gap-2">
                                 <span className="text-xs font-mono font-bold text-blue-600 dark:text-blue-400">
-                                    {showPassword ? (employee.visiblePassword || "Pass1234!") : "••••••••"}
+                                    {showPassword ? (employee.visiblePassword || "Not Set") : "••••••••"}
                                 </span>
                                 <button
                                     type="button"
@@ -211,7 +280,6 @@ export default function EmployeeDetail() {
                     <p className="text-sm text-slate-400 text-center py-8">No attendance records found for this employee.</p>
                 ) : (
                     <>
-                        {/* Stats Row */}
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
                             {[
                                 { label: "Total Days", value: totalDays, color: "text-slate-800 dark:text-slate-100" },
@@ -228,7 +296,6 @@ export default function EmployeeDetail() {
                             ))}
                         </div>
 
-                        {/* Log Table */}
                         <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800">
                             <table className="w-full text-xs">
                                 <thead>
@@ -288,6 +355,39 @@ export default function EmployeeDetail() {
                     </>
                 )}
             </div>
+
+            {/* Edit Employee Modal */}
+            <EmployeeFormModal
+                isOpen={isEditOpen}
+                onClose={() => setIsEditOpen(false)}
+                formMode="edit"
+                onSubmit={handleEditSubmit}
+                employeeId={employeeId}
+                firstName={firstName}
+                setFirstName={setFirstName}
+                lastName={lastName}
+                setLastName={setLastName}
+                email={email}
+                setEmail={setEmail}
+                phone={phone}
+                setPhone={setPhone}
+                gender={gender}
+                setGender={setGender}
+                role={role}
+                setRole={setRole}
+                password={password}
+                setPassword={setPassword}
+                joiningDate={joiningDate}
+                setJoiningDate={setJoiningDate}
+                monthlySalary={monthlySalary}
+                setMonthlySalary={setMonthlySalary}
+                profileImage={profileImage}
+                setProfileImage={setProfileImage}
+                address={address}
+                setAddress={setAddress}
+                status={status}
+                setStatus={setStatus}
+            />
         </DashboardLayout>
     );
 }
