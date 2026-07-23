@@ -2,7 +2,7 @@ import axios from "axios";
 
 const api = axios.create({
     baseURL: `${import.meta.env.VITE_API_URL}/api`,
-    withCredentials: true, // sends HTTP-only cookie on every request
+    withCredentials: true,
 });
 
 // Attach JWT from localStorage as Authorization header on every request
@@ -14,18 +14,9 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-// Redirect to login on 401
 api.interceptors.response.use(
     (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-            localStorage.removeItem("emp_token");
-            if (!window.location.pathname.includes("/login")) {
-                window.location.replace("/login");
-            }
-        }
-        return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
 );
 
 export default api;
