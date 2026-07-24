@@ -130,18 +130,7 @@ export const checkOut = async (req, res) => {
     const targetCheckOutDate = new Date(now);
     targetCheckOutDate.setHours(targetOutHour || 20, targetOutMin || 0, 0, 0);
 
-    // Enforce Working Hours / Standard Checkout Time Rule
-    if (now < targetCheckOutDate) {
-      // Trying to checkout early before standard checkout time!
-      if (attendance.earlyCheckoutStatus !== "approved") {
-        return res.status(400).json({
-          success: false,
-          requiresEarlyApproval: true,
-          earlyCheckoutStatus: attendance.earlyCheckoutStatus,
-          message: `Check-out restricted! Standard shift check-out is at ${format12HourTime(settings.checkOutTime)}. Please submit an Early Checkout Request for Admin Approval.`,
-        });
-      }
-    }
+    // Checkout allowed anytime freely
 
     // Checkout allowed
     attendance.checkOut = now;

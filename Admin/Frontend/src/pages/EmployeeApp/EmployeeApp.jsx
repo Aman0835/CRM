@@ -104,21 +104,7 @@ export default function EmployeeApp() {
                 fetchEmployeeDetails();
             }
         } catch (err) {
-            const data = err.response?.data;
-            if (data?.requiresEarlyApproval || data?.message?.includes("Early Checkout") || data?.message?.includes("check-out is at")) {
-                toast.error(data.message);
-                if (window.confirm("Early check-out is restricted before shift end. Would you like to submit an Early Checkout Request to Admin for approval?")) {
-                    try {
-                        await attendanceService.requestEarlyCheckout(selectedEmp.employeeId, "Personal reason / Early shift end request");
-                        toast.success("Early checkout request submitted to Admin!");
-                        fetchEmployeeDetails();
-                    } catch (reqErr) {
-                        toast.error(reqErr.response?.data?.message || "Failed to submit early checkout request");
-                    }
-                }
-            } else {
-                toast.error(data?.message || "Failed to check out");
-            }
+            toast.error(err.response?.data?.message || "Failed to check out");
         }
     };
 
