@@ -1,0 +1,1 @@
+import{a as e}from"./index-CImA9QlT.js";const o=async(a,s)=>(await e.post("/admin/payroll/generatePayroll",{month:a,year:s})).data,n=async()=>(await e.get("/admin/payroll/getPayrolls")).data,l=async a=>(await e.delete(`/admin/payroll/deletePayroll/${a}`)).data,y=async a=>(await e.get(`/admin/payroll/getPayrollById/${a}`)).data;export{o as a,y as b,l as d,n as g};

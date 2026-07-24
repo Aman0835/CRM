@@ -23,16 +23,31 @@ dotenv.config();
 
 const app = express();
 
+const parseOrigins = (str) =>
+  str
+    ? str
+        .split(",")
+        .map((s) => s.trim().replace(/\/+$/, ""))
+        .filter(Boolean)
+    : [];
+
 const allowedOrigins = [
-  process.env.CLIENT_URL,
-  process.env.EMPLOYEE_CLIENT_URL,
-].filter(Boolean);
+  ...parseOrigins(process.env.CLIENT_URL),
+  ...parseOrigins(process.env.EMPLOYEE_CLIENT_URL),
+];
 
 app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
+      const cleanOrigin = origin.replace(/\/+$/, "");
+      if (
+        allowedOrigins.length === 0 ||
+        allowedOrigins.includes("*") ||
+        allowedOrigins.includes(cleanOrigin)
+      ) {
+        return callback(null, true);
+      }
       callback(new Error(`CORS: ${origin} not allowed`));
     },
     credentials: true,
