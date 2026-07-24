@@ -1,6 +1,15 @@
 import Attendance from "../models/Attendance.js";
 import Settings from "../models/Settings.js";
-import Notification from "../models/Notification.js";
+const format12HourTime = (timeStr) => {
+  if (!timeStr) return "08:00 PM";
+  const [hStr, mStr] = timeStr.split(":");
+  let h = parseInt(hStr, 10);
+  const m = mStr || "00";
+  if (isNaN(h)) return timeStr;
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+  return `${String(h).padStart(2, "0")}:${m} ${ampm}`;
+};
 
 // Create Attendance
 export const createAttendance = async (req, res) => {
@@ -129,7 +138,7 @@ export const checkOut = async (req, res) => {
           success: false,
           requiresEarlyApproval: true,
           earlyCheckoutStatus: attendance.earlyCheckoutStatus,
-          message: `Check-out restricted! Standard shift check-out is at ${settings.checkOutTime || '08:00 PM'}. Please submit an Early Checkout Request for Admin Approval.`,
+          message: `Check-out restricted! Standard shift check-out is at ${format12HourTime(settings.checkOutTime)}. Please submit an Early Checkout Request for Admin Approval.`,
         });
       }
     }
