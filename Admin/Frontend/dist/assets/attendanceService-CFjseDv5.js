@@ -1,1 +1,0 @@
-import{a as t}from"./index-CImA9QlT.js";const s=async()=>(await t.get("/admin/attendance/getAttendanceList")).data,c=async e=>(await t.post("/admin/attendance/check-in",{employeeId:e})).data,o=async e=>(await t.post("/admin/attendance/check-out",{employeeId:e})).data,d=async e=>(await t.delete(`/admin/attendance/deleteAttendance/${e}`)).data;export{o as a,c,d,s as g};

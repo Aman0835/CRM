@@ -1,1 +1,0 @@
-import{a as s}from"./index-CImA9QlT.js";const n=async()=>(await s.get("/admin/holidays/getHolidays")).data,d=async a=>(await s.post("/admin/holidays/createHoliday",a)).data,i=async(a,e)=>(await s.put(`/admin/holidays/updateHoliday/${a}`,e)).data,r=async a=>(await s.delete(`/admin/holidays/deleteHoliday/${a}`)).data;export{d as c,r as d,n as g,i as u};

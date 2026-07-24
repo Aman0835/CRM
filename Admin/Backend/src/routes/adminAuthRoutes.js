@@ -16,8 +16,8 @@ const extractToken = (req) => {
   return req.cookies?.token || null;
 };
 
-// Login
-router.post("/", async (req, res) => {
+// Login (supports / and /login)
+const handleLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -37,7 +37,6 @@ router.post("/", async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    // Still set cookie as fallback for same-site setups
     res.cookie("token", token, {
       httpOnly: true,
       secure: true,
@@ -45,21 +44,23 @@ router.post("/", async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    // Also return token in body so frontend can store in localStorage
     res.status(200).json({
       success: true,
       message: "Login Successful",
-      token,                          // ← frontend stores this
+      token,
       admin: { email, role: "admin" },
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: error.message });
   }
-});
+};
 
-// Current Admin — accepts Authorization header OR cookie
-router.get("/", (req, res) => {
+router.post("/", handleLogin);
+router.post("/login", handleLogin);
+
+// Current Admin (supports / and /me)
+const handleGetMe = (req, res) => {
   try {
     const token = extractToken(req);
 
@@ -72,18 +73,23 @@ router.get("/", (req, res) => {
   } catch (error) {
     res.status(401).json({ success: false, message: "Invalid Token" });
   }
-});
+};
 
-// Logout
-router.delete("/", (req, res) => {
+router.get("/", handleGetMe);
+router.get("/me", handleGetMe);
+
+// Logout (supports DELETE / and POST /logout)
+const handleLogout = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: true,
     sameSite: "none",
   });
 
-  // Client is responsible for removing the localStorage token
   res.status(200).json({ success: true, message: "Logout Successful" });
-});
+};
+
+router.delete("/", handleLogout);
+router.post("/logout", handleLogout);
 
 export default router;
