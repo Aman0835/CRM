@@ -66,7 +66,7 @@ export const checkIn = async (req, res) => {
       await Notification.create({
         recipientRole: "admin",
         title: "Late Check-in Alert",
-        message: `Employee (${employeeId}) checked in late at ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`,
+        message: `Employee (${rawId}) checked in late at ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`,
         type: "attendance",
       });
     }
