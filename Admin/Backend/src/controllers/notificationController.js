@@ -1,7 +1,18 @@
 import Notification from "../models/Notification.js";
 
+// Helper: Clean up notifications older than 3 days
+const cleanupOldNotifications = async () => {
+  try {
+    const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+    await Notification.deleteMany({ createdAt: { $lt: threeDaysAgo } });
+  } catch (err) {
+    console.error("Failed to cleanup old notifications:", err);
+  }
+};
+
 // Helper: Seed default welcome notifications if database is empty
 const seedDefaultNotifications = async (role, employeeId = null) => {
+  await cleanupOldNotifications();
   const count = await Notification.countDocuments();
   if (count === 0) {
     await Notification.create([
@@ -116,6 +127,41 @@ export const markAllNotificationsRead = async (req, res) => {
     await Notification.updateMany(query, { read: true });
 
     res.status(200).json({ success: true, message: "All notifications marked as read" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Delete Single Notification by ID
+export const deleteNotification = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Notification.findByIdAndDelete(id);
+    res.status(200).json({ success: true, message: "Notification deleted" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Clear All Notifications for Role / Admin
+export const clearAllNotifications = async (req, res) => {
+  try {
+    const { role, employeeId } = req.body;
+    let query = {};
+    if (role === "admin") {
+      query = { recipientRole: { $in: ["admin", "all"] } };
+    } else {
+      query = {
+        $or: [
+          { recipientRole: "all" },
+          { recipientRole: "employee", employeeId: null },
+          { recipientRole: "employee", employeeId },
+        ],
+      };
+    }
+
+    await Notification.deleteMany(query);
+    res.status(200).json({ success: true, message: "All notifications cleared" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

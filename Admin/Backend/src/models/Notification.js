@@ -36,6 +36,9 @@ const notificationSchema = new mongoose.Schema(
   }
 );
 
+// Auto-expire notifications after 3 days (259,200 seconds)
+notificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 259200 });
+
 const Notification = mongoose.model("Notification", notificationSchema);
 
 export default Notification;

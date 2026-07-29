@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { FiBell, FiMoon, FiSun, FiMenu, FiX, FiInfo, FiCalendar, FiClock, FiAlertTriangle } from "react-icons/fi";
-import { NavLink, Link } from "react-router-dom";
+import { FiBell, FiMoon, FiSun, FiMenu, FiX, FiInfo, FiCalendar, FiClock, FiAlertTriangle, FiTrash2 } from "react-icons/fi";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import {
@@ -23,6 +23,7 @@ const mobileNav = [
 export default function Navbar() {
     const { employee, logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
+    const navigate = useNavigate();
     const [mobileOpen, setMobileOpen] = useState(false);
 
     // Notification dropdown state
@@ -78,6 +79,43 @@ export default function Navbar() {
             setUnreadCount(prev => Math.max(0, prev - 1));
         } catch (err) {
             console.error("Failed to mark notification read:", err);
+        }
+    };
+
+    const handleClearAll = async () => {
+        try {
+            await notificationService.clearAllNotifications("employee", employee?.employeeId);
+            setNotifications([]);
+            setUnreadCount(0);
+        } catch (err) {
+            console.error("Failed to clear notifications:", err);
+        }
+    };
+
+    const handleDeleteNotification = async (e, id, isUnread) => {
+        e.stopPropagation();
+        try {
+            await notificationService.deleteNotification(id);
+            setNotifications(prev => prev.filter(n => n._id !== id));
+            if (isUnread) setUnreadCount(prev => Math.max(0, prev - 1));
+        } catch (err) {
+            console.error("Failed to delete notification:", err);
+        }
+    };
+
+    const handleNotificationClick = async (n) => {
+        if (!n.read) {
+            handleSingleMarkRead(n._id);
+        }
+        setNotifOpen(false);
+        if (n.type === "leave") {
+            navigate("/leave");
+        } else if (n.type === "attendance") {
+            navigate("/attendance");
+        } else if (n.type === "holiday") {
+            navigate("/holidays");
+        } else if (n.type === "payroll") {
+            navigate("/payroll");
         }
     };
 
@@ -177,7 +215,7 @@ export default function Navbar() {
                                         notifications.map((n) => (
                                             <div
                                                 key={n._id}
-                                                onClick={() => !n.read && handleSingleMarkRead(n._id)}
+                                                onClick={() => handleNotificationClick(n)}
                                                 className={`flex items-start gap-3 p-3.5 transition cursor-pointer ${
                                                     !n.read
                                                         ? "bg-blue-50/40 dark:bg-blue-950/20"

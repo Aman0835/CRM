@@ -14,3 +14,13 @@ export const markAllNotificationsRead = async (role = "employee", employeeId = n
     const response = await api.post("/notifications/mark-all-read", { role, employeeId });
     return response.data;
 };
+
+export const clearAllNotifications = async (role = "employee", employeeId = null) => {
+    const response = await api.post("/notifications/clear-all", { role, employeeId });
+    return response.data;
+};
+
+export const deleteNotification = async (id) => {
+    const response = await api.delete(`/notifications/${id}`);
+    return response.data;
+};

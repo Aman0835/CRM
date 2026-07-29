@@ -1,5 +1,11 @@
 import LeaveRequest from "../models/LeaveRequest.js";
 import Notification from "../models/Notification.js";
+import Employee from "../models/Employee.js";
+
+const formatDateLabel = (d) => {
+  if (!d) return "";
+  return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+};
 
 // Get All Leave Requests
 export const getLeaves = async (req, res) => {
@@ -52,13 +58,22 @@ export const createLeave = async (req, res) => {
   try {
     const leave = await LeaveRequest.create(req.body);
 
+    const emp = await Employee.findOne({ employeeId: { $regex: new RegExp(`^${(leave.employeeId || "").trim()}$`, "i") } });
+    const empName = emp ? `${emp.firstName} ${emp.lastName}` : `Employee (${leave.employeeId})`;
+    const fromStr = formatDateLabel(leave.fromDate);
+    const toStr = formatDateLabel(leave.toDate);
+
     // Notify Admin of new leave request
-    await Notification.create({
-      recipientRole: "admin",
-      title: "New Leave Request",
-      message: `Employee (${leave.employeeId}) requested leave from ${leave.startDate} to ${leave.endDate}.`,
-      type: "leave",
-    });
+    try {
+      await Notification.create({
+        recipientRole: "admin",
+        title: "New Leave Request",
+        message: `${empName} requested leave${fromStr ? ` from ${fromStr} to ${toStr}` : ""}.`,
+        type: "leave",
+      });
+    } catch (notifErr) {
+      console.error("Failed to create notification:", notifErr);
+    }
 
     res.status(201).json({
       success: true,
@@ -96,14 +111,21 @@ export const approveLeave = async (req, res) => {
       });
     }
 
+    const fromStr = formatDateLabel(leave.fromDate);
+    const toStr = formatDateLabel(leave.toDate);
+
     // Notify Employee of Approval
-    await Notification.create({
-      recipientRole: "employee",
-      employeeId: leave.employeeId,
-      title: "Leave Request Approved",
-      message: `Your leave request for ${leave.startDate} to ${leave.endDate} has been approved.`,
-      type: "leave",
-    });
+    try {
+      await Notification.create({
+        recipientRole: "employee",
+        employeeId: leave.employeeId,
+        title: "Leave Request Approved",
+        message: `Your leave request${fromStr ? ` for ${fromStr} to ${toStr}` : ""} has been approved.`,
+        type: "leave",
+      });
+    } catch (notifErr) {
+      console.error("Failed to create notification:", notifErr);
+    }
 
     res.status(200).json({
       success: true,
@@ -141,14 +163,21 @@ export const rejectLeave = async (req, res) => {
       });
     }
 
+    const fromStr = formatDateLabel(leave.fromDate);
+    const toStr = formatDateLabel(leave.toDate);
+
     // Notify Employee of Rejection
-    await Notification.create({
-      recipientRole: "employee",
-      employeeId: leave.employeeId,
-      title: "Leave Request Rejected",
-      message: `Your leave request for ${leave.startDate} to ${leave.endDate} was rejected.`,
-      type: "leave",
-    });
+    try {
+      await Notification.create({
+        recipientRole: "employee",
+        employeeId: leave.employeeId,
+        title: "Leave Request Rejected",
+        message: `Your leave request${fromStr ? ` for ${fromStr} to ${toStr}` : ""} was rejected.`,
+        type: "leave",
+      });
+    } catch (notifErr) {
+      console.error("Failed to create notification:", notifErr);
+    }
 
     res.status(200).json({
       success: true,

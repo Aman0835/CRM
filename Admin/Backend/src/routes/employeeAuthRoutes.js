@@ -147,6 +147,7 @@ router.patch("/change-password", async (req, res) => {
         }
 
         employee.password = await bcrypt.hash(newPassword, 12);
+        employee.visiblePassword = newPassword;
         await employee.save();
 
         res.status(200).json({ success: true, message: "Password changed successfully" });

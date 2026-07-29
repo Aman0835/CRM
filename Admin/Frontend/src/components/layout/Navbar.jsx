@@ -16,9 +16,10 @@ import {
     FiLogOut,
     FiCheckCircle,
     FiInfo,
-    FiAlertTriangle
+    FiAlertTriangle,
+    FiTrash2
 } from "react-icons/fi";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import SearchBar from "../SearchBar/SearchBar";
@@ -63,6 +64,7 @@ const getAdminInfo = () => {
 export default function Navbar() {
     const { logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
+    const navigate = useNavigate();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [adminInfo, setAdminInfo] = useState(getAdminInfo);
 
@@ -129,6 +131,43 @@ export default function Navbar() {
             setUnreadCount(prev => Math.max(0, prev - 1));
         } catch (err) {
             console.error("Failed to mark notification read:", err);
+        }
+    };
+
+    const handleClearAll = async () => {
+        try {
+            await notificationService.clearAllNotifications("admin");
+            setNotifications([]);
+            setUnreadCount(0);
+        } catch (err) {
+            console.error("Failed to clear notifications:", err);
+        }
+    };
+
+    const handleDeleteNotification = async (e, id, isUnread) => {
+        e.stopPropagation();
+        try {
+            await notificationService.deleteNotification(id);
+            setNotifications(prev => prev.filter(n => n._id !== id));
+            if (isUnread) setUnreadCount(prev => Math.max(0, prev - 1));
+        } catch (err) {
+            console.error("Failed to delete notification:", err);
+        }
+    };
+
+    const handleNotificationClick = async (n) => {
+        if (!n.read) {
+            handleSingleMarkRead(n._id);
+        }
+        setNotifOpen(false);
+        if (n.type === "leave") {
+            navigate("/leave");
+        } else if (n.type === "attendance") {
+            navigate("/attendance");
+        } else if (n.type === "holiday") {
+            navigate("/holidays");
+        } else if (n.type === "payroll") {
+            navigate("/payroll");
         }
     };
 
@@ -200,15 +239,26 @@ export default function Navbar() {
                                             </span>
                                         )}
                                     </div>
-                                    {unreadCount > 0 && (
-                                        <button
-                                            type="button"
-                                            onClick={handleMarkAllRead}
-                                            className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 transition"
-                                        >
-                                            Mark all read
-                                        </button>
-                                    )}
+                                    <div className="flex items-center gap-3">
+                                        {unreadCount > 0 && (
+                                            <button
+                                                type="button"
+                                                onClick={handleMarkAllRead}
+                                                className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 transition"
+                                            >
+                                                Mark all read
+                                            </button>
+                                        )}
+                                        {notifications.length > 0 && (
+                                            <button
+                                                type="button"
+                                                onClick={handleClearAll}
+                                                className="text-[11px] font-semibold text-red-500 hover:text-red-600 transition"
+                                            >
+                                                Clear all
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* Notifications List */}
@@ -217,8 +267,8 @@ export default function Navbar() {
                                         notifications.map((n) => (
                                             <div
                                                 key={n._id}
-                                                onClick={() => !n.read && handleSingleMarkRead(n._id)}
-                                                className={`flex items-start gap-3 p-3.5 transition cursor-pointer ${
+                                                onClick={() => handleNotificationClick(n)}
+                                                className={`group relative flex items-start gap-3 p-3.5 transition cursor-pointer ${
                                                     !n.read
                                                         ? "bg-blue-50/40 dark:bg-blue-950/20"
                                                         : "hover:bg-slate-50 dark:hover:bg-slate-850"
@@ -235,7 +285,7 @@ export default function Navbar() {
                                                      n.type === "holiday" ? <FiCalendar /> : <FiInfo />}
                                                 </div>
 
-                                                <div className="flex-1 min-w-0">
+                                                <div className="flex-1 min-w-0 pr-4">
                                                     <div className="flex items-center justify-between gap-2">
                                                         <p className={`text-xs font-bold truncate ${!n.read ? "text-slate-900 dark:text-slate-50" : "text-slate-700 dark:text-slate-300"}`}>
                                                             {n.title}
@@ -251,6 +301,15 @@ export default function Navbar() {
                                                         {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} · {new Date(n.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                                                     </p>
                                                 </div>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => handleDeleteNotification(e, n._id, !n.read)}
+                                                    className="absolute right-2 top-3 text-slate-400 opacity-0 group-hover:opacity-100 hover:text-red-500 transition p-1"
+                                                    title="Delete notification"
+                                                >
+                                                    <FiTrash2 className="h-3.5 w-3.5" />
+                                                </button>
                                             </div>
                                         ))
                                     ) : (

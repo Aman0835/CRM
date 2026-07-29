@@ -1,6 +1,7 @@
 import Attendance from "../models/Attendance.js";
 import Settings from "../models/Settings.js";
 import Notification from "../models/Notification.js";
+import Employee from "../models/Employee.js";
 const format12HourTime = (timeStr) => {
   if (!timeStr) return "08:00 PM";
   const [hStr, mStr] = timeStr.split(":");
