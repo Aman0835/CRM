@@ -2,6 +2,7 @@ import {
   FiChevronDown,
   FiChevronLeft,
   FiChevronRight,
+  FiDownload,
   FiEdit2,
   FiEye, // Added FiEye
   FiEyeOff, // Added FiEyeOff
@@ -16,6 +17,8 @@ import {
   FiUsers,
   FiX,
 } from "react-icons/fi";
+import { useState, useEffect, useRef } from "react";
+import toast from "react-hot-toast";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import DashboardLayout from "../../components/layout/DashboardLayout";
@@ -225,17 +228,66 @@ export default function Employees() {
     }
   };
 
+  const handleExportCSV = () => {
+    try {
+      if (!employees || employees.length === 0) {
+        toast.error("No employee data available to export.");
+        return;
+      }
+      let csvContent = "Employee ID,First Name,Last Name,Email,Phone,Gender,Role,Joining Date,Monthly Salary,Status\n";
+      employees.forEach((emp) => {
+        const row = [
+          `"${emp.employeeId || ""}"`,
+          `"${emp.firstName || ""}"`,
+          `"${emp.lastName || ""}"`,
+          `"${emp.email || ""}"`,
+          `"${emp.phone || ""}"`,
+          `"${emp.gender || ""}"`,
+          `"${emp.role || ""}"`,
+          `"${emp.joiningDate ? emp.joiningDate.split("T")[0] : ""}"`,
+          emp.monthlySalary || 0,
+          `"${emp.status || "active"}"`,
+        ];
+        csvContent += row.join(",") + "\n";
+      });
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Employee_Roster_${new Date().toISOString().split("T")[0]}.csv`);
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success("Employee sheet exported successfully!");
+    } catch (err) {
+      console.error("Export error:", err);
+      toast.error("Failed to export employee sheet");
+    }
+  };
+
   return (
     <DashboardLayout
       title="Employees"
       subtitle="Manage your barber staff profile files, contacts, schedules, and payroll parameters."
       action={
-        <button
-          onClick={handleOpenCreate}
-          type="button"
-          className="inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-4 text-xs font-semibold text-white transition hover:bg-blue-700 shadow-sm">
-          <FiPlus /> Add Employee
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleExportCSV}
+            type="button"
+            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 shadow-sm"
+          >
+            <FiDownload className="text-sm" /> Export Sheet
+          </button>
+          <button
+            onClick={handleOpenCreate}
+            type="button"
+            className="inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-4 text-xs font-semibold text-white transition hover:bg-blue-700 shadow-sm">
+            <FiPlus /> Add Employee
+          </button>
+        </div>
       }>
       {/* Filters panel */}
       <section className="mt-2 rounded-3xl border border-slate-100 bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] dark:border-slate-800/80 dark:bg-slate-900/20 text-slate-800 dark:text-slate-100">

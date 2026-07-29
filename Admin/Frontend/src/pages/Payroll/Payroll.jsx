@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { 
-     FiPlus, FiFileText, FiTrash2, FiSearch, FiX
+     FiPlus, FiFileText, FiTrash2, FiSearch, FiX, FiDownload
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -98,18 +98,69 @@ export default function Payroll() {
     const totalDeductions = filteredPayrolls.reduce((acc, p) => acc + p.deductions, 0);
     const netPayroll = filteredPayrolls.reduce((acc, p) => acc + p.netSalary, 0);
 
+    const handleExportCSV = () => {
+        try {
+            if (!filteredPayrolls || filteredPayrolls.length === 0) {
+                toast.error("No payroll data available to export.");
+                return;
+            }
+            let csvContent = "Payroll ID,Employee ID,Staff Name,Month,Year,Base Salary,Overtime Amount,Deductions,Net Salary,Status\n";
+            filteredPayrolls.forEach((p) => {
+                const emp = employees.find((e) => e.employeeId === p.employeeId);
+                const staffName = emp ? `${emp.firstName} ${emp.lastName}` : "Unknown Barber";
+                const row = [
+                    `"${p._id || ""}"`,
+                    `"${p.employeeId || ""}"`,
+                    `"${staffName}"`,
+                    p.month || "",
+                    p.year || "",
+                    p.baseSalary || 0,
+                    p.overtimeAmount || 0,
+                    p.deductions || 0,
+                    p.netSalary || 0,
+                    `"${p.status || "generated"}"`,
+                ];
+                csvContent += row.join(",") + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Payroll_Ledger_${new Date().toISOString().split("T")[0]}.csv`);
+            link.style.visibility = "hidden";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            toast.success("Payroll sheet exported successfully!");
+        } catch (err) {
+            console.error("Export error:", err);
+            toast.error("Failed to export payroll sheet");
+        }
+    };
+
     return (
         <DashboardLayout
             title="Payroll"
             subtitle="Track salary disbursements, generate monthly payslips, and review staff deductions."
             action={
-                <button
-                    onClick={() => setIsGenModalOpen(true)}
-                    type="button"
-                    className="inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-4 text-xs font-semibold text-white transition hover:bg-blue-700 shadow-sm"
-                >
-                    <FiPlus /> Generate Payroll
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={handleExportCSV}
+                        type="button"
+                        className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-800 shadow-sm"
+                    >
+                        <FiDownload className="text-sm" /> Export Sheet
+                    </button>
+                    <button
+                        onClick={() => setIsGenModalOpen(true)}
+                        type="button"
+                        className="inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-4 text-xs font-semibold text-white transition hover:bg-blue-700 shadow-sm"
+                    >
+                        <FiPlus /> Generate Payroll
+                    </button>
+                </div>
             }
         >
             {/* Financial Overview Cards */}

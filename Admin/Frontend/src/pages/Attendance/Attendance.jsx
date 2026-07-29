@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { 
-     FiCheck, FiX, FiTrash2, FiSearch
+     FiCheck, FiX, FiTrash2, FiSearch, FiDownload
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 
@@ -122,12 +122,59 @@ export default function Attendance() {
     const absentCount = todayLogs.filter(l => l.status === "Absent").length;
     const leaveCount = todayLogs.filter(l => l.status === "Leave").length;
 
+    const handleExportCSV = () => {
+        try {
+            if (!filteredLogs || filteredLogs.length === 0) {
+                toast.error("No attendance data available to export.");
+                return;
+            }
+            let csvContent = "Date,Employee ID,Staff Name,Check In,Check Out,Status,Working Hours,Notes\n";
+            filteredLogs.forEach((log) => {
+                const emp = employees.find((e) => e.employeeId === log.employeeId);
+                const staffName = emp ? `${emp.firstName} ${emp.lastName}` : "Unknown";
+                const row = [
+                    `"${log.date || ""}"`,
+                    `"${log.employeeId || ""}"`,
+                    `"${staffName}"`,
+                    `"${log.checkIn || "--:--"}"`,
+                    `"${log.checkOut || "--:--"}"`,
+                    `"${log.status || ""}"`,
+                    log.workingHours || 0,
+                    `"${log.earlyCheckoutReason || ""}"`,
+                ];
+                csvContent += row.join(",") + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Attendance_Sheet_${dateFilter || 'all'}_${new Date().toISOString().split("T")[0]}.csv`);
+            link.style.visibility = "hidden";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            toast.success("Attendance sheet exported successfully!");
+        } catch (err) {
+            console.error("Export error:", err);
+            toast.error("Failed to export attendance sheet");
+        }
+    };
+
     return (
         <DashboardLayout
             title="Attendance"
             subtitle="Monitor daily attendance rosters, check-in schedules, and clock logs."
             action={
                 <div className="flex gap-2">
+                    <button
+                        onClick={handleExportCSV}
+                        type="button"
+                        className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-800 shadow-sm"
+                    >
+                        <FiDownload className="text-sm" /> Export Sheet
+                    </button>
                     <button
                         onClick={() => {
                             setActionType("check-in");

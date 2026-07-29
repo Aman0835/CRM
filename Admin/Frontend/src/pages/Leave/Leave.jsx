@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { 
     FiCalendar, FiClock, FiCheckCircle, FiAlertTriangle,FiSearch, 
-    FiCheck, FiX, FiTrash2, FiInbox
+    FiCheck, FiX, FiTrash2, FiInbox, FiDownload
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 
@@ -98,10 +98,59 @@ export default function Leave() {
 
     const getLeaveCount = (status) => leaves.filter(l => l.status === status).length;
 
+    const handleExportCSV = () => {
+        try {
+            if (!filteredRequests || filteredRequests.length === 0) {
+                toast.error("No leave data available to export.");
+                return;
+            }
+            let csvContent = "Leave ID,Employee ID,Staff Name,Leave Type,Start Date,End Date,Reason,Status\n";
+            filteredRequests.forEach((req) => {
+                const emp = employees.find((e) => e.employeeId === req.employeeId);
+                const staffName = emp ? `${emp.firstName} ${emp.lastName}` : "Unknown Barber";
+                const row = [
+                    `"${req._id || ""}"`,
+                    `"${req.employeeId || ""}"`,
+                    `"${staffName}"`,
+                    `"${req.leaveType || ""}"`,
+                    `"${req.startDate ? req.startDate.split("T")[0] : ""}"`,
+                    `"${req.endDate ? req.endDate.split("T")[0] : ""}"`,
+                    `"${req.reason || ""}"`,
+                    `"${req.status || ""}"`,
+                ];
+                csvContent += row.join(",") + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Leave_Requests_${activeTab}_${new Date().toISOString().split("T")[0]}.csv`);
+            link.style.visibility = "hidden";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            toast.success("Leave sheet exported successfully!");
+        } catch (err) {
+            console.error("Export error:", err);
+            toast.error("Failed to export leave sheet");
+        }
+    };
+
     return (
         <DashboardLayout
             title="Leave Management"
             subtitle="Review and process time-off applications, check leave request histories, and schedule staff resources."
+            action={
+                <button
+                    onClick={handleExportCSV}
+                    type="button"
+                    className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-blue-600 px-4 text-xs font-semibold text-white transition hover:bg-blue-700 shadow-sm"
+                >
+                    <FiDownload className="text-sm" /> Export Sheet
+                </button>
+            }
         >
             {/* Quick Metrics */}
             <section className="grid gap-5 grid-cols-1 sm:grid-cols-3">
