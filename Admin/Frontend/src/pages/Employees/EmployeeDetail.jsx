@@ -58,8 +58,9 @@ export default function EmployeeDetail() {
     const [address, setAddress] = useState("");
     const [status, setStatus] = useState("active");
 
-    const fetchEmployeeData = async () => {
+    const fetchEmployeeData = async (isInitial = false) => {
         try {
+            if (isInitial) setLoading(true);
             const [empRes, attRes] = await Promise.all([
                 employeeService.getEmployeeById(id),
                 attendanceService.getAttendanceList(),
@@ -78,12 +79,12 @@ export default function EmployeeDetail() {
         } catch {
             toast.error("Failed to load employee");
         } finally {
-            setLoading(false);
+            if (isInitial) setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchEmployeeData();
+        fetchEmployeeData(true);
     }, [id]);
 
     const handleOpenEdit = () => {

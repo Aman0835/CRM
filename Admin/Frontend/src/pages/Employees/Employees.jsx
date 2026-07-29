@@ -66,15 +66,10 @@ export default function Employees() {
   const [address, setAddress] = useState("");
   const [status, setStatus] = useState("active");
 
-  const [showPassword, setShowPassword] = useState(false); // New state for password visibility
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
 
   // Load roster data
-  const fetchEmployees = async () => {
-    setLoading(true);
+  const fetchEmployees = async (isInitial = false) => {
+    if (isInitial) setLoading(true);
     try {
       const params = {
         page,
@@ -92,12 +87,12 @@ export default function Employees() {
       console.error("Fetch roster error:", err);
       toast.error("Failed to load employee roster");
     } finally {
-      setLoading(false);
+      if (isInitial) setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchEmployees();
+    fetchEmployees(true);
   }, [page, statusFilter, search]);
 
   useEffect(() => {
