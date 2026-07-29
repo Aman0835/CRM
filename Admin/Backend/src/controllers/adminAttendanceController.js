@@ -73,12 +73,16 @@ export const checkIn = async (req, res) => {
     });
 
     if (status === "Late") {
-      await Notification.create({
-        recipientRole: "admin",
-        title: "Late Check-in Alert",
-        message: `Employee (${rawId}) checked in late at ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`,
-        type: "attendance",
-      });
+      try {
+        await Notification.create({
+          recipientRole: "admin",
+          title: "Late Check-in Alert",
+          message: `Employee (${rawId}) checked in late at ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`,
+          type: "attendance",
+        });
+      } catch (notifError) {
+        console.error("Failed to create late check-in notification:", notifError);
+      }
     }
 
     res.status(201).json({
@@ -180,12 +184,16 @@ export const requestEarlyCheckout = async (req, res) => {
     await attendance.save();
 
     // Create Notification for Admin
-    await Notification.create({
-      recipientRole: "admin",
-      title: "Early Checkout Request",
-      message: `Employee (${employeeId}) requested early checkout: "${reason || 'Personal reason'}".`,
-      type: "attendance",
-    });
+    try {
+      await Notification.create({
+        recipientRole: "admin",
+        title: "Early Checkout Request",
+        message: `Employee (${employeeId}) requested early checkout: "${reason || 'Personal reason'}".`,
+        type: "attendance",
+      });
+    } catch (notifErr) {
+      console.error("Failed to create notification:", notifErr);
+    }
 
     res.status(200).json({
       success: true,
@@ -220,13 +228,17 @@ export const approveEarlyCheckout = async (req, res) => {
     await attendance.save();
 
     // Notify Employee
-    await Notification.create({
-      recipientRole: "employee",
-      employeeId: attendance.employeeId,
-      title: "Early Checkout Approved",
-      message: "Your early checkout request has been approved by admin. You are now checked out.",
-      type: "attendance",
-    });
+    try {
+      await Notification.create({
+        recipientRole: "employee",
+        employeeId: attendance.employeeId,
+        title: "Early Checkout Approved",
+        message: "Your early checkout request has been approved by admin. You are now checked out.",
+        type: "attendance",
+      });
+    } catch (notifErr) {
+      console.error("Failed to create notification:", notifErr);
+    }
 
     res.status(200).json({
       success: true,
@@ -251,13 +263,17 @@ export const rejectEarlyCheckout = async (req, res) => {
     await attendance.save();
 
     // Notify Employee
-    await Notification.create({
-      recipientRole: "employee",
-      employeeId: attendance.employeeId,
-      title: "Early Checkout Request Rejected",
-      message: "Your early checkout request was rejected by admin. Please complete your full shift.",
-      type: "attendance",
-    });
+    try {
+      await Notification.create({
+        recipientRole: "employee",
+        employeeId: attendance.employeeId,
+        title: "Early Checkout Request Rejected",
+        message: "Your early checkout request was rejected by admin. Please complete your full shift.",
+        type: "attendance",
+      });
+    } catch (notifErr) {
+      console.error("Failed to create notification:", notifErr);
+    }
 
     res.status(200).json({
       success: true,
