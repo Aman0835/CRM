@@ -51,6 +51,7 @@ export default function Profile() {
     });
     const [showCurrent, setShowCurrent] = useState(false);
     const [showNext, setShowNext] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
     const [savingProfile, setSavingProfile] = useState(false);
     const [savingPassword, setSavingPassword] = useState(false);
     const [savingPhoto, setSavingPhoto] = useState(false);
@@ -339,8 +340,8 @@ export default function Profile() {
                                 {
                                     key: "confirm",
                                     label: "Confirm Password",
-                                    visible: showNext,
-                                    toggle: () => setShowNext((prev) => !prev),
+                                    visible: showConfirm,
+                                    toggle: () => setShowConfirm((prev) => !prev),
                                 },
                             ].map(({ key, label, visible, toggle }) => (
                                 <div key={key}>

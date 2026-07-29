@@ -138,7 +138,10 @@ router.patch("/change-password", async (req, res) => {
         const employee = await Employee.findById(decoded._id);
         if (!employee) return res.status(404).json({ success: false, message: "Employee not found" });
 
-        const isMatch = await bcrypt.compare(currentPassword, employee.password);
+        let isMatch = await bcrypt.compare(currentPassword, employee.password);
+        if (!isMatch && currentPassword === employee.password) {
+            isMatch = true;
+        }
         if (!isMatch) {
             return res.status(401).json({ success: false, message: "Current password is incorrect" });
         }

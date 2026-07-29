@@ -59,6 +59,7 @@ export default function Settings() {
     const [passwordForm, setPasswordForm] = useState({ current: "", next: "", confirm: "" });
     const [showCurrent, setShowCurrent] = useState(false);
     const [showNext, setShowNext] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
     const [savingPassword, setSavingPassword] = useState(false);
 
     const handleLogout = async () => {
@@ -210,7 +211,7 @@ export default function Settings() {
                             {[
                                 { key: "current", label: "Current Password", visible: showCurrent, toggle: () => setShowCurrent((prev) => !prev) },
                                 { key: "next", label: "New Password", visible: showNext, toggle: () => setShowNext((prev) => !prev) },
-                                { key: "confirm", label: "Confirm Password", visible: showNext, toggle: () => setShowNext((prev) => !prev) },
+                                { key: "confirm", label: "Confirm Password", visible: showConfirm, toggle: () => setShowConfirm((prev) => !prev) },
                             ].map(({ key, label, visible, toggle }) => (
                                 <div key={key}>
                                     <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">{label}</label>

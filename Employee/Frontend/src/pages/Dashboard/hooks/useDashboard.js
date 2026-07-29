@@ -13,9 +13,9 @@ export function useDashboard() {
     const [payroll, setPayroll] = useState([]);
     const [holidays, setHolidays] = useState([]);
 
-    const fetchAll = useCallback(async () => {
+    const fetchAll = useCallback(async (isInitial = false) => {
         if (!employee?.employeeId) return;
-        setLoading(true);
+        if (isInitial) setLoading(true);
         try {
             const [attRes, leaveRes, payRes, holRes] = await Promise.allSettled([
                 getMyAttendance(employee.employeeId),
@@ -52,17 +52,18 @@ export function useDashboard() {
         } catch (err) {
             console.error("Dashboard fetch error", err);
         } finally {
-            setLoading(false);
+            if (isInitial) setLoading(false);
         }
     }, [employee?.employeeId]);
 
     useEffect(() => {
-        fetchAll();
-        const interval = setInterval(fetchAll, 10000);
-        window.addEventListener("focus", fetchAll);
+        fetchAll(true);
+        const interval = setInterval(() => fetchAll(false), 10000);
+        const handleFocus = () => fetchAll(false);
+        window.addEventListener("focus", handleFocus);
         return () => {
             clearInterval(interval);
-            window.removeEventListener("focus", fetchAll);
+            window.removeEventListener("focus", handleFocus);
         };
     }, [fetchAll]);
 
