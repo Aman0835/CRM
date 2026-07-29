@@ -55,10 +55,10 @@ export default function AttendanceWidget({ todayAttendance, onRefresh }) {
         try {
             await checkIn(employee.employeeId);
             toast.success("Checked in successfully");
-            onRefresh?.();
         } catch (error) {
             toast.error(error?.response?.data?.message ?? "Check-in failed");
         } finally {
+            onRefresh?.();
             setLoading(false);
         }
     };
@@ -68,7 +68,6 @@ export default function AttendanceWidget({ todayAttendance, onRefresh }) {
         try {
             await checkOut(employee.employeeId);
             toast.success("Checked out successfully");
-            onRefresh?.();
         } catch (error) {
             const data = error?.response?.data;
             if (data?.requiresEarlyApproval || data?.message?.includes("Early Checkout")) {
@@ -78,6 +77,7 @@ export default function AttendanceWidget({ todayAttendance, onRefresh }) {
                 toast.error(data?.message ?? "Check-out failed");
             }
         } finally {
+            onRefresh?.();
             setLoading(false);
         }
     };
@@ -95,10 +95,10 @@ export default function AttendanceWidget({ todayAttendance, onRefresh }) {
             toast.success("Early checkout request sent to Admin for approval.");
             setEarlyModalOpen(false);
             setEarlyReason("");
-            onRefresh?.();
         } catch (error) {
             toast.error(error?.response?.data?.message ?? "Request failed");
         } finally {
+            onRefresh?.();
             setLoading(false);
         }
     };

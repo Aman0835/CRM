@@ -56,7 +56,15 @@ export function useDashboard() {
         }
     }, [employee?.employeeId]);
 
-    useEffect(() => { fetchAll(); }, [fetchAll]);
+    useEffect(() => {
+        fetchAll();
+        const interval = setInterval(fetchAll, 10000);
+        window.addEventListener("focus", fetchAll);
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener("focus", fetchAll);
+        };
+    }, [fetchAll]);
 
     const safeAttendance = Array.isArray(attendance) ? attendance : [];
     const safeLeaves = Array.isArray(leaves) ? leaves : [];
@@ -64,8 +72,16 @@ export function useDashboard() {
     const safeHolidays = Array.isArray(holidays) ? holidays : [];
 
     // Derived data
-    const today = new Date().toISOString().split("T")[0];
-    const todayAttendance = safeAttendance.find((a) => a && a.date === today) ?? (safeAttendance[0] || null);
+    const localDate = new Date();
+    const year = localDate.getFullYear();
+    const monthStr = String(localDate.getMonth() + 1).padStart(2, "0");
+    const dayStr = String(localDate.getDate()).padStart(2, "0");
+    const todayLocal = `${year}-${monthStr}-${dayStr}`;
+    const todayUtc = localDate.toISOString().split("T")[0];
+
+    const todayAttendance = safeAttendance.find(
+        (a) => a && (a.date === todayLocal || a.date === todayUtc)
+    ) ?? (safeAttendance[0] || null);
 
     const monthAttendance = safeAttendance.filter((a) => {
         if (!a || !a.date) return false;

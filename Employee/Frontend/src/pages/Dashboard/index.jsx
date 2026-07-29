@@ -185,10 +185,10 @@ export default function Dashboard() {
         try {
             await checkIn(employee.employeeId);
             toast.success("Checked in successfully");
-            await fetchAll();
         } catch (error) {
             toast.error(error?.response?.data?.message ?? "Check-in failed");
         } finally {
+            await fetchAll();
             setAttendanceAction("");
         }
     };
@@ -200,10 +200,10 @@ export default function Dashboard() {
         try {
             await checkOut(employee.employeeId);
             toast.success("Checked out successfully");
-            await fetchAll();
         } catch (error) {
             toast.error(error?.response?.data?.message ?? "Check-out failed");
         } finally {
+            await fetchAll();
             setAttendanceAction("");
         }
     };

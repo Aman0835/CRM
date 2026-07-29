@@ -103,11 +103,26 @@ router.get("/attendance/today/:employeeId", async (req, res) => {
         if ((req.params.employeeId || "").toLowerCase() !== (req.employee.employeeId || "").toLowerCase()) {
             return res.status(403).json({ success: false, message: "Forbidden" });
         }
-        const today = new Date().toISOString().split("T")[0];
-        const record = await Attendance.findOne({
+        const todayUtc = new Date().toISOString().split("T")[0];
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        const day = String(now.getDate()).padStart(2, "0");
+        const todayLocal = `${year}-${month}-${day}`;
+
+        let record = await Attendance.findOne({
             employeeId: { $regex: new RegExp(`^${req.params.employeeId.trim()}$`, "i") },
-            date: today
-        });
+            $or: [{ date: todayUtc }, { date: todayLocal }]
+        }).sort({ createdAt: -1 });
+
+        if (!record) {
+            const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+            record = await Attendance.findOne({
+                employeeId: { $regex: new RegExp(`^${req.params.employeeId.trim()}$`, "i") },
+                createdAt: { $gte: oneDayAgo }
+            }).sort({ createdAt: -1 });
+        }
+
         res.status(200).json({ success: true, data: record });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
