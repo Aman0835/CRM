@@ -17,9 +17,9 @@ export function useDashboard() {
     const [leavesList, setLeavesList] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const fetchDashboardData = async () => {
+    const fetchDashboardData = async (isInitial = false) => {
         try {
-            setLoading(true);
+            if (isInitial) setLoading(true);
             const [overviewRes, payrollRes, attendanceRes, empRes, allAttendanceRes, leavesRes] = await Promise.all([
                 dashboardService.getDashboardOverview(),
                 dashboardService.getPayrollSummary(),
@@ -38,11 +38,11 @@ export function useDashboard() {
             console.error("Dashboard data extraction error:", error);
             toast.error("Failed to extract real data from backend");
         } finally {
-            setLoading(false);
+            if (isInitial) setLoading(false);
         }
     };
 
-    useEffect(() => { fetchDashboardData(); }, []);
+    useEffect(() => { fetchDashboardData(true); }, []);
 
     const totalEmployees = overview?.totalEmployees ?? employees.length;
 

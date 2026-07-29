@@ -12,8 +12,8 @@ export function useHolidays() {
     const [date, setDate] = useState("");
     const [description, setDescription] = useState("");
 
-    const fetchHolidays = async () => {
-        setLoading(true);
+    const fetchHolidays = async (isInitial = false) => {
+        if (isInitial) setLoading(true);
         try {
             const res = await holidayService.getHolidays();
             if (res.success) {
@@ -24,11 +24,11 @@ export function useHolidays() {
             console.error("Holidays fetch error:", err);
             toast.error("Failed to load holiday roster");
         } finally {
-            setLoading(false);
+            if (isInitial) setLoading(false);
         }
     };
 
-    useEffect(() => { fetchHolidays(); }, []);
+    useEffect(() => { fetchHolidays(true); }, []);
 
     const handleOpenCreate = () => {
         setModalMode("create");

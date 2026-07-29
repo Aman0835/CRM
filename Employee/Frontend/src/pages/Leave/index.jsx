@@ -24,21 +24,21 @@ export default function Leave() {
     reason: "",
   });
 
-  const fetchLeaves = useCallback(async () => {
+  const fetchLeaves = useCallback(async (isInitial = false) => {
     if (!employee?.employeeId) return;
-    setLoading(true);
+    if (isInitial) setLoading(true);
     try {
       const result = await getMyLeaves(employee.employeeId);
       setLeaves(result?.data ?? []);
     } catch (error) {
       toast.error("Failed to load leave requests");
     } finally {
-      setLoading(false);
+      if (isInitial) setLoading(false);
     }
   }, [employee?.employeeId]);
 
   useEffect(() => {
-    fetchLeaves();
+    fetchLeaves(true);
   }, [fetchLeaves]);
 
   const handleSubmit = async (event) => {

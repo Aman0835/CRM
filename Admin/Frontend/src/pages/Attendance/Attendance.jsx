@@ -22,8 +22,8 @@ export default function Attendance() {
     const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
     const [actionType, setActionType] = useState("check-in"); // "check-in" | "check-out"
 
-    const fetchAttendance = async () => {
-        setLoading(true);
+    const fetchAttendance = async (isInitial = false) => {
+        if (isInitial) setLoading(true);
         try {
             const listRes = await attendanceService.getAttendanceList();
             if (listRes.success) {
@@ -37,12 +37,12 @@ export default function Attendance() {
             console.error("Attendance fetch error:", err);
             toast.error("Failed to load attendance logs");
         } finally {
-            setLoading(false);
+            if (isInitial) setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchAttendance();
+        fetchAttendance(true);
     }, []);
 
     const handleLogDelete = async (id) => {

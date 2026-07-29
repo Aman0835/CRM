@@ -9,8 +9,8 @@ export function useLeave() {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("pending");
 
-    const fetchLeaves = async () => {
-        setLoading(true);
+    const fetchLeaves = async (isInitial = false) => {
+        if (isInitial) setLoading(true);
         try {
             const leaveRes = await leaveService.getLeaves();
             if (leaveRes.success) setLeaves(leaveRes.data);
@@ -20,12 +20,12 @@ export function useLeave() {
             console.error("Leave requests fetch error:", err);
             toast.error("Failed to load leave requests");
         } finally {
-            setLoading(false);
+            if (isInitial) setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchLeaves();
+        fetchLeaves(true);
     }, []);
 
     const handleApprove = async (id) => {

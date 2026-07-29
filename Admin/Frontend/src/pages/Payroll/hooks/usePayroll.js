@@ -17,8 +17,8 @@ export function usePayroll() {
     const [genYear, setGenYear] = useState(new Date().getFullYear());
     const [generating, setGenerating] = useState(false);
 
-    const fetchPayrollData = async () => {
-        setLoading(true);
+    const fetchPayrollData = async (isInitial = false) => {
+        if (isInitial) setLoading(true);
         try {
             const payRes = await payrollService.getPayrolls();
             if (payRes.success) setPayrolls(payRes.data);
@@ -28,11 +28,11 @@ export function usePayroll() {
             console.error("Payroll fetch error:", err);
             toast.error("Failed to load payroll records");
         } finally {
-            setLoading(false);
+            if (isInitial) setLoading(false);
         }
     };
 
-    useEffect(() => { fetchPayrollData(); }, []);
+    useEffect(() => { fetchPayrollData(true); }, []);
 
     const handleGenerate = async (e) => {
         e.preventDefault();

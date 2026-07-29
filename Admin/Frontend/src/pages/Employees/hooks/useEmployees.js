@@ -35,8 +35,8 @@ export function useEmployees() {
     const [address, setAddress] = useState("");
     const [status, setStatus] = useState("active");
 
-    const fetchEmployees = async () => {
-        setLoading(true);
+    const fetchEmployees = async (isInitial = false) => {
+        if (isInitial) setLoading(true);
         try {
             const params = { page, limit: 100, search, status: statusFilter || undefined };
             const res = await employeeService.getEmployees(params);
@@ -49,11 +49,11 @@ export function useEmployees() {
             console.error("Fetch roster error:", err);
             toast.error("Failed to load employee roster");
         } finally {
-            setLoading(false);
+            if (isInitial) setLoading(false);
         }
     };
 
-    useEffect(() => { fetchEmployees(); }, [page, statusFilter, search]);
+    useEffect(() => { fetchEmployees(true); }, [page, statusFilter, search]);
 
     useEffect(() => {
         const handleClickOutside = (e) => {
