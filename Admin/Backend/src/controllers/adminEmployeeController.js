@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import Employee from "../models/Employee.js";
+import { broadcastRealtime } from "../utils/realtime.js";
 
 const generateEmployeeId = () => `EMP-${Math.floor(1000 + Math.random() * 9000)}`;
 
@@ -92,6 +93,8 @@ export const updateEmployeeStatus = async (req, res) => {
       obj.visiblePassword = "Pass1234!";
     }
 
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "employee", action: "updated", entity: "employee", data: obj });
+
     res.status(200).json({
       success: true,
       message: "Employee status updated successfully",
@@ -156,6 +159,8 @@ export const createEmployee = async (req, res) => {
     const employee = await Employee.create(employeeData);
     const employeeResponse = employee.toObject();
 
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "employee", action: "created", entity: "employee", data: employeeResponse });
+
     res.status(201).json({
       success: true,
       message: "Employee created successfully",
@@ -212,6 +217,8 @@ export const updateEmployee = async (req, res) => {
 
     const empObj = employee.toObject();
 
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "employee", action: "updated", entity: "employee", data: empObj });
+
     res.status(200).json({
       success: true,
       message: "Employee updated successfully",
@@ -237,6 +244,8 @@ export const deleteEmployee = async (req, res) => {
         message: "Employee not found",
       });
     }
+
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "employee", action: "deleted", entity: "employee", data: { id: req.params.id } });
 
     res.status(200).json({
       success: true,

@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { useSearchParams } from "react-router-dom";
 import * as employeeService from "../../../services/employeeService";
+import { subscribeRealtime } from "../../../services/realtime";
 
 export function useEmployees() {
     const [employees, setEmployees] = useState([]);
@@ -54,6 +55,13 @@ export function useEmployees() {
     };
 
     useEffect(() => { fetchEmployees(true); }, [page, statusFilter, search]);
+
+    useEffect(() => {
+        const unsubscribe = subscribeRealtime(() => {
+            fetchEmployees(false);
+        });
+        return unsubscribe;
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (e) => {

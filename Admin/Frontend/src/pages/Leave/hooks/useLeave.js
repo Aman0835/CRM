@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import * as leaveService from "../../../services/leaveService";
 import * as employeeService from "../../../services/employeeService";
+import * as leaveService from "../../../services/leaveService";
+import { subscribeRealtime } from "../../../services/realtime";
 
 export function useLeave() {
     const [leaves, setLeaves] = useState([]);
@@ -26,6 +27,10 @@ export function useLeave() {
 
     useEffect(() => {
         fetchLeaves(true);
+        const unsubscribe = subscribeRealtime(() => {
+            fetchLeaves(false);
+        });
+        return unsubscribe;
     }, []);
 
     const handleApprove = async (id) => {

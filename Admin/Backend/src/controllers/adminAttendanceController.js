@@ -1,7 +1,7 @@
 import Attendance from "../models/Attendance.js";
-import Settings from "../models/Settings.js";
 import Notification from "../models/Notification.js";
-import Employee from "../models/Employee.js";
+import Settings from "../models/Settings.js";
+import { broadcastRealtime } from "../utils/realtime.js";
 const format12HourTime = (timeStr) => {
   if (!timeStr) return "08:00 PM";
   const [hStr, mStr] = timeStr.split(":");
@@ -86,6 +86,8 @@ export const checkIn = async (req, res) => {
       }
     }
 
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "attendance", action: "updated", entity: "attendance", data: attendance });
+
     res.status(201).json({
       success: true,
       message: status === "Late" ? "Check In Successful (Marked Late)" : "Check In Successful",
@@ -155,6 +157,8 @@ export const checkOut = async (req, res) => {
 
     await attendance.save();
 
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "attendance", action: "updated", entity: "attendance", data: attendance });
+
     res.status(200).json({
       success: true,
       message: "Check Out Successful",
@@ -195,6 +199,8 @@ export const requestEarlyCheckout = async (req, res) => {
     } catch (notifErr) {
       console.error("Failed to create notification:", notifErr);
     }
+
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "attendance", action: "updated", entity: "attendance", data: attendance });
 
     res.status(200).json({
       success: true,
@@ -241,6 +247,8 @@ export const approveEarlyCheckout = async (req, res) => {
       console.error("Failed to create notification:", notifErr);
     }
 
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "attendance", action: "updated", entity: "attendance", data: attendance });
+
     res.status(200).json({
       success: true,
       message: "Early checkout approved and employee checked out.",
@@ -275,6 +283,8 @@ export const rejectEarlyCheckout = async (req, res) => {
     } catch (notifErr) {
       console.error("Failed to create notification:", notifErr);
     }
+
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "attendance", action: "updated", entity: "attendance", data: attendance });
 
     res.status(200).json({
       success: true,

@@ -1,4 +1,5 @@
 import Holiday from "../models/Holiday.js";
+import { broadcastRealtime } from "../utils/realtime.js";
 
 
 // Get All Holidays
@@ -85,6 +86,8 @@ export const createHoliday = async (req, res) => {
   try {
     const holiday = await Holiday.create(req.body);
 
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "holiday", action: "created", entity: "holiday", data: holiday });
+
     res.status(201).json({
       success: true,
       message: "Holiday created successfully",
@@ -121,6 +124,8 @@ export const updateHoliday = async (req, res) => {
       });
     }
 
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "holiday", action: "updated", entity: "holiday", data: holiday });
+
     res.status(200).json({
       success: true,
       message: "Holiday updated successfully",
@@ -149,6 +154,8 @@ export const deleteHoliday = async (req, res) => {
         message: "Holiday not found",
       });
     }
+
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "holiday", action: "deleted", entity: "holiday", data: { id: req.params.id } });
 
     res.status(200).json({
       success: true,

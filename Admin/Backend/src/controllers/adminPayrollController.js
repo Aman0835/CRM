@@ -1,7 +1,8 @@
+import Attendance from "../models/Attendance.js";
 import Employee from "../models/Employee.js";
 import Payroll from "../models/Payroll.js";
-import Attendance from "../models/Attendance.js";
 import Settings from "../models/Settings.js";
+import { broadcastRealtime } from "../utils/realtime.js";
 
 // Generate Payroll
 export const generatePayroll = async (req, res) => {
@@ -77,6 +78,8 @@ export const generatePayroll = async (req, res) => {
 
       payrolls.push(payroll);
     }
+
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "payroll", action: "generated", entity: "payroll", data: payrolls });
 
     res.status(201).json({
       success: true,

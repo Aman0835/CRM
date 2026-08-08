@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import * as holidayService from "../../../services/holidayService";
+import { subscribeRealtime } from "../../../services/realtime";
 
 export function useHolidays() {
     const [holidays, setHolidays] = useState([]);
@@ -28,7 +29,13 @@ export function useHolidays() {
         }
     };
 
-    useEffect(() => { fetchHolidays(true); }, []);
+    useEffect(() => {
+        fetchHolidays(true);
+        const unsubscribe = subscribeRealtime(() => {
+            fetchHolidays(false);
+        });
+        return unsubscribe;
+    }, []);
 
     const handleOpenCreate = () => {
         setModalMode("create");

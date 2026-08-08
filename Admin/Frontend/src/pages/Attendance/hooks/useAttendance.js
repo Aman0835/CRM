@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import * as attendanceService from "../../../services/attendanceService";
 import * as employeeService from "../../../services/employeeService";
+import { subscribeRealtime } from "../../../services/realtime";
 
 export function useAttendance() {
     const [attendanceList, setAttendanceList] = useState([]);
@@ -38,6 +39,10 @@ export function useAttendance() {
 
     useEffect(() => {
         fetchAttendance();
+        const unsubscribe = subscribeRealtime(() => {
+            fetchAttendance();
+        });
+        return unsubscribe;
     }, []);
 
     const handleLogDelete = async (id) => {

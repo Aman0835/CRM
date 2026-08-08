@@ -8,6 +8,7 @@ import {
   cancelLeave,
   getMyLeaves,
 } from "../../services/leaveService";
+import { subscribeRealtime } from "../../services/realtime";
 
 const leaveOptions = ["Sick Leave", "Casual Leave", "Annual Leave"];
 
@@ -24,21 +25,28 @@ export default function Leave() {
     reason: "",
   });
 
-  const fetchLeaves = useCallback(async (isInitial = false) => {
-    if (!employee?.employeeId) return;
-    if (isInitial) setLoading(true);
-    try {
-      const result = await getMyLeaves(employee.employeeId);
-      setLeaves(result?.data ?? []);
-    } catch (error) {
-      toast.error("Failed to load leave requests");
-    } finally {
-      if (isInitial) setLoading(false);
-    }
-  }, [employee?.employeeId]);
+  const fetchLeaves = useCallback(
+    async (isInitial = false) => {
+      if (!employee?.employeeId) return;
+      if (isInitial) setLoading(true);
+      try {
+        const result = await getMyLeaves(employee.employeeId);
+        setLeaves(result?.data ?? []);
+      } catch (error) {
+        toast.error("Failed to load leave requests");
+      } finally {
+        if (isInitial) setLoading(false);
+      }
+    },
+    [employee?.employeeId],
+  );
 
   useEffect(() => {
     fetchLeaves(true);
+    const unsubscribe = subscribeRealtime(() => {
+      fetchLeaves(false);
+    });
+    return unsubscribe;
   }, [fetchLeaves]);
 
   const handleSubmit = async (event) => {

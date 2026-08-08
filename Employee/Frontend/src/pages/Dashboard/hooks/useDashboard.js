@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "../../../context/AuthContext";
 import { getMyAttendance } from "../../../services/attendanceService";
+import { getHolidays } from "../../../services/holidayService";
 import { getMyLeaves } from "../../../services/leaveService";
 import { getMyPayroll } from "../../../services/payrollService";
-import { getHolidays } from "../../../services/holidayService";
-import { useAuth } from "../../../context/AuthContext";
+import { subscribeRealtime } from "../../../services/realtime";
 
 export function useDashboard() {
     const { employee } = useAuth();
@@ -60,9 +61,13 @@ export function useDashboard() {
         fetchAll(true);
         const interval = setInterval(() => fetchAll(false), 10000);
         const handleFocus = () => fetchAll(false);
+        const unsubscribe = subscribeRealtime(() => {
+            fetchAll(false);
+        });
         window.addEventListener("focus", handleFocus);
         return () => {
             clearInterval(interval);
+            unsubscribe();
             window.removeEventListener("focus", handleFocus);
         };
     }, [fetchAll]);

@@ -1,6 +1,7 @@
+import Employee from "../models/Employee.js";
 import LeaveRequest from "../models/LeaveRequest.js";
 import Notification from "../models/Notification.js";
-import Employee from "../models/Employee.js";
+import { broadcastRealtime } from "../utils/realtime.js";
 
 const formatDateLabel = (d) => {
   if (!d) return "";
@@ -75,6 +76,8 @@ export const createLeave = async (req, res) => {
       console.error("Failed to create notification:", notifErr);
     }
 
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "leave", action: "created", entity: "leave", data: leave });
+
     res.status(201).json({
       success: true,
       message: "Leave request created successfully",
@@ -126,6 +129,8 @@ export const approveLeave = async (req, res) => {
     } catch (notifErr) {
       console.error("Failed to create notification:", notifErr);
     }
+
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "leave", action: "updated", entity: "leave", data: leave });
 
     res.status(200).json({
       success: true,
@@ -179,6 +184,8 @@ export const rejectLeave = async (req, res) => {
       console.error("Failed to create notification:", notifErr);
     }
 
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "leave", action: "updated", entity: "leave", data: leave });
+
     res.status(200).json({
       success: true,
       message: "Leave rejected successfully",
@@ -212,6 +219,8 @@ export const updateLeave = async (req, res) => {
       });
     }
 
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "leave", action: "updated", entity: "leave", data: leave });
+
     res.status(200).json({
       success: true,
       message: "Leave updated successfully",
@@ -237,6 +246,8 @@ export const deleteLeave = async (req, res) => {
         message: "Leave request not found",
       });
     }
+
+    req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "leave", action: "deleted", entity: "leave", data: { id: req.params.id } });
 
     res.status(200).json({
       success: true,

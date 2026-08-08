@@ -1,12 +1,18 @@
-import { useState, useEffect } from "react";
-import {
-    FiUsers, FiCalendar, FiDollarSign, FiCheck, FiX, FiTrendingUp
-} from "react-icons/fi";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import {
+    FiCalendar,
+    FiCheck,
+    FiDollarSign,
+    FiTrendingUp,
+    FiUsers,
+    FiX
+} from "react-icons/fi";
+import * as attendanceService from "../../../services/attendanceService";
 import * as dashboardService from "../../../services/dashboardService";
 import * as employeeService from "../../../services/employeeService";
-import * as attendanceService from "../../../services/attendanceService";
 import * as leaveService from "../../../services/leaveService";
+import { subscribeRealtime } from "../../../services/realtime";
 
 export function useDashboard() {
     const [overview, setOverview] = useState(null);
@@ -43,6 +49,13 @@ export function useDashboard() {
     };
 
     useEffect(() => { fetchDashboardData(true); }, []);
+
+    useEffect(() => {
+        const unsubscribe = subscribeRealtime(() => {
+            fetchDashboardData(false);
+        });
+        return unsubscribe;
+    }, []);
 
     const totalEmployees = overview?.totalEmployees ?? employees.length;
 

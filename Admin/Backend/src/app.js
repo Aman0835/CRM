@@ -2,7 +2,9 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import http from "http";
 import morgan from "morgan";
+import { Server } from "socket.io";
 
 import { connectDB } from "./config/db.js";
 
@@ -21,8 +23,6 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 
 dotenv.config();
 
-const app = express();
-
 const parseOrigins = (str) =>
   str
     ? str
@@ -30,6 +30,28 @@ const parseOrigins = (str) =>
         .map((s) => s.trim().replace(/\/+$/, ""))
         .filter(Boolean)
     : [];
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const cleanOrigin = origin.replace(/\/+$/, "");
+      const allowed = [
+        ...parseOrigins(process.env.CLIENT_URL),
+        ...parseOrigins(process.env.EMPLOYEE_CLIENT_URL),
+      ];
+      if (allowed.length === 0 || allowed.includes("*") || allowed.includes(cleanOrigin)) {
+        return callback(null, true);
+      }
+      callback(new Error(`CORS: ${origin} not allowed`));
+    },
+    credentials: true,
+  },
+});
+
+app.set("io", io);
 
 const allowedOrigins = [
   ...parseOrigins(process.env.CLIENT_URL),
@@ -80,12 +102,22 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/employee/auth", employeeAuthRoutes);
 app.use("/api/employee", employeeRoutes);
 
+io.on("connection", (socket) => {
+  socket.on("join", ({ room }) => {
+    if (room) socket.join(room);
+  });
+
+  socket.on("disconnect", () => {
+    // no-op
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 
 connectDB()
   .then(() => {
     console.log("MongoDB Connected Successfully");
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   })
