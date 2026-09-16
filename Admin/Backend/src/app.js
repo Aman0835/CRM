@@ -20,6 +20,7 @@ import settingsRoutes from "./routes/adminSettingsRoutes.js";
 import employeeAuthRoutes from "./routes/employeeAuthRoutes.js";
 import employeeRoutes from "./routes/employeeRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import leadRoutes from "./routes/leadRoutes.js";
 
 dotenv.config();
 
@@ -100,7 +101,9 @@ app.use("/api/admin/settings", settingsRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 app.use("/api/employee/auth", employeeAuthRoutes);
+app.use("/api/employee/leads", leadRoutes);
 app.use("/api/employee", employeeRoutes);
+app.use("/api/leads", leadRoutes);
 
 io.on("connection", (socket) => {
   socket.on("join", ({ room }) => {
