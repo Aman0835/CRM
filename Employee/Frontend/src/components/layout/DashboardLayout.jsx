@@ -1,17 +1,18 @@
-import { FiCalendar, FiClock, FiDollarSign, FiHome, FiUser } from "react-icons/fi";
+import { FiCalendar, FiClock, FiDollarSign, FiHome, FiUser, FiUsers } from "react-icons/fi";
 import { NavLink, useLocation } from "react-router-dom";
 import PwaInstallPrompt from "../PwaInstallPrompt";
 
 const navItems = [
-    { to: "/dashboard", label: "Home", icon: FiHome },
-    { to: "/attendance", label: "Attend.", icon: FiClock },
-    { to: "/leave", label: "Leave", icon: FiCalendar },
-    { to: "/payroll", label: "Salary", icon: FiDollarSign },
-    { to: "/profile", label: "Profile", icon: FiUser },
+    { to: "/dashboard",  label: "Home",     icon: FiHome },
+    { to: "/attendance", label: "Attend.",  icon: FiClock },
+    { to: "/leads",      label: "Leads",    icon: FiUsers },
+    { to: "/payroll",    label: "Salary",   icon: FiDollarSign },
+    { to: "/profile",    label: "Profile",  icon: FiUser },
 ];
 
 function isNavActive(pathname, to) {
     if (to === "/profile") return pathname.startsWith("/profile") || pathname.startsWith("/settings");
+    if (to === "/leads") return pathname.startsWith("/leads");
     return pathname === to;
 }
 

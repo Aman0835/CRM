@@ -13,6 +13,10 @@ const Holidays    = lazy(() => import("../pages/Holidays"));
 const Profile     = lazy(() => import("../pages/Profile"));
 const Settings    = lazy(() => import("../pages/Settings"));
 const NotFound    = lazy(() => import("../pages/NotFound/NotFound"));
+const LeadHubPage     = lazy(() => import("../leads/pages/LeadHubPage"));
+const MyLeadsPage     = lazy(() => import("../leads/pages/MyLeadsPage"));
+const CreateLeadPage  = lazy(() => import("../leads/pages/CreateLeadPage"));
+const LeadDetailsPage = lazy(() => import("../leads/pages/LeadDetailsPage"));
 
 function PageLoader() {
     return (
@@ -92,11 +96,43 @@ export default function AppRoutes() {
                     }
                 />
 
-                <Route
+                {/* <Route
                     path="/leave"
                     element={
                         <ProtectedRoute>
                             <Leave />
+                        </ProtectedRoute>
+                    }
+                /> */}
+                <Route
+                    path="/leads"
+                    element={
+                        <ProtectedRoute>
+                            <LeadHubPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/leads/my"
+                    element={
+                        <ProtectedRoute>
+                            <MyLeadsPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/leads/new"
+                    element={
+                        <ProtectedRoute>
+                            <CreateLeadPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/leads/:leadId"
+                    element={
+                        <ProtectedRoute>
+                            <LeadDetailsPage />
                         </ProtectedRoute>
                     }
                 />

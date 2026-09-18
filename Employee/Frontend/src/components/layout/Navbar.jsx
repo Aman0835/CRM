@@ -12,12 +12,12 @@ import * as notificationService from "../../services/notificationService";
 
 const mobileNav = [
     { to: "/dashboard",  label: "Dashboard",  icon: FiHome },
-    { to: "/attendance", label: "Attendance",  icon: FiCalendar },
-    { to: "/leave",      label: "Leave",       icon: FiClock },
-    { to: "/payroll",    label: "Payroll",     icon: FiBriefcase },
-    { to: "/holidays",   label: "Holidays",    icon: FiSunIcon },
-    { to: "/profile",    label: "Profile",     icon: FiUser },
-    { to: "/settings",   label: "Settings",    icon: FiSettings },
+    { to: "/attendance", label: "Attendance", icon: FiCalendar },
+    { to: "/leads",      label: "Leads",      icon: FiBriefcase },
+    { to: "/payroll",    label: "Payroll",    icon: FiBriefcase },
+    { to: "/holidays",   label: "Holidays",   icon: FiSunIcon },
+    { to: "/profile",    label: "Profile",    icon: FiUser },
+    { to: "/settings",   label: "Settings",   icon: FiSettings },
 ];
 
 export default function Navbar() {
