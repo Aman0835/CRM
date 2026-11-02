@@ -40,7 +40,6 @@ export function useAdminProfile(logout, theme, toggleTheme) {
             emailNotif: true,
             payrollNotif: true,
             attendanceAlert: true,
-            leaveRequest: true,
             holidayReminder: true
         };
     });

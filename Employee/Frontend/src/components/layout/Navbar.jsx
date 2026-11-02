@@ -6,7 +6,6 @@ import { useTheme } from "../../context/ThemeContext";
 import {
     FiHome, FiBriefcase, FiUser, FiSettings, FiLogOut
 } from "react-icons/fi";
-import { FiSun as FiSunIcon } from "react-icons/fi";
 import toast from "react-hot-toast";
 import * as notificationService from "../../services/notificationService";
 
@@ -15,7 +14,6 @@ const mobileNav = [
     { to: "/attendance", label: "Attendance", icon: FiCalendar },
     { to: "/leads",      label: "Leads",      icon: FiBriefcase },
     { to: "/payroll",    label: "Payroll",    icon: FiBriefcase },
-    { to: "/holidays",   label: "Holidays",   icon: FiSunIcon },
     { to: "/profile",    label: "Profile",    icon: FiUser },
     { to: "/settings",   label: "Settings",   icon: FiSettings },
 ];
@@ -113,7 +111,7 @@ export default function Navbar() {
         } else if (n.type === "attendance") {
             navigate("/attendance");
         } else if (n.type === "holiday") {
-            navigate("/holidays");
+            navigate("/dashboard");
         } else if (n.type === "payroll") {
             navigate("/payroll");
         }

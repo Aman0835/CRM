@@ -222,3 +222,11 @@ export function formatFollowUp(dateString, timeString) {
     time: timeString || "11:00 AM",
   };
 }
+
+export function cleanPhoneForWa(phone = "") {
+  let clean = String(phone).replace(/[^0-9]/g, "");
+  if (clean.length === 10) clean = `91${clean}`;
+  if (clean.length === 11 && clean.startsWith("0")) clean = `91${clean.slice(1)}`;
+  return clean;
+}
+

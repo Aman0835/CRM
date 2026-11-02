@@ -19,6 +19,42 @@ import {
   LEAD_STATUSES,
 } from "../utils/leadUtils";
 import { addInteraction } from "../services/leadService";
+import SchedulePicker from "./SchedulePicker";
+
+function CustomSelect({ label, value, onChange, options, required }) {
+  const [open, setOpen] = useState(false);
+  
+  return (
+    <div className="relative">
+      <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
+        {label} {required && <span className="text-red-400">*</span>}
+      </label>
+      <div 
+        className="mt-1.5 h-11 w-full rounded-2xl border border-[#2a3c5a] bg-[#162136] px-3 flex items-center justify-between cursor-pointer"
+        onClick={() => setOpen(!open)}
+      >
+        <span className="text-xs text-white">{value}</span>
+        <svg className={`w-4 h-4 text-[#7d93ba] transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+      </div>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-50 max-h-48 overflow-y-auto rounded-xl border border-[#2a3c5a] bg-[#1a253a] py-1 shadow-2xl [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {options.map(opt => (
+              <div 
+                key={opt}
+                className={`px-3 py-2.5 text-xs cursor-pointer hover:bg-[#2f6cf6] hover:text-white transition-colors ${value === opt ? 'bg-[#202e48] text-white font-bold' : 'text-[#aebcd5]'}`}
+                onClick={() => { onChange(opt); setOpen(false); }}
+              >
+                {opt}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 export default function AddInteractionModal({
   leadId,
@@ -83,7 +119,7 @@ export default function AddInteractionModal({
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/75 p-0 sm:items-center sm:p-4 backdrop-blur-xs">
       <div
-        className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-t-[32px] sm:rounded-[32px] border border-[#263756] bg-[#101827] p-5 text-white shadow-2xl animate-in slide-in-from-bottom-5 duration-200"
+        className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-t-[32px] sm:rounded-[32px] border border-[#263756] bg-[#101827] p-5 text-white shadow-2xl animate-in slide-in-from-bottom-5 duration-200 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Top Header */}
@@ -102,33 +138,7 @@ export default function AddInteractionModal({
         </div>
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-          {/* Interaction Type Selector */}
-          <div>
-            <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
-              Interaction Type
-            </label>
-            <div className="mt-2 grid grid-cols-5 gap-1.5">
-              {INTERACTION_TYPES.map((t) => {
-                const Icon = t.icon;
-                const isSelected = type === t.id;
-                return (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setType(t.id)}
-                    className={`flex flex-col items-center justify-center rounded-xl p-2 text-center transition-all ${
-                      isSelected
-                        ? "bg-[#2f6cf6] text-white shadow-[0_4px_12px_rgba(47,108,246,0.35)]"
-                        : "bg-[#182338] text-[#7d93ba] hover:bg-[#202e48]"
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span className="mt-1 text-[10px] font-bold">{t.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+
 
           {/* Client Response */}
           <div>
@@ -161,80 +171,39 @@ export default function AddInteractionModal({
 
           {/* Outcome & Next Action */}
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
-                Outcome <span className="text-red-400">*</span>
-              </label>
-              <select
-                value={outcome}
-                onChange={(e) => setOutcome(e.target.value)}
-                className="mt-1.5 h-11 w-full rounded-2xl border border-[#2a3c5a] bg-[#162136] px-3 text-xs text-white outline-none focus:border-[#2f6cf6]"
-              >
-                {OUTCOME_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt} className="bg-[#101827] text-white">
-                    {opt}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
-                Next Action <span className="text-red-400">*</span>
-              </label>
-              <select
-                value={nextAction}
-                onChange={(e) => setNextAction(e.target.value)}
-                className="mt-1.5 h-11 w-full rounded-2xl border border-[#2a3c5a] bg-[#162136] px-3 text-xs text-white outline-none focus:border-[#2f6cf6]"
-              >
-                {NEXT_ACTION_OPTIONS.map((act) => (
-                  <option key={act} value={act} className="bg-[#101827] text-white">
-                    {act}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <CustomSelect
+              label="Outcome"
+              value={outcome}
+              onChange={setOutcome}
+              options={OUTCOME_OPTIONS}
+              required
+            />
+            <CustomSelect
+              label="Next Action"
+              value={nextAction}
+              onChange={setNextAction}
+              options={NEXT_ACTION_OPTIONS}
+              required
+            />
           </div>
 
           {/* Update Lead Status */}
-          <div>
-            <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
-              Update Lead Status
-            </label>
-            <select
-              value={leadStatus}
-              onChange={(e) => setLeadStatus(e.target.value)}
-              className="mt-1.5 h-11 w-full rounded-2xl border border-[#2a3c5a] bg-[#162136] px-3 text-xs text-white outline-none focus:border-[#2f6cf6]"
-            >
-              {LEAD_STATUSES.map((st) => (
-                <option key={st} value={st} className="bg-[#101827] text-white">
-                  {st}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CustomSelect
+            label="Update Lead Status"
+            value={leadStatus}
+            onChange={setLeadStatus}
+            options={LEAD_STATUSES}
+          />
 
           {/* Next Follow-up Date & Time */}
-          <div className="rounded-2xl border border-[#253652] bg-[#141e30] p-3.5 space-y-2">
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#fbbf24]">
-              Schedule Follow-up (Optional)
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                type="date"
-                value={followUpDate}
-                onChange={(e) => setFollowUpDate(e.target.value)}
-                className="h-10 w-full rounded-xl border border-[#2a3c5a] bg-[#162136] px-3 text-xs text-white outline-none focus:border-[#2f6cf6]"
-              />
-              <input
-                type="text"
-                value={followUpTime}
-                onChange={(e) => setFollowUpTime(e.target.value)}
-                placeholder="e.g. 11:00 AM"
-                className="h-10 w-full rounded-xl border border-[#2a3c5a] bg-[#162136] px-3 text-xs text-white outline-none focus:border-[#2f6cf6]"
-              />
-            </div>
-          </div>
+          <SchedulePicker
+            date={followUpDate}
+            onDateChange={setFollowUpDate}
+            time={followUpTime}
+            onTimeChange={setFollowUpTime}
+            title="Schedule Follow-up (Optional)"
+            optional={true}
+          />
 
           {/* Actions */}
           <div className="flex gap-2.5 pt-2">

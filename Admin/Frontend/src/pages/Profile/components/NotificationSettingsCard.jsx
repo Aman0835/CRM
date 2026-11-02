@@ -9,7 +9,6 @@ export default function NotificationSettingsCard({ notifs, setNotifs }) {
         { key: "emailNotif", label: "Email Notifications", desc: "Send summary payroll runs to contact email." },
         { key: "payrollNotif", label: "Payroll Notifications", desc: "Alert when monthly salary statement gets compiled." },
         { key: "attendanceAlert", label: "Attendance Alerts", desc: "Notify when check-ins or check-outs run late." },
-        { key: "leaveRequest", label: "Leave Request Updates", desc: "Email alerts for staff leave approvals or denials." },
         { key: "holidayReminder", label: "Holiday Reminders", desc: "Alert operators 24-hours before shop closure." }
     ];
 

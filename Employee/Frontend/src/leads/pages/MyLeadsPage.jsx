@@ -52,6 +52,14 @@ export default function MyLeadsPage() {
 
   const filterTabs = ["all", "Interested", "Follow-up", "Visit Scheduled", "Contacted", "New", "Won", "Lost"];
 
+  const handleBack = () => {
+    if (window.history.state && window.history.state.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate("/dashboard");
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-4 pb-6 pt-1">
@@ -60,8 +68,9 @@ export default function MyLeadsPage() {
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => navigate("/leads")}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#182338] text-[#8ea4cb] hover:text-white transition-colors"
+              onClick={handleBack}
+              aria-label="Go back"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#182338] text-[#8ea4cb] hover:text-white active:scale-95 transition-all"
             >
               <FiArrowLeft className="h-5 w-5" />
             </button>

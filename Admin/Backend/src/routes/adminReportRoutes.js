@@ -6,7 +6,6 @@ import {
   getAttendanceReport,
   getCustomReport,
   getEmployeeReport,
-  getLeaveReport,
   getMonthlyReport,
   getPayrollReport,
 } from "../controllers/adminReportController.js";
@@ -22,8 +21,6 @@ router.get("/getAttendanceReport", getAttendanceReport);
 // Payroll Report
 router.get("/getPayrollReport", getPayrollReport);
 
-// Leave Report
-router.get("/getLeaveReport", getLeaveReport);
 
 // Employee Report
 router.get("/getEmployeeReport", getEmployeeReport);

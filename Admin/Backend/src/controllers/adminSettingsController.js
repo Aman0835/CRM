@@ -29,7 +29,7 @@ export const updateSettings = async (req, res) => {
       checkInTime,
       checkOutTime,
       overtimeRate,
-      leaveDeduction,
+      lateGraceMinutes,
     } = req.body;
 
     let settings = await Settings.findOne();
@@ -42,7 +42,9 @@ export const updateSettings = async (req, res) => {
     if (checkInTime !== undefined) settings.checkInTime = checkInTime;
     if (checkOutTime !== undefined) settings.checkOutTime = checkOutTime;
     if (overtimeRate !== undefined) settings.overtimeRate = Number(overtimeRate);
-    if (leaveDeduction !== undefined) settings.leaveDeduction = Number(leaveDeduction);
+    if (lateGraceMinutes !== undefined) settings.lateGraceMinutes = Number(lateGraceMinutes);
+    if (Array.isArray(req.body.vendors)) settings.vendors = req.body.vendors;
+    if (Array.isArray(req.body.sourcingManagers)) settings.sourcingManagers = req.body.sourcingManagers;
 
     await settings.save();
 

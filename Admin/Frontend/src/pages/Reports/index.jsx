@@ -39,7 +39,7 @@ export default function Reports() {
                         </div>
                         <div className="panel-surface rounded-2xl p-4 shadow-sm">
                             <span className="text-[10px] text-slate-400 dark:text-slate-550 uppercase block font-bold tracking-wider">Cumulative Payout</span>
-                            <strong className="text-xl font-bold block mt-1.5 text-blue-600 dark:text-blue-450">${stats.totalPayout.toLocaleString()}</strong>
+                            <strong className="text-xl font-bold block mt-1.5 text-blue-600 dark:text-blue-450">₹{stats.totalPayout.toLocaleString()}</strong>
                         </div>
                         <div className="panel-surface rounded-2xl p-4 shadow-sm">
                             <span className="text-[10px] text-slate-400 dark:text-slate-555 uppercase block font-bold tracking-wider">Approved Leave Days</span>

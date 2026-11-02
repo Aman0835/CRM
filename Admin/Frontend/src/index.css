@@ -115,6 +115,16 @@ html.dark {
     caret-color: #f3f4f6;
 }
 
+/* Global dark mode: prevent inputs going white on focus */
+.dark input:focus,
+.dark input:not([type="checkbox"]):not([type="radio"]):focus,
+.dark select:focus,
+.dark textarea:focus {
+    background-color: #1e293b !important;
+    color: #f3f4f6 !important;
+    caret-color: #f3f4f6;
+}
+
 /* Hide scrollbar for Chrome, Safari and Opera */
 .no-scrollbar::-webkit-scrollbar {
     display: none;

@@ -14,13 +14,14 @@ import {
   FiUser,
   FiCheckCircle,
 } from "react-icons/fi";
+import { FaWhatsapp } from "react-icons/fa";
 import toast from "react-hot-toast";
 import DashboardLayout from "../../components/layout/DashboardLayout";
 import StatusBadge from "../components/StatusBadge";
 import InteractionTimeline from "../components/InteractionTimeline";
 import AddInteractionModal from "../components/AddInteractionModal";
 import { getLeadById, getLeadInteractions } from "../services/leadService";
-import { formatFollowUp } from "../utils/leadUtils";
+import { formatFollowUp, cleanPhoneForWa } from "../utils/leadUtils";
 
 export default function LeadDetailsPage() {
   const { leadId } = useParams();
@@ -71,12 +72,6 @@ export default function LeadDetailsPage() {
 
   const followUp = formatFollowUp(lead?.nextFollowUp?.date, lead?.nextFollowUp?.time);
 
-  const cleanPhoneForWa = (phone = "") => {
-    let clean = phone.replace(/[^0-9]/g, "");
-    if (clean.length === 10) clean = `91${clean}`;
-    return clean;
-  };
-
   if (loading) {
     return (
       <DashboardLayout>
@@ -96,7 +91,7 @@ export default function LeadDetailsPage() {
           <div className="flex justify-center gap-3">
             <button
               type="button"
-              onClick={() => navigate("/leads/my")}
+              onClick={() => navigate("/leads")}
               className="rounded-xl border border-[#243552] bg-[#1d2840] px-4 py-2 text-xs font-bold text-white"
             >
               Back to Leads
@@ -115,6 +110,14 @@ export default function LeadDetailsPage() {
     );
   }
 
+  const handleBack = () => {
+    if (window.history.state && window.history.state.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate("/leads");
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-4 pb-20 pt-1">
@@ -122,8 +125,9 @@ export default function LeadDetailsPage() {
         <div className="flex items-center justify-between gap-3 px-1">
           <button
             type="button"
-            onClick={() => navigate("/leads/my")}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#182338] text-[#8ea4cb] hover:text-white transition-colors"
+            onClick={handleBack}
+            aria-label="Go back"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#182338] text-[#8ea4cb] hover:text-white active:scale-95 transition-all"
           >
             <FiArrowLeft className="h-5 w-5" />
           </button>
@@ -142,10 +146,10 @@ export default function LeadDetailsPage() {
                   href={`https://wa.me/${cleanPhoneForWa(lead.phone)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#16382a] text-emerald-400 hover:bg-emerald-600 hover:text-white transition-colors shadow-sm"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#143d2c] text-emerald-400 hover:bg-[#25D366] hover:text-slate-950 transition-all active:scale-95 shadow-sm"
                   title="WhatsApp Client"
                 >
-                  <FiMessageSquare className="h-4 w-4" />
+                  <FaWhatsapp className="h-4.5 w-4.5 text-[#25D366]" />
                 </a>
               </>
             )}
@@ -169,18 +173,29 @@ export default function LeadDetailsPage() {
             <StatusBadge status={lead.status} size="md" />
           </div>
 
-          <div className="flex flex-wrap gap-2 pt-1">
+          <div className="flex flex-wrap items-center gap-2 pt-1">
             {lead.phone && (
-              <span className="inline-flex items-center gap-1.5 rounded-xl bg-[#141e31] px-3 py-1.5 text-xs font-semibold text-blue-300 border border-[#233451]">
-                <FiPhone className="h-3.5 w-3.5 text-blue-400" />
-                <span>{lead.phone}</span>
-              </span>
-            )}
-            {lead.email && (
-              <span className="inline-flex items-center gap-1.5 rounded-xl bg-[#141e31] px-3 py-1.5 text-xs font-semibold text-[#8ea4cb] border border-[#233451]">
-                <FiMail className="h-3.5 w-3.5" />
-                <span>{lead.email}</span>
-              </span>
+              <>
+                <a
+                  href={`tel:${lead.phone}`}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#141e31] px-3 py-1.5 text-xs font-semibold text-blue-300 border border-[#233451] hover:bg-blue-600 hover:text-white transition-colors"
+                  title="Call Client"
+                >
+                  <FiPhone className="h-3.5 w-3.5 text-blue-400" />
+                  <span>{lead.phone}</span>
+                </a>
+
+                <a
+                  href={`https://wa.me/${cleanPhoneForWa(lead.phone)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#143d2c] border border-[#1b583f] px-3 py-1.5 text-xs font-bold text-emerald-400 transition-all hover:bg-[#25D366] hover:text-slate-950 active:scale-95 shadow-sm"
+                  title="Chat on WhatsApp"
+                >
+                  <FaWhatsapp className="h-3.5 w-3.5 text-[#25D366]" />
+                  <span>WhatsApp</span>
+                </a>
+              </>
             )}
           </div>
         </div>
@@ -250,11 +265,11 @@ export default function LeadDetailsPage() {
         </div>
 
         {/* Floating/Bottom "+ Add Interaction" Button */}
-        <div className="fixed inset-x-0 bottom-18 z-20 mx-auto max-w-[390px] px-4">
+        <div className="fixed inset-x-0 bottom-24 z-20 mx-auto max-w-[390px] px-4 pointer-events-none">
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[#2f6cf6] text-sm font-bold text-white shadow-[0_12px_28px_rgba(47,108,246,0.5)] active:scale-[0.98] border border-blue-400/30"
+            className="pointer-events-auto flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[#2f6cf6] text-sm font-bold text-white shadow-[0_12px_28px_rgba(47,108,246,0.5)] active:scale-[0.98] border border-blue-400/30"
           >
             <FiPlus className="h-5 w-5" />
             <span>Add Interaction</span>

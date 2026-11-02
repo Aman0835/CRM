@@ -1,13 +1,15 @@
+import dotenv from "dotenv";
 import express from "express";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 import {
-  createLead,
-  getMyLeads,
-  getLeadById,
-  updateLead,
   addInteraction,
+  createLead,
+  getAllLeads,
+  getLeadById,
   getLeadInteractions,
+  getMyLeads,
+  getMyReminders,
+  updateLead,
 } from "../controllers/leadController.js";
 
 dotenv.config();
@@ -49,7 +51,9 @@ router.use(leadAuth);
 
 // Routes
 router.post("/", createLead);
+router.get("/", getAllLeads);
 router.get("/my", getMyLeads);
+router.get("/my/reminders", getMyReminders);
 router.get("/:leadId", getLeadById);
 router.patch("/:leadId", updateLead);
 router.post("/:leadId/interactions", addInteraction);

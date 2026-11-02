@@ -18,28 +18,10 @@ function formatMonthYear(month, year) {
     });
 }
 
-function countLeaveDays(leaves, month, year) {
-    let total = 0;
-
-    leaves
-        .filter((leave) => leave.status === "approved")
-        .forEach((leave) => {
-            const cursor = new Date(leave.fromDate);
-            const end = new Date(leave.toDate);
-
-            while (cursor <= end) {
-                if (cursor.getMonth() === month - 1 && cursor.getFullYear() === year) total += 1;
-                cursor.setDate(cursor.getDate() + 1);
-            }
-        });
-
-    return total;
-}
 
 export default function Payroll() {
     const {
         attendance,
-        leaves,
         payroll,
         latestPayroll,
     } = useDashboard();
@@ -65,10 +47,7 @@ export default function Payroll() {
         (sum, item) => sum + Math.max(Number(item.workingHours ?? 0) - 8, 0),
         0,
     );
-    const leaveCount = useMemo(
-        () => countLeaveDays(leaves, currentMonth, currentYear),
-        [leaves, currentMonth, currentYear],
-    );
+    const leaveCount = 0;
 
     const previousPayroll = payroll[1] ?? null;
     const trendPercent = previousPayroll?.netSalary

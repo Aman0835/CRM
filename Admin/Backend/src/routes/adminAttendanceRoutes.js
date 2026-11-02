@@ -15,6 +15,11 @@ import {
     rejectEarlyCheckout,
 } from "../controllers/adminAttendanceController.js";
 
+import {
+    sendAttendanceReminders,
+    getNotCheckedInToday,
+} from "../controllers/attendanceReminderController.js";
+
 import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = Router();
@@ -52,5 +57,9 @@ router.put("/updateAttendance/:id", updateAttendance);
 
 // Delete Attendance
 router.delete("/deleteAttendance/:id", deleteAttendance);
+
+// Attendance Reminders
+router.get("/not-checked-in-today", getNotCheckedInToday);
+router.post("/send-reminders", sendAttendanceReminders);
 
 export default router;

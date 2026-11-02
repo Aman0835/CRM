@@ -19,7 +19,6 @@ export default function Dashboard() {
     loading,
     metrics,
     weeklyData,
-    leaveTypesData,
     topBarbers,
     upcomingAppointments,
   } = useDashboard();
@@ -72,7 +71,6 @@ export default function Dashboard() {
           <DashboardMetrics metrics={metrics} />
           <DashboardCharts
             weeklyData={weeklyData}
-            leaveTypesData={leaveTypesData}
           />
           <DashboardBottomRow
             upcomingAppointments={upcomingAppointments}

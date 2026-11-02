@@ -22,8 +22,8 @@ export default function Reports() {
     const [stats, setStats] = useState({
         avgAttendance: 0,
         avgHours: 0,
-        totalPayout: 0,
-        leaveCount: 0
+        avgHours: 0,
+        totalPayout: 0
     });
     
     const [rankingList, setRankingList] = useState([]);
@@ -32,17 +32,15 @@ export default function Reports() {
     const fetchReportsData = async () => {
         setLoading(true);
         try {
-            const [attRes, payRes, leaveRes, empRes] = await Promise.all([
+            const [attRes, payRes, empRes] = await Promise.all([
                 reportService.getAttendanceReport(),
                 reportService.getPayrollReport(),
-                reportService.getLeaveReport(),
                 employeeService.getEmployees({ limit: 100 })
             ]);
 
             if (empRes.success) {
                 const attData = attRes.success ? attRes.data : [];
                 const payData = payRes.success ? payRes.data : [];
-                const leaveData = leaveRes.success ? leaveRes.data : [];
                 const empList = empRes.data;
 
                 const totalAttLogs = attData.length;
@@ -55,13 +53,10 @@ export default function Reports() {
 
                 const totalPayout = payData.reduce((sum, p) => sum + p.netSalary, 0);
 
-                const leaveCount = leaveData.filter(l => l.status === "approved").length;
-
                 setStats({
                     avgAttendance,
                     avgHours,
-                    totalPayout,
-                    leaveCount
+                    totalPayout
                 });
 
                 const rankings = empList
@@ -129,8 +124,7 @@ export default function Reports() {
             csvContent += "SYSTEM OVERVIEW STATS\n";
             csvContent += `Avg Attendance Rate,${stats.avgAttendance}%\n`;
             csvContent += `Avg Shift Hours,${stats.avgHours} hours/day\n`;
-            csvContent += `Cumulative Payout,$${stats.totalPayout}\n`;
-            csvContent += `Approved Leave Periods,${stats.leaveCount}\n\n`;
+            csvContent += `Cumulative Payout,₹${stats.totalPayout}\n\n`;
             
             // 2. Leaderboard Ranks Section
             csvContent += "STAFF ATTENDANCE RANKS\n";
@@ -189,7 +183,7 @@ export default function Reports() {
             ) : (
                 <div className="space-y-6 text-slate-800 dark:text-slate-105">
                     {/* Metrics Grid */}
-                    <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    <section className="grid gap-4 md:grid-cols-3 xl:grid-cols-3">
                         <div className="panel-surface rounded-2xl p-4 shadow-sm">
                             <span className="text-[10px] text-slate-400 dark:text-slate-550 uppercase block font-bold tracking-wider">Avg Attendance Rate</span>
                             <strong className="text-xl font-bold block mt-1.5 text-emerald-650 dark:text-emerald-500">{stats.avgAttendance}%</strong>
@@ -200,11 +194,8 @@ export default function Reports() {
                         </div>
                         <div className="panel-surface rounded-2xl p-4 shadow-sm">
                             <span className="text-[10px] text-slate-400 dark:text-slate-550 uppercase block font-bold tracking-wider">Cumulative Payout</span>
-                            <strong className="text-xl font-bold block mt-1.5 text-blue-600 dark:text-blue-450">${stats.totalPayout.toLocaleString()}</strong>
+                            <strong className="text-xl font-bold block mt-1.5 text-blue-600 dark:text-blue-450">₹{stats.totalPayout.toLocaleString()}</strong>
                         </div>
-                        <div className="panel-surface rounded-2xl p-4 shadow-sm">
-                            <span className="text-[10px] text-slate-400 dark:text-slate-555 uppercase block font-bold tracking-wider">Approved Leave Days</span>
-                            <strong className="text-xl font-bold block mt-1.5 text-orange-500">{stats.leaveCount} Periods</strong>
                         </div>
                     </section>
 

@@ -45,17 +45,12 @@ export default function EmployeeDetail() {
     // Edit modal states
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [employeeId, setEmployeeId] = useState("");
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
+    const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
-    const [gender, setGender] = useState("male");
-    const [role, setRole] = useState("barber");
+    const [vendor, setVendor] = useState("");
+    const [perDayPayout, setPerDayPayout] = useState(0);
+    const [sourcingManager, setSourcingManager] = useState("");
     const [password, setPassword] = useState("");
-    const [joiningDate, setJoiningDate] = useState("");
-    const [monthlySalary, setMonthlySalary] = useState(0);
-    const [profileImage, setProfileImage] = useState("");
-    const [address, setAddress] = useState("");
     const [status, setStatus] = useState("active");
 
     const fetchEmployeeData = async (isInitial = false) => {
@@ -90,19 +85,14 @@ export default function EmployeeDetail() {
     const handleOpenEdit = () => {
         if (!employee) return;
         setEmployeeId(employee.employeeId || "");
-        setFirstName(employee.firstName || "");
-        setLastName(employee.lastName || "");
-        setEmail(employee.email || "");
+        setName(employee.name || `${employee.firstName || ""} ${employee.lastName || ""}`.trim());
         let p = employee.phone || "";
         if (p.startsWith("+91")) p = p.substring(3);
         setPhone(p);
-        setGender(employee.gender || "male");
-        setRole(employee.role || "barber");
-        setPassword(employee.visiblePassword || "");
-        setJoiningDate(employee.joiningDate ? employee.joiningDate.split("T")[0] : "");
-        setMonthlySalary(employee.monthlySalary || 0);
-        setProfileImage(employee.profileImage || "");
-        setAddress(employee.address || "");
+        setVendor(employee.vendor || "");
+        setPerDayPayout(employee.perDayPayout || (employee.monthlySalary ? Math.round(employee.monthlySalary / 30) : 0));
+        setSourcingManager(employee.sourcingManager || "");
+        setPassword("");
         setStatus(employee.status || "active");
         setIsEditOpen(true);
     };
@@ -111,16 +101,11 @@ export default function EmployeeDetail() {
         e.preventDefault();
         const payload = {
             employeeId,
-            firstName,
-            lastName,
-            email,
+            name: name.trim(),
             phone: phone.startsWith("+91") ? phone : `+91${phone}`,
-            gender,
-            role,
-            joiningDate,
-            monthlySalary: Number(monthlySalary),
-            profileImage,
-            address,
+            vendor: vendor.trim(),
+            sourcingManager: sourcingManager.trim(),
+            perDayPayout: Number(perDayPayout) || 0,
             status,
         };
 
@@ -224,8 +209,10 @@ export default function EmployeeDetail() {
 
                     <div className="w-full grid grid-cols-2 gap-3 text-center">
                         <div className="rounded-2xl bg-slate-50 dark:bg-slate-950/20 p-3 border border-slate-100 dark:border-slate-800">
-                            <span className="text-[9px] text-slate-400 uppercase tracking-wider font-semibold block">Monthly Pay</span>
-                            <strong className="text-sm block mt-1 text-slate-800 dark:text-slate-100">${employee.monthlySalary?.toLocaleString()}</strong>
+                            <span className="text-[9px] text-slate-400 uppercase tracking-wider font-semibold block">Per Day Payout</span>
+                            <strong className="text-sm block mt-1 text-slate-800 dark:text-slate-100">
+                                ₹{(employee.perDayPayout || (employee.monthlySalary ? Math.round(employee.monthlySalary / 30) : 0)).toLocaleString()}/day
+                            </strong>
                         </div>
                         <div className="rounded-2xl bg-slate-50 dark:bg-slate-950/20 p-3 border border-slate-100 dark:border-slate-800">
                             <span className="text-[9px] text-slate-400 uppercase tracking-wider font-semibold block">Employee ID</span>
@@ -254,15 +241,17 @@ export default function EmployeeDetail() {
                 <div className="lg:col-span-2 space-y-6">
                     <div className="panel-surface rounded-3xl p-6 shadow-sm">
                         <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4">Contact Information</h3>
-                        {infoRow("Email", employee.email)}
-                        {infoRow("Phone", employee.phone)}
-                        {infoRow("Gender", employee.gender)}
+                        {infoRow("Mobile Number", employee.phone)}
+                        {employee.email && !employee.email.includes("@clipper.internal") && infoRow("Email", employee.email)}
                         {infoRow("Address", employee.address)}
                     </div>
 
                     <div className="panel-surface rounded-3xl p-6 shadow-sm">
                         <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4">Employment Details</h3>
                         {infoRow("Employee Code", employee.employeeId)}
+                        {infoRow("Vendor", employee.vendor || "Direct / Internal")}
+                        {infoRow("Sourcing Manager", employee.sourcingManager || "Self / Direct")}
+                        {infoRow("Per Day Payment", `₹${(employee.perDayPayout || (employee.monthlySalary ? Math.round(employee.monthlySalary / 30) : 0)).toLocaleString()} / day`)}
                         <div className="flex justify-between items-center py-2.5 border-b border-slate-100 dark:border-slate-800">
                             <span className="text-xs text-slate-400 dark:text-slate-500">Login Password</span>
                             <div className="flex items-center gap-2">
@@ -279,9 +268,7 @@ export default function EmployeeDetail() {
                                 </button>
                             </div>
                         </div>
-                        {infoRow("Role", employee.role)}
                         {infoRow("Status", employee.status)}
-                        {infoRow("Joining Date", employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : null)}
                         {infoRow("Member Since", new Date(employee.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }))}
                     </div>
                 </div>
@@ -378,28 +365,18 @@ export default function EmployeeDetail() {
                 formMode="edit"
                 onSubmit={handleEditSubmit}
                 employeeId={employeeId}
-                firstName={firstName}
-                setFirstName={setFirstName}
-                lastName={lastName}
-                setLastName={setLastName}
-                email={email}
-                setEmail={setEmail}
+                name={name}
+                setName={setName}
                 phone={phone}
                 setPhone={setPhone}
-                gender={gender}
-                setGender={setGender}
-                role={role}
-                setRole={setRole}
+                vendor={vendor}
+                setVendor={setVendor}
+                perDayPayout={perDayPayout}
+                setPerDayPayout={setPerDayPayout}
+                sourcingManager={sourcingManager}
+                setSourcingManager={setSourcingManager}
                 password={password}
                 setPassword={setPassword}
-                joiningDate={joiningDate}
-                setJoiningDate={setJoiningDate}
-                monthlySalary={monthlySalary}
-                setMonthlySalary={setMonthlySalary}
-                profileImage={profileImage}
-                setProfileImage={setProfileImage}
-                address={address}
-                setAddress={setAddress}
                 status={status}
                 setStatus={setStatus}
             />

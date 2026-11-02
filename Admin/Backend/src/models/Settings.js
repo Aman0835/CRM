@@ -24,11 +24,19 @@ const settingsSchema = new mongoose.Schema(
     },
     overtimeRate: {
       type: Number,
-      default: 25, // $/hr
+      default: 25, // ₹/hr
     },
-    leaveDeduction: {
+    lateGraceMinutes: {
       type: Number,
-      default: 100, // $/day
+      default: 15, // minutes buffer before marking as Late
+    },
+    vendors: {
+      type: [String],
+      default: ["Direct / Internal", "Apex Staffing", "Elite Salon Associates", "Freelance Network"],
+    },
+    sourcingManagers: {
+      type: [String],
+      default: ["Self / Walk-in", "Aman Sharma", "Rohan Verma", "Neha Patel"],
     },
   },
   {

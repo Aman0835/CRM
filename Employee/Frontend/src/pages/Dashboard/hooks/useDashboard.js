@@ -1,28 +1,28 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { getMyAttendance } from "../../../services/attendanceService";
-import { getHolidays } from "../../../services/holidayService";
-import { getMyLeaves } from "../../../services/leaveService";
 import { getMyPayroll } from "../../../services/payrollService";
+import { getMyLeads, getMyReminders } from "../../../leads/services/leadService";
 import { subscribeRealtime } from "../../../services/realtime";
 
 export function useDashboard() {
     const { employee } = useAuth();
     const [loading, setLoading] = useState(true);
     const [attendance, setAttendance] = useState([]);
-    const [leaves, setLeaves] = useState([]);
     const [payroll, setPayroll] = useState([]);
-    const [holidays, setHolidays] = useState([]);
+    const [leads, setLeads] = useState([]);
+    const [reminders, setReminders] = useState([]);
+    const [leadsSummary, setLeadsSummary] = useState({ totalLeads: 0, totalActive: 0, totalLost: 0, todaysFollowUps: 0 });
 
     const fetchAll = useCallback(async (isInitial = false) => {
         if (!employee?.employeeId) return;
         if (isInitial) setLoading(true);
         try {
-            const [attRes, leaveRes, payRes, holRes] = await Promise.allSettled([
+            const [attRes, payRes, leadsRes, remRes] = await Promise.allSettled([
                 getMyAttendance(employee.employeeId),
-                getMyLeaves(employee.employeeId),
                 getMyPayroll(employee.employeeId),
-                getHolidays(),
+                getMyLeads({ limit: 5 }),
+                getMyReminders(),
             ]);
 
             if (attRes.status === "fulfilled") {
@@ -36,19 +36,25 @@ export function useDashboard() {
                 }
             }
 
-            if (leaveRes.status === "fulfilled") {
-                const rawLeave = leaveRes.value?.data;
-                setLeaves(Array.isArray(rawLeave) ? rawLeave : []);
-            }
+
 
             if (payRes.status === "fulfilled") {
                 const rawPay = payRes.value?.data;
                 setPayroll(Array.isArray(rawPay) ? rawPay : []);
             }
 
-            if (holRes.status === "fulfilled") {
-                const rawHol = holRes.value?.data;
-                setHolidays(Array.isArray(rawHol) ? rawHol : []);
+
+            if (leadsRes.status === "fulfilled") {
+                const rawLeads = leadsRes.value?.data;
+                setLeads(Array.isArray(rawLeads) ? rawLeads : []);
+                if (leadsRes.value?.summary) {
+                    setLeadsSummary(leadsRes.value.summary);
+                }
+            }
+
+            if (remRes.status === "fulfilled") {
+                const rawRem = remRes.value?.data;
+                setReminders(Array.isArray(rawRem) ? rawRem : []);
             }
         } catch (err) {
             console.error("Dashboard fetch error", err);
@@ -73,9 +79,7 @@ export function useDashboard() {
     }, [fetchAll]);
 
     const safeAttendance = Array.isArray(attendance) ? attendance : [];
-    const safeLeaves = Array.isArray(leaves) ? leaves : [];
     const safePayroll = Array.isArray(payroll) ? payroll : [];
-    const safeHolidays = Array.isArray(holidays) ? holidays : [];
 
     // Derived data
     const localDate = new Date();
@@ -99,28 +103,24 @@ export function useDashboard() {
     const presentDays = monthAttendance.filter((a) => a.status === "Present" || a.status === "Late").length;
     const absentDays = monthAttendance.filter((a) => a.status === "Absent").length;
 
-    const pendingLeaves = safeLeaves.filter((l) => l.status === "pending");
-    const upcomingLeave = pendingLeaves[0] ?? null;
-
     const latestPayroll = safePayroll[0] ?? null;
 
-    const upcomingHolidays = safeHolidays
-        .filter((h) => h && h.date && new Date(h.date) >= new Date())
-        .slice(0, 3);
+    const upcomingHolidays = [];
 
     return {
         loading,
         attendance: safeAttendance,
         payroll: safePayroll,
-        holidays: safeHolidays,
+        holidays: [],
         todayAttendance,
         presentDays,
         absentDays,
-        leaves: safeLeaves,
-        upcomingLeave,
         latestPayroll,
         upcomingHolidays,
         recentAttendance: safeAttendance.slice(0, 5),
+        recentLeads: leads,
+        leadsSummary,
+        reminders,
         fetchAll,
     };
 }

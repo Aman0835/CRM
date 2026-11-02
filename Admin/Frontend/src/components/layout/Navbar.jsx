@@ -29,7 +29,6 @@ const mainNavigation = [
     { to: "/dashboard", label: "Dashboard", icon: FiHome },
     { to: "/employees", label: "Employees", icon: FiUsers },
     { to: "/attendance", label: "Attendance", icon: FiCalendar },
-    { to: "/leave", label: "Leave", icon: FiClock },
     { to: "/payroll", label: "Payroll", icon: FiBriefcase },
 ];
 
@@ -160,9 +159,7 @@ export default function Navbar() {
             handleSingleMarkRead(n._id);
         }
         setNotifOpen(false);
-        if (n.type === "leave") {
-            navigate("/leave");
-        } else if (n.type === "attendance") {
+        if (n.type === "attendance") {
             navigate("/attendance");
         } else if (n.type === "holiday") {
             navigate("/holidays");
@@ -275,13 +272,11 @@ export default function Navbar() {
                                                 }`}
                                             >
                                                 <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold ${
-                                                    n.type === "leave" ? "bg-purple-100 text-purple-600 dark:bg-purple-950/50 dark:text-purple-400" :
                                                     n.type === "attendance" ? "bg-amber-100 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400" :
                                                     n.type === "holiday" ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400" :
                                                     "bg-blue-100 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400"
                                                 }`}>
                                                     {n.type === "attendance" ? <FiAlertTriangle /> :
-                                                     n.type === "leave" ? <FiClock /> :
                                                      n.type === "holiday" ? <FiCalendar /> : <FiInfo />}
                                                 </div>
 

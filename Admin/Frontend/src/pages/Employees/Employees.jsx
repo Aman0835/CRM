@@ -29,7 +29,6 @@ const statusOptions = [
   { value: "", label: "All Statuses" },
   { value: "active", label: "Active" },
   { value: "inactive", label: "Inactive" },
-  { value: "on_leave", label: "On Leave" },
 ];
 
 export default function Employees() {

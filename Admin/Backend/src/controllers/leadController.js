@@ -1,6 +1,6 @@
-import Lead from "../models/Lead.js";
-import Interaction from "../models/Interaction.js";
 import Employee from "../models/Employee.js";
+import Interaction from "../models/Interaction.js";
+import Lead from "../models/Lead.js";
 import { broadcastRealtime } from "../utils/realtime.js";
 
 // Helper: Normalize phone numbers (strip spaces, hyphens, ensure clean format)
@@ -195,10 +195,17 @@ export const getMyLeads = async (req, res) => {
     const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const endOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
 
-    const [totalActive, todaysFollowUps] = await Promise.all([
+    const [totalLeads, totalActive, totalLost, todaysFollowUps] = await Promise.all([
+      Lead.countDocuments({
+        assignedTo: employee._id,
+      }),
       Lead.countDocuments({
         assignedTo: employee._id,
         status: { $nin: ["Won", "Lost"] },
+      }),
+      Lead.countDocuments({
+        assignedTo: employee._id,
+        status: "Lost",
       }),
       Lead.countDocuments({
         assignedTo: employee._id,
@@ -212,7 +219,9 @@ export const getMyLeads = async (req, res) => {
       totalCount,
       page: Number(page),
       summary: {
+        totalLeads,
         totalActive,
+        totalLost,
         todaysFollowUps,
       },
       data: leads,
@@ -224,20 +233,95 @@ export const getMyLeads = async (req, res) => {
 };
 
 /**
- * GET /api/employee/leads/:leadId
- * Get details of a single lead by ID.
+ * GET /api/employee/leads/reminders
+ * Get all active leads for the logged-in employee that have an upcoming or overdue follow-up
  */
-export const getLeadById = async (req, res) => {
+export const getMyReminders = async (req, res) => {
   try {
     const employee = req.employee || req.user;
     if (!employee || !employee._id) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
+    const today = new Date();
+    const endOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+
+    const query = {
+      assignedTo: employee._id,
+      status: { $nin: ["Won", "Lost"] },
+      "nextFollowUp.date": { $lte: endOfToday, $ne: null }
+    };
+
+    const reminders = await Lead.find(query).sort({ "nextFollowUp.date": 1 });
+
+    res.status(200).json({
+      success: true,
+      count: reminders.length,
+      data: reminders,
+    });
+  } catch (error) {
+    console.error("getMyReminders error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * GET /api/leads
+ * Admin: Get all leads with optional search/status/page/limit
+ */
+export const getAllLeads = async (req, res) => {
+  try {
+    const { search = "", status = "all", page = 1, limit = 50 } = req.query;
+
+    const query = {};
+    if (search && search.trim()) {
+      const term = search.trim();
+      query.$or = [
+        { name: { $regex: term, $options: "i" } },
+        { phone: { $regex: term, $options: "i" } },
+        { project: { $regex: term, $options: "i" } },
+        { location: { $regex: term, $options: "i" } },
+        { "latestInteraction.clientResponse": { $regex: term, $options: "i" } },
+      ];
+    }
+
+    if (status && status !== "all") {
+      query.status = status;
+    }
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [leads, totalCount] = await Promise.all([
+      Lead.find(query)
+        .populate("assignedTo", "firstName lastName employeeId profileImage")
+        .sort({ updatedAt: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(Number(limit)),
+      Lead.countDocuments(query),
+    ]);
+
+    res.status(200).json({ success: true, count: leads.length, totalCount, page: Number(page), data: leads });
+  } catch (error) {
+    console.error("getAllLeads error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * GET /api/employee/leads/:leadId
+ * Get details of a single lead by ID.
+ */
+export const getLeadById = async (req, res) => {
+  try {
+    const employee = req.employee || req.user;
+    if (!employee || (!employee._id && employee.role !== "admin" && employee.role !== "manager")) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
     const { leadId } = req.params;
     const lead = await Lead.findById(leadId).populate(
       "assignedTo",
-      "firstName lastName employeeId phone email role"
+      "firstName lastName employeeId phone email role profileImage"
     );
 
     if (!lead) {
@@ -245,8 +329,8 @@ export const getLeadById = async (req, res) => {
     }
 
     // Authorization check: Only assigned employee or admin/manager can access
-    const isAssigned = lead.assignedTo?._id?.toString() === employee._id.toString();
     const isStaffOrAdmin = employee.role === "admin" || employee.role === "manager";
+    const isAssigned = lead.assignedTo?._id?.toString() === employee._id?.toString();
 
     if (!isAssigned && !isStaffOrAdmin) {
       return res.status(403).json({ success: false, message: "You are not authorized to view this lead" });
@@ -259,14 +343,10 @@ export const getLeadById = async (req, res) => {
   }
 };
 
-/**
- * PATCH /api/employee/leads/:leadId
- * Update lead properties (status, project, budget, etc.).
- */
 export const updateLead = async (req, res) => {
   try {
     const employee = req.employee || req.user;
-    if (!employee || !employee._id) {
+    if (!employee || (!employee._id && employee.role !== "admin" && employee.role !== "manager")) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
@@ -277,8 +357,8 @@ export const updateLead = async (req, res) => {
       return res.status(404).json({ success: false, message: "Lead not found" });
     }
 
-    const isAssigned = lead.assignedTo.toString() === employee._id.toString();
     const isStaffOrAdmin = employee.role === "admin" || employee.role === "manager";
+    const isAssigned = lead.assignedTo.toString() === employee._id?.toString();
 
     if (!isAssigned && !isStaffOrAdmin) {
       return res.status(403).json({ success: false, message: "Unauthorized to modify this lead" });
@@ -323,7 +403,7 @@ export const updateLead = async (req, res) => {
 export const addInteraction = async (req, res) => {
   try {
     const employee = req.employee || req.user;
-    if (!employee || !employee._id) {
+    if (!employee || (!employee._id && employee.role !== "admin" && employee.role !== "manager")) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
@@ -334,8 +414,8 @@ export const addInteraction = async (req, res) => {
       return res.status(404).json({ success: false, message: "Lead not found" });
     }
 
-    const isAssigned = lead.assignedTo.toString() === employee._id.toString();
     const isStaffOrAdmin = employee.role === "admin" || employee.role === "manager";
+    const isAssigned = lead.assignedTo.toString() === employee._id?.toString();
 
     if (!isAssigned && !isStaffOrAdmin) {
       return res.status(403).json({ success: false, message: "Unauthorized to add interaction to this lead" });
@@ -363,15 +443,18 @@ export const addInteraction = async (req, res) => {
       return res.status(400).json({ success: false, message: "Next action is required" });
     }
 
-    const empDoc = await Employee.findById(employee._id).select("firstName lastName employeeId");
-    const employeeFullName = empDoc ? `${empDoc.firstName} ${empDoc.lastName}`.trim() : "Employee";
+    let employeeFullName = "Admin";
+    if (employee._id) {
+      const empDoc = await Employee.findById(employee._id).select("firstName lastName employeeId");
+      employeeFullName = empDoc ? `${empDoc.firstName} ${empDoc.lastName}`.trim() : "Employee";
+    }
 
     const parsedFollowUpDate = followUpDate ? new Date(followUpDate) : null;
 
     // 1. Create Interaction record
     const interaction = new Interaction({
       leadId: lead._id,
-      employeeId: employee._id,
+      employeeId: employee._id || null, // null for admin
       employeeName: employeeFullName,
       type: type.toUpperCase(),
       clientResponse: clientResponse.trim(),
@@ -436,7 +519,7 @@ export const addInteraction = async (req, res) => {
 export const getLeadInteractions = async (req, res) => {
   try {
     const employee = req.employee || req.user;
-    if (!employee || !employee._id) {
+    if (!employee || (!employee._id && employee.role !== "admin" && employee.role !== "manager")) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
@@ -447,8 +530,8 @@ export const getLeadInteractions = async (req, res) => {
       return res.status(404).json({ success: false, message: "Lead not found" });
     }
 
-    const isAssigned = lead.assignedTo.toString() === employee._id.toString();
     const isStaffOrAdmin = employee.role === "admin" || employee.role === "manager";
+    const isAssigned = lead.assignedTo.toString() === employee._id?.toString();
 
     if (!isAssigned && !isStaffOrAdmin) {
       return res.status(403).json({ success: false, message: "Unauthorized to view interactions for this lead" });

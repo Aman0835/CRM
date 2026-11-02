@@ -28,15 +28,15 @@ export default function Payroll() {
             <section className="grid gap-4 grid-cols-3 text-slate-800 dark:text-slate-100">
                 <div className="panel-surface rounded-2xl p-4 shadow-sm">
                     <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase block tracking-wider font-bold">Gross Salaries</span>
-                    <strong className="text-xl font-bold block mt-1.5 text-slate-800 dark:text-slate-200">${grossPayroll.toLocaleString()}</strong>
+                    <strong className="text-xl font-bold block mt-1.5 text-slate-800 dark:text-slate-200">₹{grossPayroll.toLocaleString()}</strong>
                 </div>
                 <div className="panel-surface rounded-2xl p-4 shadow-sm">
                     <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase block tracking-wider font-bold">Total Deductions</span>
-                    <strong className="text-xl font-bold block mt-1.5 text-red-500">-${totalDeductions.toLocaleString()}</strong>
+                    <strong className="text-xl font-bold block mt-1.5 text-red-500">-₹{totalDeductions.toLocaleString()}</strong>
                 </div>
                 <div className="panel-surface rounded-2xl p-4 shadow-sm">
                     <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase block tracking-wider font-bold">Net Disbursements</span>
-                    <strong className="text-xl font-bold block mt-1.5 text-blue-600 dark:text-blue-450">${netPayroll.toLocaleString()}</strong>
+                    <strong className="text-xl font-bold block mt-1.5 text-blue-600 dark:text-blue-450">₹{netPayroll.toLocaleString()}</strong>
                 </div>
             </section>
 
@@ -94,10 +94,10 @@ export default function Payroll() {
                                                 {emp ? `${emp.firstName} ${emp.lastName}` : "Unknown Barber"} ({payroll.employeeId})
                                             </td>
                                             <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400 font-medium">{payroll.month}/{payroll.year}</td>
-                                            <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400">${payroll.baseSalary.toLocaleString()}</td>
-                                            <td className="py-3.5 px-4 text-emerald-600 dark:text-emerald-500 font-medium">+${payroll.overtimeAmount.toLocaleString()}</td>
-                                            <td className="py-3.5 px-4 text-red-500 font-medium">-${payroll.deductions.toLocaleString()}</td>
-                                            <td className="py-3.5 px-4 font-bold text-blue-600 dark:text-blue-400">${payroll.netSalary.toLocaleString()}</td>
+                                            <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400">₹{payroll.baseSalary.toLocaleString()}</td>
+                                            <td className="py-3.5 px-4 text-emerald-600 dark:text-emerald-500 font-medium">+₹{payroll.overtimeAmount.toLocaleString()}</td>
+                                            <td className="py-3.5 px-4 text-red-500 font-medium">-₹{payroll.deductions.toLocaleString()}</td>
+                                            <td className="py-3.5 px-4 font-bold text-blue-600 dark:text-blue-400">₹{payroll.netSalary.toLocaleString()}</td>
                                             <td className="py-3.5 px-4">
                                                 <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
                                                     payroll.status === "paid"

@@ -13,8 +13,8 @@ export default function Attendance() {
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Filter states
     const [search, setSearch] = useState("");
+    const [modalSearch, setModalSearch] = useState("");
     const [dateFilter, setDateFilter] = useState(new Date().toISOString().split("T")[0]);
 
     // Check-in modal states
@@ -120,7 +120,6 @@ export default function Attendance() {
     const todayLogs = attendanceList.filter(l => l.date === new Date().toISOString().split("T")[0]);
     const presentCount = todayLogs.filter(l => l.status === "Present").length;
     const absentCount = todayLogs.filter(l => l.status === "Absent").length;
-    const leaveCount = todayLogs.filter(l => l.status === "Leave").length;
 
     const handleExportCSV = () => {
         try {
@@ -205,10 +204,6 @@ export default function Attendance() {
                 <div className="panel-surface rounded-2xl p-4 shadow-sm">
                     <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase block tracking-wider font-bold">Present Today</span>
                     <strong className="text-xl font-bold block mt-1.5 text-emerald-650 dark:text-emerald-500">{presentCount} Barbers</strong>
-                </div>
-                <div className="panel-surface rounded-2xl p-4 shadow-sm">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase block tracking-wider font-bold">On Leave Today</span>
-                    <strong className="text-xl font-bold block mt-1.5 text-orange-500">{leaveCount} Barbers</strong>
                 </div>
                 <div className="panel-surface rounded-2xl p-4 shadow-sm">
                     <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase block tracking-wider font-bold">Absent Today</span>
@@ -371,7 +366,10 @@ export default function Attendance() {
                                 Admin {actionType} Roster
                             </h3>
                             <button
-                                onClick={() => setIsActionModalOpen(false)}
+                                onClick={() => {
+                                    setIsActionModalOpen(false);
+                                    setModalSearch(""); // clear on close
+                                }}
                                 className="h-8 w-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
                             >
                                 <FiX />
@@ -383,18 +381,40 @@ export default function Attendance() {
                                 <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-550">
                                     Select Employee
                                 </label>
-                                <select
-                                    value={selectedEmployeeId}
-                                    onChange={(e) => setSelectedEmployeeId(e.target.value)}
-                                    className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-slate-700 outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-slate-350 dark:focus:bg-slate-850"
-                                    required
-                                >
-                                    {employees.map(emp => (
-                                        <option key={emp._id} value={emp.employeeId}>
-                                            {emp.firstName} {emp.lastName} ({emp.employeeId})
-                                        </option>
-                                    ))}
-                                </select>
+                                <div className="mt-1.5 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-800 focus-within:border-blue-500 focus-within:bg-white dark:focus-within:bg-slate-850">
+                                    <div className="flex items-center px-3 border-b border-slate-100 dark:border-slate-700/50">
+                                        <FiSearch className="text-slate-400 text-sm shrink-0" />
+                                        <input
+                                            type="text"
+                                            placeholder="Type to filter..."
+                                            value={modalSearch}
+                                            onChange={(e) => setModalSearch(e.target.value)}
+                                            className="w-full h-10 px-2 bg-transparent outline-none text-slate-700 dark:text-slate-200"
+                                        />
+                                    </div>
+                                    <div className="max-h-48 overflow-y-auto p-1">
+                                        {employees
+                                            .filter(emp => 
+                                                `${emp.firstName} ${emp.lastName} ${emp.employeeId}`
+                                                .toLowerCase()
+                                                .includes(modalSearch.toLowerCase())
+                                            )
+                                            .map(emp => (
+                                            <div 
+                                                key={emp._id} 
+                                                onClick={() => setSelectedEmployeeId(emp.employeeId)}
+                                                className={`px-3 py-2 rounded-lg cursor-pointer flex items-center justify-between transition-colors ${
+                                                    selectedEmployeeId === emp.employeeId 
+                                                        ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold' 
+                                                        : 'hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-600 dark:text-slate-300'
+                                                }`}
+                                            >
+                                                <span>{emp.firstName} {emp.lastName}</span>
+                                                <span className="text-[10px] text-slate-400">ID: {emp.employeeId}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
 
                             <button

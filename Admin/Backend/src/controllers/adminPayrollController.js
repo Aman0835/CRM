@@ -39,18 +39,27 @@ export const generatePayroll = async (req, res) => {
       let totalOvertimeHours = 0;
       let absentDays = 0;
 
+      let presentDays = 0;
       for (const record of attendanceRecords) {
         if (record.overtime && record.overtime > 0) {
           totalOvertimeHours += record.overtime;
         }
         if (record.status === "Absent") {
           absentDays += 1;
+        } else if (record.status === "Present") {
+          presentDays += 1;
+        } else if (record.status === "Half Day") {
+          presentDays += 0.5;
         }
       }
 
-      const baseSalary = employee.monthlySalary || 0;
+      const baseSalary = employee.perDayPayout && employee.perDayPayout > 0
+        ? Math.round(employee.perDayPayout * presentDays)
+        : (employee.monthlySalary || 0);
       const overtimeAmount = Math.round(totalOvertimeHours * (settings.overtimeRate || 25));
-      const deductions = Math.round(absentDays * (settings.leaveDeduction || 100));
+      const deductions = employee.perDayPayout && employee.perDayPayout > 0
+        ? 0 // Per-day employees are only paid for days worked
+        : Math.round(absentDays * (settings.leaveDeduction || 100));
       const netSalary = Math.max(0, baseSalary + overtimeAmount - deductions);
 
       const payroll = await Payroll.findOneAndUpdate(

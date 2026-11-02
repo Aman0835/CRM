@@ -24,16 +24,27 @@ router.post("/login", async (req, res) => {
             return res.status(400).json({ success: false, message: "Email/ID and password are required" });
         }
 
-        const searchRegex = new RegExp(`^${emailOrId.trim()}$`, "i");
-        const employee = await Employee.findOne({
-            $or: [
-                { email: emailOrId.toLowerCase().trim() },
-                { employeeId: searchRegex },
-            ],
-        });
+        const cleanInput = emailOrId.trim();
+        const searchRegex = new RegExp(`^${cleanInput}$`, "i");
+        const digitsOnly = cleanInput.replace(/\D/g, "");
+
+        const orConditions = [
+            { email: cleanInput.toLowerCase() },
+            { employeeId: searchRegex },
+            { phone: cleanInput },
+        ];
+
+        if (digitsOnly.length >= 10) {
+            const last10 = digitsOnly.slice(-10);
+            orConditions.push({ phone: { $regex: last10 } });
+            orConditions.push({ phone: `+91${last10}` });
+            orConditions.push({ phone: last10 });
+        }
+
+        const employee = await Employee.findOne({ $or: orConditions });
 
         if (!employee) {
-            return res.status(401).json({ success: false, message: "No account found with this Employee ID or Email" });
+            return res.status(401).json({ success: false, message: "No account found with this Mobile Number, Employee ID or Email" });
         }
 
         let isMatch = await bcrypt.compare(password, employee.password);
@@ -72,10 +83,15 @@ router.post("/login", async (req, res) => {
             employee: {
                 _id: employee._id,
                 employeeId: employee.employeeId,
+                name: employee.name || `${employee.firstName || ""} ${employee.lastName || ""}`.trim(),
                 firstName: employee.firstName,
                 lastName: employee.lastName,
                 email: employee.email,
                 phone: employee.phone,
+                vendor: employee.vendor || "",
+                sourcing: employee.sourcing || employee.sourcingManager || "",
+                sourcingManager: employee.sourcing || employee.sourcingManager || "",
+                perDayPayout: employee.perDayPayout || (employee.monthlySalary ? Math.round(employee.monthlySalary / 30) : 0),
                 gender: employee.gender,
                 role: employee.role,
                 joiningDate: employee.joiningDate,

@@ -21,11 +21,11 @@ export default function Employees() {
         totalPages, statusFilter, setStatusFilter, statusDropdownOpen, setStatusDropdownOpen,
         statusDropdownRef, isFormOpen, setIsFormOpen, formMode,
         handleClearFilters, handleOpenCreate, handleOpenEdit, handleDelete, handleFormSubmit,
-        employeeId, firstName, setFirstName, lastName, setLastName,
-        email, setEmail, phone, setPhone, gender, setGender,
-        role, setRole, password, setPassword, joiningDate, setJoiningDate,
-        monthlySalary, setMonthlySalary, profileImage, setProfileImage,
-        address, setAddress, status, setStatus,
+        employeeId, name, setName, phone, setPhone,
+        vendor, setVendor, vendorOptions, handleAddVendor,
+        perDayPayout, setPerDayPayout,
+        sourcingManager, setSourcingManager, sourcingManagerOptions, handleAddSourcingManager,
+        password, setPassword, status, setStatus,
     } = useEmployees();
 
     return (
@@ -135,15 +135,29 @@ export default function Employees() {
             )}
 
             <EmployeeFormModal
-                isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} formMode={formMode} onSubmit={handleFormSubmit}
-                employeeId={employeeId} firstName={firstName} setFirstName={setFirstName}
-                lastName={lastName} setLastName={setLastName} email={email} setEmail={setEmail}
-                phone={phone} setPhone={setPhone} gender={gender} setGender={setGender}
-                role={role} setRole={setRole} password={password} setPassword={setPassword}
-                joiningDate={joiningDate} setJoiningDate={setJoiningDate}
-                monthlySalary={monthlySalary} setMonthlySalary={setMonthlySalary}
-                profileImage={profileImage} setProfileImage={setProfileImage}
-                address={address} setAddress={setAddress} status={status} setStatus={setStatus}
+                isOpen={isFormOpen}
+                onClose={() => setIsFormOpen(false)}
+                formMode={formMode}
+                onSubmit={handleFormSubmit}
+                employeeId={employeeId}
+                name={name}
+                setName={setName}
+                phone={phone}
+                setPhone={setPhone}
+                vendor={vendor}
+                setVendor={setVendor}
+                vendorOptions={vendorOptions}
+                onAddVendor={handleAddVendor}
+                perDayPayout={perDayPayout}
+                setPerDayPayout={setPerDayPayout}
+                sourcingManager={sourcingManager}
+                setSourcingManager={setSourcingManager}
+                sourcingManagerOptions={sourcingManagerOptions}
+                onAddSourcingManager={handleAddSourcingManager}
+                password={password}
+                setPassword={setPassword}
+                status={status}
+                setStatus={setStatus}
             />
         </DashboardLayout>
     );

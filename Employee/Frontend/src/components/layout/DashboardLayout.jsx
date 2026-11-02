@@ -1,4 +1,4 @@
-import { FiCalendar, FiClock, FiDollarSign, FiHome, FiUser, FiUsers } from "react-icons/fi";
+import { FiCalendar, FiClock, FiCreditCard, FiHome, FiUser, FiUsers } from "react-icons/fi";
 import { NavLink, useLocation } from "react-router-dom";
 import PwaInstallPrompt from "../PwaInstallPrompt";
 
@@ -6,7 +6,7 @@ const navItems = [
     { to: "/dashboard",  label: "Home",     icon: FiHome },
     { to: "/attendance", label: "Attend.",  icon: FiClock },
     { to: "/leads",      label: "Leads",    icon: FiUsers },
-    { to: "/payroll",    label: "Salary",   icon: FiDollarSign },
+    { to: "/payroll",    label: "Salary",   icon: FiCreditCard },
     { to: "/profile",    label: "Profile",  icon: FiUser },
 ];
 
@@ -24,7 +24,7 @@ export default function DashboardLayout({ children }) {
             <PwaInstallPrompt />
             <div className="mx-auto h-screen w-screen overflow-hidden md:h-[calc(100vh-40px)] md:max-h-[900px] md:w-[390px] md:rounded-[42px] md:border-[10px] md:border-[#24324d] md:bg-[#0b1120] md:shadow-[0_60px_120px_-20px_rgba(0,0,0,0.9)]">
                 <div className="relative flex h-full flex-col overflow-hidden bg-[#0b1120] text-white">
-                    <main className="employee-shell-scroll flex-1 overflow-y-auto px-4 pb-24 pt-5 md:pt-7">
+                    <main className="employee-shell-scroll flex-1 overflow-y-auto px-4 pb-32 pt-5 md:pt-7">
                         {children}
                     </main>
 

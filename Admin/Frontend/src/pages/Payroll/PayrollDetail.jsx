@@ -371,27 +371,27 @@ export default function PayrollDetail() {
                             <tbody>
                                 <tr style="border-bottom: 1px solid #f1f5f9;">
                                     <td style="padding: 8px 0; color: #334155;">Basic Salary</td>
-                                    <td style="text-align: right; padding: 8px 0; font-weight: 600;">$${basicPay.toLocaleString()}</td>
+                                    <td style="text-align: right; padding: 8px 0; font-weight: 600;">₹${basicPay.toLocaleString()}</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid #f1f5f9;">
                                     <td style="padding: 8px 0; color: #334155;">HRA (House Rent Allow.)</td>
-                                    <td style="text-align: right; padding: 8px 0; font-weight: 600;">$${hra.toLocaleString()}</td>
+                                    <td style="text-align: right; padding: 8px 0; font-weight: 600;">₹${hra.toLocaleString()}</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid #f1f5f9;">
                                     <td style="padding: 8px 0; color: #334155;">Medical Allowance</td>
-                                    <td style="text-align: right; padding: 8px 0; font-weight: 600;">$${medical.toLocaleString()}</td>
+                                    <td style="text-align: right; padding: 8px 0; font-weight: 600;">₹${medical.toLocaleString()}</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid #f1f5f9;">
                                     <td style="padding: 8px 0; color: #334155;">Travel Allowance</td>
-                                    <td style="text-align: right; padding: 8px 0; font-weight: 600;">$${travel.toLocaleString()}</td>
+                                    <td style="text-align: right; padding: 8px 0; font-weight: 600;">₹${travel.toLocaleString()}</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid #f1f5f9;">
                                     <td style="padding: 8px 0; color: #334155;">Overtime Pay</td>
-                                    <td style="text-align: right; padding: 8px 0; font-weight: 600; color: #16a34a;">+$${payroll.overtimeAmount.toLocaleString()}</td>
+                                    <td style="text-align: right; padding: 8px 0; font-weight: 600; color: #16a34a;">+₹${payroll.overtimeAmount.toLocaleString()}</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid #f1f5f9;">
                                     <td style="padding: 8px 0; color: #334155;">Other Allowances</td>
-                                    <td style="text-align: right; padding: 8px 0; font-weight: 600;">$${otherAllow.toLocaleString()}</td>
+                                    <td style="text-align: right; padding: 8px 0; font-weight: 600;">₹${otherAllow.toLocaleString()}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -408,19 +408,19 @@ export default function PayrollDetail() {
                             <tbody>
                                 <tr style="border-bottom: 1px solid #f1f5f9;">
                                     <td style="padding: 8px 0; color: #334155;">Provident Fund (PF)</td>
-                                    <td style="text-align: right; padding: 8px 0; font-weight: 600; color: #dc2626;">-$${pf.toLocaleString()}</td>
+                                    <td style="text-align: right; padding: 8px 0; font-weight: 600; color: #dc2626;">-₹${pf.toLocaleString()}</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid #f1f5f9;">
                                     <td style="padding: 8px 0; color: #334155;">Professional Tax</td>
-                                    <td style="text-align: right; padding: 8px 0; font-weight: 600; color: #dc2626;">-$${pt.toLocaleString()}</td>
+                                    <td style="text-align: right; padding: 8px 0; font-weight: 600; color: #dc2626;">-₹${pt.toLocaleString()}</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid #f1f5f9;">
                                     <td style="padding: 8px 0; color: #334155;">Leave Deduction</td>
-                                    <td style="text-align: right; padding: 8px 0; font-weight: 600; color: #dc2626;">-$${leaveDeduction.toLocaleString()}</td>
+                                    <td style="text-align: right; padding: 8px 0; font-weight: 600; color: #dc2626;">-₹${leaveDeduction.toLocaleString()}</td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid #f1f5f9;">
                                     <td style="padding: 8px 0; color: #334155;">Other Deductions</td>
-                                    <td style="text-align: right; padding: 8px 0; font-weight: 600; color: #dc2626;">-$${otherDeduction.toLocaleString()}</td>
+                                    <td style="text-align: right; padding: 8px 0; font-weight: 600; color: #dc2626;">-₹${otherDeduction.toLocaleString()}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -432,17 +432,17 @@ export default function PayrollDetail() {
                     <div style="width: 280px; background-color: #f1f5f9; border-radius: 12px; padding: 15px; float: right;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 6px; flex-direction: row;">
                             <span style="color: #64748b;">Gross Earnings:</span>
-                            <strong style="color: #1e293b; float: right;">$${totalEarnings.toLocaleString()}</strong>
+                            <strong style="color: #1e293b; float: right;">₹${totalEarnings.toLocaleString()}</strong>
                             <div style="clear: both;"></div>
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid #cbd5e1; padding-bottom: 6px; flex-direction: row;">
                             <span style="color: #64748b;">Total Deductions:</span>
-                            <strong style="color: #dc2626; float: right;">-$${payroll.deductions.toLocaleString()}</strong>
+                            <strong style="color: #dc2626; float: right;">-₹${payroll.deductions.toLocaleString()}</strong>
                             <div style="clear: both;"></div>
                         </div>
                         <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: bold; color: #1e3a8a; flex-direction: row;">
                             <span>Net Paid Salary:</span>
-                            <span style="float: right;">$${payroll.netSalary.toLocaleString()}</span>
+                            <span style="float: right;">₹${payroll.netSalary.toLocaleString()}</span>
                             <div style="clear: both;"></div>
                         </div>
                     </div>

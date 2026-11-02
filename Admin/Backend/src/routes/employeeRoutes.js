@@ -1,8 +1,6 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import Employee from "../models/Employee.js";
-import LeaveRequest from "../models/LeaveRequest.js";
-import Holiday from "../models/Holiday.js";
 import Attendance from "../models/Attendance.js";
 
 const router = express.Router();
@@ -71,31 +69,7 @@ router.patch("/profile/me", async (req, res) => {
     }
 });
 
-// GET /api/employee/leaves/my/:employeeId — own leave requests
-router.get("/leaves/my/:employeeId", async (req, res) => {
-    try {
-        // Ensure employee can only see their own leaves (case-insensitive comparison)
-        if ((req.params.employeeId || "").toLowerCase() !== (req.employee.employeeId || "").toLowerCase()) {
-            return res.status(403).json({ success: false, message: "Forbidden" });
-        }
-        const leaves = await LeaveRequest.find({
-            employeeId: { $regex: new RegExp(`^${req.params.employeeId.trim()}$`, "i") }
-        }).sort({ createdAt: -1 });
-        res.status(200).json({ success: true, count: leaves.length, data: leaves });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-});
 
-// GET /api/employee/holidays — all holidays (read-only for employees)
-router.get("/holidays", async (req, res) => {
-    try {
-        const holidays = await Holiday.find().sort({ date: 1 });
-        res.status(200).json({ success: true, count: holidays.length, data: holidays });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-});
 
 // GET /api/employee/attendance/today/:employeeId
 router.get("/attendance/today/:employeeId", async (req, res) => {

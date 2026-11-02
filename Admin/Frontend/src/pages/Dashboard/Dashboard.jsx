@@ -5,7 +5,7 @@ import {
   FiCalendar,
   FiCheck,
   FiClock,
-  FiDollarSign,
+  FiCreditCard,
   FiStar,
   FiTrendingUp,
   FiUsers,
@@ -30,7 +30,6 @@ import DashboardLayout from "../../components/layout/DashboardLayout";
 import * as attendanceService from "../../services/attendanceService";
 import * as dashboardService from "../../services/dashboardService";
 import * as employeeService from "../../services/employeeService";
-import * as leaveService from "../../services/leaveService";
 import { buildDashboardExportCsv } from "./utils/dashboardExport";
 
 export default function Dashboard() {
@@ -42,7 +41,6 @@ export default function Dashboard() {
   // Roster arrays loaded from DB
   const [employees, setEmployees] = useState([]);
   const [attendanceLogs, setAttendanceLogs] = useState([]);
-  const [leavesList, setLeavesList] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchDashboardData = async () => {
@@ -61,7 +59,6 @@ export default function Dashboard() {
         dashboardService.getAttendanceSummary(),
         employeeService.getEmployees({ limit: 100 }),
         attendanceService.getAttendanceList(),
-        leaveService.getLeaves(),
       ]);
 
       if (overviewRes.success) setOverview(overviewRes.data);
@@ -69,7 +66,6 @@ export default function Dashboard() {
       if (attendanceRes.success) setAttendanceSummary(attendanceRes.data);
       if (empRes.success) setEmployees(empRes.data);
       if (allAttendanceRes.success) setAttendanceLogs(allAttendanceRes.data);
-      if (leavesRes.success) setLeavesList(leavesRes.data);
     } catch (error) {
       console.error("Dashboard data extraction error:", error);
       toast.error("Failed to extract real data from backend");
@@ -89,11 +85,7 @@ export default function Dashboard() {
   const presentItem = attList.find((item) => item._id === "Present");
   const halfDayItem = attList.find((item) => item._id === "Half Day");
   const absentItem = attList.find((item) => item._id === "Absent");
-  const leaveItem = attList.find((item) => item._id === "Leave");
-
-  const presentCount = (presentItem?.count || 0) + (halfDayItem?.count || 0);
   const absentCount = absentItem?.count || 0;
-  const leaveCount = leaveItem?.count || overview?.pendingLeaves || 0;
 
   const netPayrollSum = payrollSummary?.totalNetSalary ?? 0;
 
@@ -122,18 +114,7 @@ export default function Dashboard() {
       hoverShadow: "hover:shadow-[0_8px_30px_rgba(16,185,129,0.06)]",
       glowColor: "bg-emerald-500/5",
     },
-    {
-      label: "On Leave",
-      value: leaveCount,
-      subtext: "Staff requests",
-      growth: "Approved leaves",
-      icon: FiCalendar,
-      iconBg:
-        "bg-orange-50 text-orange-600 border border-orange-100 dark:bg-orange-950/20 dark:text-orange-400 dark:border-orange-900/30",
-      path: "/leave",
-      hoverShadow: "hover:shadow-[0_8px_30px_rgba(245,158,11,0.06)]",
-      glowColor: "bg-orange-500/5",
-    },
+
     {
       label: "Absent",
       value: absentCount,
@@ -151,7 +132,7 @@ export default function Dashboard() {
       value: netPayrollSum > 0 ? `₹${netPayrollSum.toLocaleString()}` : "₹0",
       subtext: "Calculated releases",
       growth: "+3.4%",
-      icon: FiDollarSign,
+      icon: FiCreditCard,
       iconBg:
         "bg-purple-50 text-purple-600 border border-purple-100 dark:bg-purple-950/20 dark:text-purple-400 dark:border-purple-900/30",
       path: "/payroll",
@@ -191,67 +172,15 @@ export default function Dashboard() {
         (log) => log.status === "Present" || log.status === "Half Day",
       ).length;
       const absent = dayLogs.filter((log) => log.status === "Absent").length;
-      const leave = dayLogs.filter((log) => log.status === "Leave").length;
-
-      weeklyDataArr.push({
         name: dayName,
         Present: present,
         Absent: absent,
-        Leave: leave,
       });
     }
     return weeklyDataArr;
   };
 
   const weeklyData = getWeeklyAttendanceData();
-
-  // 3. Calculate Leave Types Donut Data Dynamically from DB Leaves list
-  const getLeaveTypesData = () => {
-    let sick = 0;
-    let casual = 0;
-    let annual = 0;
-    let unpaid = 0;
-
-    leavesList.forEach((l) => {
-      if (l.status === "approved") {
-        const reasonText = (l.reason || "").toLowerCase();
-        const duration =
-          Math.ceil(
-            (new Date(l.toDate) - new Date(l.fromDate)) / (1000 * 60 * 60 * 24),
-          ) + 1;
-        if (
-          reasonText.includes("sick") ||
-          reasonText.includes("doctor") ||
-          reasonText.includes("medical")
-        ) {
-          sick += duration;
-        } else if (
-          reasonText.includes("annual") ||
-          reasonText.includes("vacation") ||
-          reasonText.includes("trip")
-        ) {
-          annual += duration;
-        } else if (reasonText.includes("unpaid")) {
-          unpaid += duration;
-        } else {
-          casual += duration;
-        }
-      }
-    });
-
-    return [
-      { name: "Sick", value: sick, color: "#f87171" },
-      { name: "Casual", value: casual, color: "#fbbf24" },
-      { name: "Annual", value: annual, color: "#34d399" },
-      { name: "Unpaid", value: unpaid, color: "#9ca3af" },
-    ];
-  };
-
-  const leaveTypesData = getLeaveTypesData();
-  const totalLeavesInChart = leaveTypesData.reduce(
-    (acc, curr) => acc + curr.value,
-    0,
-  );
 
   // 4. Calculate Best Performing Barbers dynamically based on attendance rates
   const getTopBarbers = () => {
@@ -327,7 +256,6 @@ export default function Dashboard() {
         attendanceSummary,
         employees,
         attendanceLogs,
-        leavesList,
       });
 
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -464,75 +392,11 @@ export default function Dashboard() {
                       radius={[4, 4, 0, 0]}
                       maxBarSize={16}
                     />
-                    <Bar
-                      dataKey="Leave"
-                      fill="#f59e0b"
-                      radius={[4, 4, 0, 0]}
-                      maxBarSize={16}
-                    />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
-            {/* Leave Types Donut Chart */}
-            <div className="panel-surface rounded-3xl p-6 shadow-sm">
-              <div className="border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
-                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">
-                  Leave Types
-                </h3>
-                <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-                  July distribution
-                </p>
-              </div>
-
-              {totalLeavesInChart === 0 ? (
-                <div className="h-[180px] flex flex-col items-center justify-center text-center px-4">
-                  <p className="text-xs text-slate-400 dark:text-slate-500">
-                    No approved leaves this month.
-                  </p>
-                </div>
-              ) : (
-                <div className="h-[180px] flex items-center justify-center">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={leaveTypesData}
-                        dataKey="value"
-                        innerRadius={50}
-                        outerRadius={74}
-                        paddingAngle={3}>
-                        {leaveTypesData.map((entry) => (
-                          <Cell key={entry.name} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-
-              <div className="space-y-2 mt-4">
-                {leaveTypesData.map((type) => (
-                  <div
-                    key={type.name}
-                    className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="h-2.5 w-2.5 rounded-full"
-                        style={{ backgroundColor: type.color }}
-                      />
-                      <span className="text-slate-600 dark:text-slate-405 font-medium">
-                        {type.name}
-                      </span>
-                    </div>
-                    <span className="text-slate-800 dark:text-slate-200 font-bold">
-                      {type.value}d
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
           </section>
 
           {/* Today's Shifts & Top Barbers */}

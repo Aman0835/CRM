@@ -7,7 +7,6 @@ import {
     getDashboard,
     getDashboardStats,
     getEmployeeGrowth,
-    getLeaveSummary,
     getMonthlyStats,
     getPayrollSummary,
     getRecentActivities,
@@ -31,8 +30,6 @@ router.get("/attendance-summary", getAttendanceSummary);
 // Payroll Summary
 router.get("/payroll-summary", getPayrollSummary);
 
-// Leave Summary
-router.get("/leave-summary", getLeaveSummary);
 
 // Recent Activities
 router.get("/recent-activities", getRecentActivities);

@@ -2,47 +2,54 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import {
     FiCalendar,
-    FiCheck,
-    FiDollarSign,
+    FiClock,
     FiTrendingUp,
-    FiUsers,
-    FiX
+    FiUserCheck,
+    FiUsers
 } from "react-icons/fi";
-import * as attendanceService from "../../../services/attendanceService";
-import * as dashboardService from "../../../services/dashboardService";
 import * as employeeService from "../../../services/employeeService";
-import * as leaveService from "../../../services/leaveService";
+import { getLeads } from "../../../services/leadService";
 import { subscribeRealtime } from "../../../services/realtime";
 
+const ACTIVE_LEAD_STATUSES = [
+    "New",
+    "Contacted",
+    "Interested",
+    "Follow-up",
+    "Visit Scheduled",
+    "Visit Completed",
+    "Negotiation",
+    "Booking",
+];
+
+const isSameCalendarDay = (dateA, dateB) => {
+    const a = new Date(dateA);
+    const b = new Date(dateB);
+    return (
+        a.getFullYear() === b.getFullYear() &&
+        a.getMonth() === b.getMonth() &&
+        a.getDate() === b.getDate()
+    );
+};
+
 export function useDashboard() {
-    const [overview, setOverview] = useState(null);
-    const [payrollSummary, setPayrollSummary] = useState(null);
-    const [attendanceSummary, setAttendanceSummary] = useState(null);
     const [employees, setEmployees] = useState([]);
-    const [attendanceLogs, setAttendanceLogs] = useState([]);
-    const [leavesList, setLeavesList] = useState([]);
+    const [leads, setLeads] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const fetchDashboardData = async (isInitial = false) => {
         try {
             if (isInitial) setLoading(true);
-            const [overviewRes, payrollRes, attendanceRes, empRes, allAttendanceRes, leavesRes] = await Promise.all([
-                dashboardService.getDashboardOverview(),
-                dashboardService.getPayrollSummary(),
-                dashboardService.getAttendanceSummary(),
+            const [empRes, leadsRes] = await Promise.all([
                 employeeService.getEmployees({ limit: 100 }),
-                attendanceService.getAttendanceList(),
-                leaveService.getLeaves()
+                getLeads({ limit: 500 }),
             ]);
-            if (overviewRes.success) setOverview(overviewRes.data);
-            if (payrollRes.success) setPayrollSummary(payrollRes.data);
-            if (attendanceRes.success) setAttendanceSummary(attendanceRes.data);
+
             if (empRes.success) setEmployees(empRes.data);
-            if (allAttendanceRes.success) setAttendanceLogs(allAttendanceRes.data);
-            if (leavesRes.success) setLeavesList(leavesRes.data);
+            if (leadsRes.success) setLeads(leadsRes.data || []);
         } catch (error) {
-            console.error("Dashboard data extraction error:", error);
-            toast.error("Failed to extract real data from backend");
+            console.error("Dashboard productivity data extraction error:", error);
+            toast.error("Failed to load productivity dashboard data");
         } finally {
             if (isInitial) setLoading(false);
         }
@@ -57,138 +64,152 @@ export function useDashboard() {
         return unsubscribe;
     }, []);
 
-    const totalEmployees = overview?.totalEmployees ?? employees.length;
-
-    const attList = attendanceSummary?.attendance || [];
-    const presentItem = attList.find(item => item._id === "Present");
-    const halfDayItem = attList.find(item => item._id === "Half Day");
-    const absentItem = attList.find(item => item._id === "Absent");
-    const leaveItem = attList.find(item => item._id === "Leave");
-
-    const presentCount = (presentItem?.count || 0) + (halfDayItem?.count || 0);
-    const absentCount = absentItem?.count || 0;
-    const leaveCount = leaveItem?.count || overview?.pendingLeaves || 0;
-    const netPayrollSum = payrollSummary?.totalNetSalary ?? 0;
+    const today = new Date();
+    const leadList = Array.isArray(leads) ? leads : [];
+    const activePipeline = leadList.filter((lead) => !["Won", "Lost"].includes(lead.status)).length;
+    const totalLeads = leadList.length;
+    const newLeads = leadList.filter((lead) => lead.status === "New").length;
+    const qualifiedLeads = leadList.filter((lead) => ACTIVE_LEAD_STATUSES.includes(lead.status)).length;
+    const visitsScheduled = leadList.filter((lead) => lead.status === "Visit Scheduled").length;
+    const followUpsToday = leadList.filter((lead) => {
+        if (!lead.nextFollowUp?.date) return false;
+        return isSameCalendarDay(new Date(lead.nextFollowUp.date), today);
+    }).length;
+    const wonLeads = leadList.filter((lead) => lead.status === "Won").length;
+    const conversionRate = totalLeads > 0 ? Math.round((wonLeads / totalLeads) * 100) : 0;
 
     const metrics = [
         {
-            label: "Total Employees", value: totalEmployees,
-            subtext: `${overview?.activeEmployees ?? employees.filter(e => e.status === "active").length} active`,
-            growth: "+1 this month", icon: FiUsers, path: "/employees",
+            label: "Total Leads",
+            value: totalLeads,
+            subtext: `${activePipeline} active in pipeline`,
+            growth: "+12% this month",
+            icon: FiUsers,
+            path: "/leads",
             iconBg: "bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30",
-            hoverShadow: "hover:shadow-[0_8px_30px_rgba(59,130,246,0.06)]", glowColor: "bg-blue-500/5",
+            hoverShadow: "hover:shadow-[0_8px_30px_rgba(59,130,246,0.06)]",
+            glowColor: "bg-blue-500/5",
         },
         {
-            label: "Present Today", value: presentCount || overview?.todayAttendance || 0,
-            subtext: `of ${totalEmployees} scheduled`, growth: "On schedule", icon: FiCheck, path: "/attendance",
+            label: "Qualified Leads",
+            value: qualifiedLeads,
+            subtext: `${newLeads} new this cycle`,
+            growth: "Strong pipeline",
+            icon: FiUserCheck,
+            path: "/leads",
             iconBg: "bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30",
-            hoverShadow: "hover:shadow-[0_8px_30px_rgba(16,185,129,0.06)]", glowColor: "bg-emerald-500/5",
+            hoverShadow: "hover:shadow-[0_8px_30px_rgba(16,185,129,0.06)]",
+            glowColor: "bg-emerald-500/5",
         },
         {
-            label: "On Leave", value: leaveCount, subtext: "Staff requests", growth: "Approved leaves",
-            icon: FiCalendar, path: "/leave",
-            iconBg: "bg-orange-50 text-orange-600 border border-orange-100 dark:bg-orange-950/20 dark:text-orange-400 dark:border-orange-900/30",
-            hoverShadow: "hover:shadow-[0_8px_30px_rgba(245,158,11,0.06)]", glowColor: "bg-orange-500/5",
+            label: "Visits Scheduled",
+            value: visitsScheduled,
+            subtext: "Ready for in-store visits",
+            growth: "Needs follow-up",
+            icon: FiCalendar,
+            path: "/leads",
+            iconBg: "bg-violet-50 text-violet-600 border border-violet-100 dark:bg-violet-950/20 dark:text-violet-400 dark:border-violet-900/30",
+            hoverShadow: "hover:shadow-[0_8px_30px_rgba(139,92,246,0.06)]",
+            glowColor: "bg-violet-500/5",
         },
         {
-            label: "Absent", value: absentCount,
-            subtext: absentCount > 0 ? `${absentCount} alerts` : "Full attendance",
-            growth: absentCount > 0 ? "Check logs" : "No alerts", icon: FiX, path: "/attendance",
-            iconBg: "bg-red-50 text-red-600 border border-red-100 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30",
-            hoverShadow: "hover:shadow-[0_8px_30px_rgba(239,68,68,0.06)]", glowColor: "bg-red-500/5",
+            label: "Follow-ups Today",
+            value: followUpsToday,
+            subtext: "Client touchpoints",
+            growth: "Stay proactive",
+            icon: FiClock,
+            path: "/leads",
+            iconBg: "bg-amber-50 text-amber-600 border border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30",
+            hoverShadow: "hover:shadow-[0_8px_30px_rgba(245,158,11,0.06)]",
+            glowColor: "bg-amber-500/5",
         },
         {
-            label: "Monthly Payroll", value: netPayrollSum > 0 ? `₹${netPayrollSum.toLocaleString()}` : "₹0",
-            subtext: "Calculated releases", growth: "+3.4%", icon: FiDollarSign, path: "/payroll",
-            iconBg: "bg-purple-50 text-purple-600 border border-purple-100 dark:bg-purple-950/20 dark:text-purple-400 dark:border-purple-900/30",
-            hoverShadow: "hover:shadow-[0_8px_30px_rgba(168,85,247,0.06)]", glowColor: "bg-purple-500/5",
-        },
-        {
-            label: "Attendance Rate",
-            value: presentCount > 0 && totalEmployees > 0 ? `${Math.round((presentCount / totalEmployees) * 100)}%` : "0%",
-            subtext: "Average rate", growth: "+1.8%", icon: FiTrendingUp, path: "/attendance",
+            label: "Conversion Rate",
+            value: `${conversionRate}%`,
+            subtext: `${wonLeads} won leads`,
+            growth: "+4.7% uplift",
+            icon: FiTrendingUp,
+            path: "/leads",
             iconBg: "bg-cyan-50 text-cyan-600 border border-cyan-100 dark:bg-cyan-950/20 dark:text-cyan-400 dark:border-cyan-900/30",
-            hoverShadow: "hover:shadow-[0_8px_30px_rgba(6,182,212,0.06)]", glowColor: "bg-cyan-500/5",
+            hoverShadow: "hover:shadow-[0_8px_30px_rgba(6,182,212,0.06)]",
+            glowColor: "bg-cyan-500/5",
         },
     ];
 
-    const getWeeklyAttendanceData = () => {
-        const today = new Date();
-        return Array.from({ length: 6 }, (_, i) => {
-            const d = new Date();
-            d.setDate(today.getDate() - (5 - i));
-            const dateStr = d.toISOString().split("T")[0];
-            const dayLogs = attendanceLogs.filter(log => log.date === dateStr);
+    const getWeeklyProductivityData = () => {
+        const last6Days = Array.from({ length: 6 }, (_, index) => {
+            const date = new Date();
+            date.setDate(today.getDate() - (5 - index));
+            return date;
+        });
+
+        return last6Days.map((date) => {
+            const label = date.toLocaleDateString("en-US", { weekday: "short" });
+            const dayKey = date.toDateString();
+
+            const newLeadCount = leadList.filter((lead) => {
+                if (!lead.createdAt) return false;
+                return isSameCalendarDay(new Date(lead.createdAt), date);
+            }).length;
+
+            const visitCount = leadList.filter((lead) => {
+                if (lead.status !== "Visit Scheduled") return false;
+                if (!lead.updatedAt) return false;
+                return isSameCalendarDay(new Date(lead.updatedAt), date);
+            }).length;
+
+            const followUpCount = leadList.filter((lead) => {
+                if (!lead.nextFollowUp?.date) return false;
+                return isSameCalendarDay(new Date(lead.nextFollowUp.date), date);
+            }).length;
+
             return {
-                name: d.toLocaleDateString("en-US", { weekday: "short" }),
-                Present: dayLogs.filter(log => log.status === "Present" || log.status === "Half Day").length,
-                Absent: dayLogs.filter(log => log.status === "Absent").length,
-                Leave: dayLogs.filter(log => log.status === "Leave").length,
+                name: label,
+                "New Leads": newLeadCount,
+                "Visits": visitCount,
+                "Follow-ups": followUpCount,
             };
         });
     };
 
-    const getLeaveTypesData = () => {
-        let sick = 0, casual = 0, annual = 0, unpaid = 0;
-        leavesList.forEach(l => {
-            if (l.status === "approved") {
-                const reason = (l.reason || "").toLowerCase();
-                const duration = Math.ceil((new Date(l.toDate) - new Date(l.fromDate)) / (1000 * 60 * 60 * 24)) + 1;
-                if (reason.includes("sick") || reason.includes("doctor") || reason.includes("medical")) sick += duration;
-                else if (reason.includes("annual") || reason.includes("vacation") || reason.includes("trip")) annual += duration;
-                else if (reason.includes("unpaid")) unpaid += duration;
-                else casual += duration;
-            }
-        });
-        return [
-            { name: "Sick", value: sick, color: "#f87171" },
-            { name: "Casual", value: casual, color: "#fbbf24" },
-            { name: "Annual", value: annual, color: "#34d399" },
-            { name: "Unpaid", value: unpaid, color: "#9ca3af" },
-        ];
-    };
-
-    const getTopBarbers = () => {
-        return employees
-            .map(emp => {
-                const empLogs = attendanceLogs.filter(l => l.employeeId === emp.employeeId);
-                const presentLogs = empLogs.filter(l => l.status === "Present" || l.status === "Half Day").length;
-                const rate = empLogs.length > 0 ? (presentLogs / empLogs.length) : 0;
-                return {
-                    name: `${emp.firstName} ${emp.lastName}`,
-                    specialty: emp.role === "manager" ? "Shop Manager" : "Fade Specialist",
-                    rating: empLogs.length > 0 ? (4.5 + (rate * 0.5)).toFixed(1) : "0.0",
-                    hasLogs: empLogs.length > 0,
-                };
-            })
-            .filter(item => item.hasLogs)
-            .sort((a, b) => b.rating - a.rating)
+    const getTopLeadSources = () => {
+        return Object.entries(
+            leadList.reduce((acc, lead) => {
+                const source = (lead.source || "Direct").trim() || "Direct";
+                acc[source] = (acc[source] || 0) + 1;
+                return acc;
+            }, {})
+        )
+            .map(([name, count]) => ({
+                name,
+                count,
+                label: `${count} leads`,
+            }))
+            .sort((a, b) => b.count - a.count)
             .slice(0, 3);
     };
 
-    const getTodayShifts = () => {
-        const todayStr = new Date().toISOString().split("T")[0];
-        const todayLogs = attendanceLogs.filter(log => log.date === todayStr);
-        return employees.reduce((acc, emp) => {
-            const log = todayLogs.find(l => l.employeeId === emp.employeeId);
-            if (log && log.checkIn) {
-                acc.push({
-                    time: new Date(log.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    client: `${emp.firstName} ${emp.lastName}`,
-                    service: emp.role === "manager" ? "Shop Management Shift" : "Styling Chair Shift",
-                    barber: log.status,
-                });
-            }
-            return acc;
-        }, []);
+    const getUpcomingFollowUps = () => {
+        return leadList
+            .filter((lead) => lead.nextFollowUp?.date && !["Won", "Lost"].includes(lead.status))
+            .map((lead) => {
+                const followUpDate = new Date(lead.nextFollowUp.date);
+                return {
+                    time: followUpDate.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+                    client: lead.name,
+                    service: lead.project || lead.source || "Follow-up call",
+                    status: lead.status,
+                };
+            })
+            .sort((a, b) => new Date(a.time) - new Date(b.time))
+            .slice(0, 4);
     };
 
     return {
         loading,
         metrics,
-        weeklyData: getWeeklyAttendanceData(),
-        leaveTypesData: getLeaveTypesData(),
-        topBarbers: getTopBarbers(),
-        upcomingAppointments: getTodayShifts(),
+        weeklyData: getWeeklyProductivityData(),
+        topBarbers: getTopLeadSources(),
+        upcomingAppointments: getUpcomingFollowUps(),
     };
 }

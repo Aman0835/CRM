@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import ReminderProvider from "./context/ReminderProvider";
 import AppRoutes from "./routes/AppRoutes";
 import api from "./services/api";
 import { connectRealtime } from "./services/realtime";
@@ -16,8 +17,9 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <AppRoutes />
-        <Toaster
+        <ReminderProvider>
+          <AppRoutes />
+          <Toaster
           position="top-right"
           toastOptions={{
             style: {
@@ -28,6 +30,7 @@ function App() {
             },
           }}
         />
+        </ReminderProvider>
       </AuthProvider>
     </ThemeProvider>
   );

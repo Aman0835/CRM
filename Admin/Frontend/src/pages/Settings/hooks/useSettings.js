@@ -9,7 +9,6 @@ export function useSettings() {
     const [checkInTime, setCheckInTime] = useState("09:00");
     const [checkOutTime, setCheckOutTime] = useState("20:00");
     const [overtimeRate, setOvertimeRate] = useState(25);
-    const [leaveDeduction, setLeaveDeduction] = useState(100);
 
     const [upcomingHolidays, setUpcomingHolidays] = useState([]);
     const [hTitle, setHTitle] = useState("");
@@ -26,7 +25,6 @@ export function useSettings() {
                 if (res.data.checkInTime) setCheckInTime(res.data.checkInTime);
                 if (res.data.checkOutTime) setCheckOutTime(res.data.checkOutTime);
                 if (res.data.overtimeRate !== undefined) setOvertimeRate(res.data.overtimeRate);
-                if (res.data.leaveDeduction !== undefined) setLeaveDeduction(res.data.leaveDeduction);
             }
         } catch (err) {
             console.error("Failed to load settings from server:", err);
@@ -64,7 +62,6 @@ export function useSettings() {
                 checkInTime,
                 checkOutTime,
                 overtimeRate: Number(overtimeRate),
-                leaveDeduction: Number(leaveDeduction),
             });
             if (res.success) {
                 toast.success("Settings saved successfully!");
@@ -108,7 +105,7 @@ export function useSettings() {
     return {
         shopName, setShopName, contactEmail, setContactEmail,
         checkInTime, setCheckInTime, checkOutTime, setCheckOutTime,
-        overtimeRate, setOvertimeRate, leaveDeduction, setLeaveDeduction,
+        overtimeRate, setOvertimeRate,
         upcomingHolidays, hTitle, setHTitle, hDate, setHDate, hDesc, setHDesc,
         loadingHolidays, handleSave, handleAddHoliday, handleDeleteHoliday,
     };

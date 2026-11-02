@@ -1,12 +1,10 @@
 import {
     FiCalendar,
-    FiClock,
     FiBriefcase,
     FiHome,
     FiScissors,
     FiSettings,
     FiUser,
-    FiSun,
     FiLogOut,
 } from "react-icons/fi";
 import { NavLink, Link } from "react-router-dom";
@@ -16,9 +14,7 @@ import toast from "react-hot-toast";
 const navigation = [
     { to: "/dashboard",  label: "Dashboard",  icon: FiHome },
     { to: "/attendance", label: "Attendance",  icon: FiCalendar },
-    { to: "/leave",      label: "My Leave",    icon: FiClock },
     { to: "/payroll",    label: "Payroll",     icon: FiBriefcase },
-    { to: "/holidays",   label: "Holidays",    icon: FiSun },
 ];
 
 const accountNav = [

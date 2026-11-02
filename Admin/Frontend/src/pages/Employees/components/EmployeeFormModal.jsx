@@ -1,193 +1,484 @@
-import React, { useState } from "react";
-import { FiX, FiUpload, FiLink, FiImage, FiEye, FiEyeOff } from "react-icons/fi";
+import React, { useState, useRef, useEffect } from "react";
+import { FiX, FiPlus, FiCheck, FiUser, FiPhone, FiBriefcase, FiUsers, FiDollarSign, FiEye, FiEyeOff, FiKey, FiChevronDown } from "react-icons/fi";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function EmployeeFormModal({
-    isOpen, onClose, formMode, onSubmit,
-    employeeId, firstName, setFirstName, lastName, setLastName,
-    email, setEmail, phone, setPhone, gender, setGender,
-    role, setRole, password, setPassword, joiningDate, setJoiningDate,
-    monthlySalary, setMonthlySalary, profileImage, setProfileImage,
-    address, setAddress, status, setStatus,
+    isOpen,
+    onClose,
+    formMode,
+    onSubmit,
+    employeeId,
+    name,
+    setName,
+    phone,
+    setPhone,
+    vendor,
+    setVendor,
+    vendorOptions = [],
+    onAddVendor,
+    sourcing,
+    setSourcing,
+    sourcingOptions = [],
+    onAddSourcing,
+    sourcingManager,
+    setSourcingManager,
+    sourcingManagerOptions,
+    onAddSourcingManager,
+    perDayPayout,
+    setPerDayPayout,
+    password,
+    setPassword,
+    status,
+    setStatus,
 }) {
     const [showPassword, setShowPassword] = useState(false);
+    const [isAddingCustomVendor, setIsAddingCustomVendor] = useState(false);
+    const [customVendor, setCustomVendor] = useState("");
+    const [isAddingCustomSourcing, setIsAddingCustomSourcing] = useState(false);
+    const [customSourcing, setCustomSourcing] = useState("");
+    const [vendorOpen, setVendorOpen] = useState(false);
+    const [sourcingOpen, setSourcingOpen] = useState(false);
+    const vendorRef = useRef(null);
+    const sourcingRef = useRef(null);
+
+    useEffect(() => {
+        const handler = (e) => {
+            if (vendorRef.current && !vendorRef.current.contains(e.target)) setVendorOpen(false);
+            if (sourcingRef.current && !sourcingRef.current.contains(e.target)) setSourcingOpen(false);
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, []);
+
+    const currentSourcing = sourcing !== undefined ? sourcing : (sourcingManager || "");
+    const updateSourcing = setSourcing || setSourcingManager;
+    const currentSourcingOptions = (sourcingOptions && sourcingOptions.length > 0)
+        ? sourcingOptions
+        : (sourcingManagerOptions || ["Walk-in", "Direct / Internal", "Referral", "Agency / Staffing", "Social Media", "Freelance Network"]);
+    const handleAddNewSourcing = onAddSourcing || onAddSourcingManager;
+
+    const handleConfirmCustomVendor = () => {
+        const val = customVendor.trim();
+        if (val) {
+            if (onAddVendor) onAddVendor(val);
+            setVendor(val);
+            setCustomVendor("");
+            setIsAddingCustomVendor(false);
+        }
+    };
+
+    const handleConfirmCustomSourcing = () => {
+        const val = customSourcing.trim();
+        if (val) {
+            if (handleAddNewSourcing) handleAddNewSourcing(val);
+            if (updateSourcing) updateSourcing(val);
+            setCustomSourcing("");
+            setIsAddingCustomSourcing(false);
+        }
+    };
 
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
                     <motion.div
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.95, opacity: 0 }}
-                        className="bg-white dark:bg-slate-900 w-full max-w-[600px] rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xl overflow-y-auto no-scrollbar max-h-[90vh] text-slate-800 dark:text-slate-100"
+                        className="bg-white dark:bg-slate-900 w-full max-w-[560px] rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xl overflow-y-auto no-scrollbar max-h-[92vh] text-slate-800 dark:text-slate-100"
                     >
+                        {/* Header */}
                         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
-                            <h3 className="text-xl font-bold text-slate-850 dark:text-slate-100">
-                                {formMode === "create" ? "Add New Employee" : "Edit Employee Profile"}
-                            </h3>
-                            <button onClick={onClose}
-                                className="h-9 w-9 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-800 dark:hover:bg-slate-700 dark:hover:text-slate-200">
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                                    {formMode === "create" ? "Add New Employee" : "Edit Employee Profile"}
+                                </h3>
+                                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+                                    {formMode === "create"
+                                        ? "Enter the 5 required fields to register the employee."
+                                        : `Updating record for ${name || "employee"}`}
+                                </p>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                className="h-9 w-9 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-800 dark:hover:bg-slate-700 dark:hover:text-slate-200 transition"
+                            >
                                 <FiX />
                             </button>
                         </div>
 
                         <form onSubmit={onSubmit} autoComplete="off" className="mt-5 space-y-4 text-xs">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">First Name</label>
-                                    <input type="text" required autoComplete="off" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Marcus"
-                                        className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150" />
-                                </div>
-                                <div>
-                                    <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Last Name</label>
-                                    <input type="text" required autoComplete="off" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Rivera"
-                                        className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150" />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Employee ID (Auto-generated)</label>
-                                    <input type="text" required value={employeeId} readOnly
-                                        className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-100 dark:bg-slate-800/40 px-3 text-xs outline-none text-slate-500 cursor-not-allowed dark:border-slate-800 dark:text-slate-450" />
-                                </div>
-                                <div>
-                                    <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Email Address</label>
-                                    <input type="email" required autoComplete="off" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="marcus@clipper.co"
-                                        className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150" />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Phone Number</label>
-                                    <div className="relative mt-1.5 flex items-center">
-                                        <span className="absolute left-3.5 text-xs font-bold text-slate-455 dark:text-slate-500 select-none">+91</span>
-                                        <input type="tel" required autoComplete="off" maxLength={10} value={phone}
-                                            onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))} placeholder="98765 43210"
-                                            className="w-full h-10 pl-11 pr-3 rounded-xl border border-slate-200 bg-slate-50 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Gender</label>
-                                    <select value={gender} onChange={(e) => setGender(e.target.value)}
-                                        className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150">
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Role / Designation</label>
-                                    <select value={role} onChange={(e) => setRole(e.target.value)}
-                                        className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150">
-                                        <option value="employee">Barber / Stylist</option>
-                                        <option value="manager">Shop Manager</option>
-                                        <option value="admin">Administrator</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Monthly Base Salary (₹)</label>
-                                    <input type="number" required value={monthlySalary} onChange={(e) => setMonthlySalary(e.target.value)} placeholder="25000"
-                                        className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150" />
-                                </div>
-                            </div>
-
+                            {/* 1. Employee Name */}
                             <div>
-                                <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Employee Login Password</label>
-                                <div className="relative mt-1.5">
+                                <label className="flex items-center gap-1.5 text-[11px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">
+                                    <FiUser className="text-blue-500" /> 1. Employee Name <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    required
+                                    autoComplete="off"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="e.g. Rahul Sharma"
+                                    className="w-full h-11 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-xs text-slate-800 outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-100 placeholder:text-slate-400 transition"
+                                />
+                            </div>
+
+                            {/* 2. Mobile Number (Phone number) */}
+                            <div>
+                                <label className="flex items-center gap-1.5 text-[11px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">
+                                    <FiPhone className="text-emerald-500" /> 2. Phone Number <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative mt-1.5 flex items-center">
+                                    <span className="absolute left-3.5 text-xs font-bold text-slate-400 dark:text-slate-500 select-none">
+                                        +91
+                                    </span>
                                     <input
-                                        type={showPassword ? "text" : "password"}
-                                        required={formMode === "create"}
-                                        autoComplete="new-password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        placeholder={formMode === "create" ? "Set password for employee login" : "Leave blank or enter new password..."}
-                                        className="w-full h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 pr-11 text-xs text-slate-800 outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150 placeholder:text-slate-350 dark:placeholder:text-slate-500"
+                                        type="tel"
+                                        required
+                                        autoComplete="off"
+                                        maxLength={10}
+                                        value={phone}
+                                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
+                                        placeholder="98765 43210"
+                                        className="w-full h-11 pl-12 pr-3.5 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-800 outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-100 placeholder:text-slate-400 tracking-wide transition"
                                     />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword((prev) => !prev)}
-                                        className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-slate-400 transition hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-200"
-                                        aria-label={showPassword ? "Hide password" : "Show password"}
-                                    >
-                                        {showPassword ? <FiEyeOff className="text-sm" /> : <FiEye className="text-sm" />}
-                                    </button>
                                 </div>
+                                <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
+                                    Used for employee portal sign-in and mobile verification.
+                                </p>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Joining Date</label>
-                                    <input type="date" required value={joiningDate} onChange={(e) => setJoiningDate(e.target.value)}
-                                        className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150" />
+                            {/* 3. Vendor */}
+                            <div ref={vendorRef} className="relative">
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <label className="flex items-center gap-1.5 text-[11px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">
+                                        <FiBriefcase className="text-amber-500" /> 3. Vendor
+                                    </label>
+                                    {!isAddingCustomVendor && (
+                                        <button
+                                            type="button"
+                                            onClick={() => { setIsAddingCustomVendor(true); setVendorOpen(false); }}
+                                            className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold hover:underline flex items-center gap-1"
+                                        >
+                                            <FiPlus className="text-[11px]" /> Add New
+                                        </button>
+                                    )}
                                 </div>
-                                <div>
-                                    <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Status</label>
-                                    <select value={status} onChange={(e) => setStatus(e.target.value)}
-                                        className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150">
-                                        <option value="active">Active</option>
-                                        <option value="inactive">Inactive</option>
-                                        <option value="on_leave">On Leave</option>
-                                    </select>
-                                </div>
-                            </div>
 
-                            <div>
-                                <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Profile Picture</label>
-                                <div className="mt-1.5 flex items-center gap-3.5 bg-slate-50 dark:bg-slate-800/20 p-3 rounded-2xl border border-slate-150 dark:border-slate-800">
-                                    <div className="relative h-14 w-14 shrink-0 rounded-xl overflow-hidden bg-slate-100 border border-slate-200/50 dark:bg-slate-900 dark:border-slate-800 flex items-center justify-center">
-                                        {profileImage ? (
-                                            <img src={profileImage} alt="Avatar Preview" className="h-full w-full object-cover" />
-                                        ) : (
-                                            <FiImage className="text-xl text-slate-400 dark:text-slate-600" />
-                                        )}
+                                {isAddingCustomVendor ? (
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            autoFocus
+                                            value={customVendor}
+                                            onChange={(e) => setCustomVendor(e.target.value)}
+                                            placeholder="Enter vendor / agency name..."
+                                            className="flex-1 h-10 rounded-xl border border-amber-400 bg-amber-50/30 px-3 text-xs outline-none text-slate-800 dark:bg-slate-800 dark:border-amber-500 dark:text-slate-100"
+                                            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleConfirmCustomVendor(); } }}
+                                        />
+                                        <button type="button" onClick={handleConfirmCustomVendor}
+                                            className="h-10 px-3 rounded-xl bg-amber-500 text-white font-medium hover:bg-amber-600 transition flex items-center gap-1">
+                                            <FiCheck /> Add
+                                        </button>
+                                        <button type="button" onClick={() => setIsAddingCustomVendor(false)}
+                                            className="h-10 px-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                                            <FiX />
+                                        </button>
                                     </div>
-                                    <div className="flex-1 min-w-0 space-y-2">
-                                        <div className="flex flex-wrap gap-2">
-                                            <label className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100 transition-all font-bold px-3 text-[10px] uppercase tracking-wider dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30 cursor-pointer">
-                                                <FiUpload className="text-xs" /> Upload Photo
-                                                <input type="file" accept="image/*" onChange={(e) => {
-                                                    const file = e.target.files[0];
-                                                    if (file) {
-                                                        const reader = new FileReader();
-                                                        reader.onloadend = () => setProfileImage(reader.result);
-                                                        reader.readAsDataURL(file);
-                                                    }
-                                                }} className="hidden" />
-                                            </label>
-                                            {profileImage && (
-                                                <button type="button" onClick={() => setProfileImage("")}
-                                                    className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-all font-bold px-3 text-[10px] uppercase tracking-wider dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30 cursor-pointer">
-                                                    Clear
-                                                </button>
+                                ) : (
+                                    <>
+                                        {/* Trigger button */}
+                                        <button
+                                            type="button"
+                                            onClick={() => { setVendorOpen((o) => !o); setSourcingOpen(false); }}
+                                            className={`w-full h-11 flex items-center justify-between px-3.5 rounded-xl border text-xs font-medium transition
+                                                ${vendor
+                                                    ? "border-amber-400 bg-amber-50/50 text-amber-800 dark:bg-amber-950/30 dark:border-amber-600 dark:text-amber-300"
+                                                    : "border-slate-200 bg-slate-50 text-slate-400 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-500"
+                                                } ${vendorOpen ? "ring-2 ring-amber-400/30" : ""}`}
+                                        >
+                                            <span className="flex items-center gap-2">
+                                                {vendor
+                                                    ? <><span className="h-1.5 w-1.5 rounded-full bg-amber-500 shrink-0"></span><span className="text-slate-800 dark:text-slate-100">{vendor}</span></>
+                                                    : "Select Vendor / Agency"
+                                                }
+                                            </span>
+                                            <FiChevronDown className={`text-slate-400 transition-transform duration-200 ${vendorOpen ? "rotate-180" : ""}`} />
+                                        </button>
+
+                                        {/* Dropdown panel */}
+                                        <AnimatePresence>
+                                            {vendorOpen && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                                                    transition={{ duration: 0.12 }}
+                                                    className="absolute z-50 mt-1.5 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl overflow-hidden"
+                                                >
+                                                    <div className="py-1.5 max-h-48 overflow-y-auto">
+                                                        {vendorOptions.map((v) => (
+                                                            <button
+                                                                key={v}
+                                                                type="button"
+                                                                onClick={() => { setVendor(v); setVendorOpen(false); }}
+                                                                className={`flex w-full items-center justify-between px-4 py-2.5 text-left text-xs transition hover:bg-amber-50 dark:hover:bg-amber-950/20
+                                                                    ${vendor === v ? "bg-amber-50/70 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 font-bold" : "text-slate-700 dark:text-slate-300"}`}
+                                                            >
+                                                                <span className="flex items-center gap-2.5">
+                                                                    <span className={`h-2 w-2 rounded-full ${vendor === v ? "bg-amber-500" : "bg-slate-200 dark:bg-slate-600"}`}></span>
+                                                                    {v}
+                                                                </span>
+                                                                {vendor === v && <FiCheck className="text-amber-500 shrink-0" />}
+                                                            </button>
+                                                        ))}
+                                                        {vendor && !vendorOptions.includes(vendor) && (
+                                                            <button type="button" onClick={() => { setVendor(vendor); setVendorOpen(false); }}
+                                                                className="flex w-full items-center justify-between px-4 py-2.5 text-left text-xs bg-amber-50/70 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 font-bold">
+                                                                <span className="flex items-center gap-2.5"><span className="h-2 w-2 rounded-full bg-amber-500"></span>{vendor}</span>
+                                                                <FiCheck className="text-amber-500 shrink-0" />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </motion.div>
                                             )}
+                                        </AnimatePresence>
+                                    </>
+                                )}
+                            </div>
+
+                            {/* 4. Sourcing */}
+                            <div ref={sourcingRef} className="relative">
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <label className="flex items-center gap-1.5 text-[11px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">
+                                        <FiUsers className="text-indigo-500" /> 4. Sourcing
+                                    </label>
+                                    {!isAddingCustomSourcing && (
+                                        <button
+                                            type="button"
+                                            onClick={() => { setIsAddingCustomSourcing(true); setSourcingOpen(false); }}
+                                            className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold hover:underline flex items-center gap-1"
+                                        >
+                                            <FiPlus className="text-[11px]" /> Add New
+                                        </button>
+                                    )}
+                                </div>
+
+                                {isAddingCustomSourcing ? (
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            autoFocus
+                                            value={customSourcing}
+                                            onChange={(e) => setCustomSourcing(e.target.value)}
+                                            placeholder="Enter recruitment sourcing channel..."
+                                            className="flex-1 h-10 rounded-xl border border-indigo-400 bg-indigo-50/30 px-3 text-xs outline-none text-slate-800 dark:bg-slate-800 dark:border-indigo-500 dark:text-slate-100"
+                                            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleConfirmCustomSourcing(); } }}
+                                        />
+                                        <button type="button" onClick={handleConfirmCustomSourcing}
+                                            className="h-10 px-3 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition flex items-center gap-1">
+                                            <FiCheck /> Add
+                                        </button>
+                                        <button type="button" onClick={() => setIsAddingCustomSourcing(false)}
+                                            className="h-10 px-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                                            <FiX />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {/* Trigger button */}
+                                        <button
+                                            type="button"
+                                            onClick={() => { setSourcingOpen((o) => !o); setVendorOpen(false); }}
+                                            className={`w-full h-11 flex items-center justify-between px-3.5 rounded-xl border text-xs font-medium transition
+                                                ${currentSourcing
+                                                    ? "border-indigo-400 bg-indigo-50/50 text-indigo-800 dark:bg-indigo-950/30 dark:border-indigo-600 dark:text-indigo-300"
+                                                    : "border-slate-200 bg-slate-50 text-slate-400 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-500"
+                                                } ${sourcingOpen ? "ring-2 ring-indigo-400/30" : ""}`}
+                                        >
+                                            <span className="flex items-center gap-2">
+                                                {currentSourcing
+                                                    ? <><span className="h-1.5 w-1.5 rounded-full bg-indigo-500 shrink-0"></span><span className="text-slate-800 dark:text-slate-100">{currentSourcing}</span></>
+                                                    : "Select Sourcing Channel"
+                                                }
+                                            </span>
+                                            <FiChevronDown className={`text-slate-400 transition-transform duration-200 ${sourcingOpen ? "rotate-180" : ""}`} />
+                                        </button>
+
+                                        {/* Dropdown panel */}
+                                        <AnimatePresence>
+                                            {sourcingOpen && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                                                    transition={{ duration: 0.12 }}
+                                                    className="absolute z-50 mt-1.5 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl overflow-hidden"
+                                                >
+                                                    <div className="py-1.5 max-h-48 overflow-y-auto">
+                                                        {currentSourcingOptions.map((m) => (
+                                                            <button
+                                                                key={m}
+                                                                type="button"
+                                                                onClick={() => { if (updateSourcing) updateSourcing(m); setSourcingOpen(false); }}
+                                                                className={`flex w-full items-center justify-between px-4 py-2.5 text-left text-xs transition hover:bg-indigo-50 dark:hover:bg-indigo-950/20
+                                                                    ${currentSourcing === m ? "bg-indigo-50/70 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400 font-bold" : "text-slate-700 dark:text-slate-300"}`}
+                                                            >
+                                                                <span className="flex items-center gap-2.5">
+                                                                    <span className={`h-2 w-2 rounded-full ${currentSourcing === m ? "bg-indigo-500" : "bg-slate-200 dark:bg-slate-600"}`}></span>
+                                                                    {m}
+                                                                </span>
+                                                                {currentSourcing === m && <FiCheck className="text-indigo-500 shrink-0" />}
+                                                            </button>
+                                                        ))}
+                                                        {currentSourcing && !currentSourcingOptions.includes(currentSourcing) && (
+                                                            <button type="button" onClick={() => { if (updateSourcing) updateSourcing(currentSourcing); setSourcingOpen(false); }}
+                                                                className="flex w-full items-center justify-between px-4 py-2.5 text-left text-xs bg-indigo-50/70 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400 font-bold">
+                                                                <span className="flex items-center gap-2.5"><span className="h-2 w-2 rounded-full bg-indigo-500"></span>{currentSourcing}</span>
+                                                                <FiCheck className="text-indigo-500 shrink-0" />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </>
+                                )}
+                            </div>
+
+                            {/* 5. Per Day Payout (₹ Amount) */}
+                            <div>
+                                <label className="flex items-center gap-1.5 text-[11px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider mb-2">
+                                    <FiDollarSign className="text-violet-500" /> 5. Per Day Payout (₹) <span className="text-red-500">*</span>
+                                </label>
+
+                                {/* Hidden required input for form validation */}
+                                <input
+                                    type="text"
+                                    required
+                                    readOnly
+                                    tabIndex={-1}
+                                    value={perDayPayout}
+                                    style={{ position: "absolute", opacity: 0, width: 0, height: 0, pointerEvents: "none" }}
+                                    aria-hidden="true"
+                                />
+
+                                <div className="grid grid-cols-4 gap-2 mt-1.5">
+                                    {["850", "900", "950", "1000"].map((amount) => {
+                                        const isSelected = String(perDayPayout) === amount;
+                                        return (
+                                            <button
+                                                key={amount}
+                                                type="button"
+                                                onClick={() => setPerDayPayout(amount)}
+                                                className={`relative flex flex-col items-center justify-center py-3 rounded-2xl border-2 transition-all duration-150 select-none
+                                                    ${isSelected
+                                                        ? "border-violet-500 bg-violet-50 dark:bg-violet-950/40 shadow-sm"
+                                                        : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:border-violet-300 hover:bg-violet-50/40 dark:hover:bg-violet-950/20"
+                                                    }`}
+                                            >
+                                                <span className={`text-[9px] font-bold uppercase tracking-wider mb-0.5 ${isSelected ? "text-violet-500" : "text-slate-400 dark:text-slate-500"}`}>
+                                                    ₹ / day
+                                                </span>
+                                                <span className={`text-base font-black leading-none ${isSelected ? "text-violet-600 dark:text-violet-400" : "text-slate-700 dark:text-slate-200"}`}>
+                                                    {amount}
+                                                </span>
+                                                {isSelected && (
+                                                    <span className="absolute top-1.5 right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-violet-500">
+                                                        <FiCheck className="text-white" style={{ fontSize: "8px" }} />
+                                                    </span>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                {perDayPayout && (
+                                    <p className="mt-2 text-[11px] text-slate-400 dark:text-slate-500">
+                                        Selected: <span className="font-bold text-violet-600 dark:text-violet-400">₹{Number(perDayPayout).toLocaleString()}/day</span>
+                                        <span className="ml-1.5 text-slate-400">≈ ₹{(Number(perDayPayout) * 30).toLocaleString()}/month</span>
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Collapsible/Info Box for Login Credentials and Status */}
+                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-850/50 p-4 space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                                        <FiKey className="text-blue-500" /> Access & Credentials
+                                    </span>
+                                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md font-medium">
+                                        Phone Sign-in Enabled
+                                    </span>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">
+                                            Employee ID
+                                        </label>
+                                        <div className="h-10 mt-1 rounded-xl border border-slate-200 bg-white dark:bg-slate-800 dark:border-slate-700 px-3 text-xs font-mono font-bold flex items-center text-slate-700 dark:text-slate-300 select-all">
+                                            {employeeId || "Auto-assigned"}
                                         </div>
-                                        <div className="relative flex items-center">
-                                            <div className="absolute left-2.5 text-slate-400 dark:text-slate-600"><FiLink className="text-[10px]" /></div>
-                                            <input type="text"
-                                                value={profileImage && profileImage.startsWith("data:") ? "" : profileImage}
-                                                onChange={(e) => setProfileImage(e.target.value)}
-                                                placeholder="Or paste external image URL..."
-                                                className="w-full h-8 pl-7.5 pr-2.5 rounded-lg border border-slate-200 bg-white text-[10px] outline-none focus:border-blue-500 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-150" />
-                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">
+                                            Account Status
+                                        </label>
+                                        <select
+                                            value={status}
+                                            onChange={(e) => setStatus(e.target.value)}
+                                            className="w-full h-10 mt-1 rounded-xl border border-slate-200 bg-white px-3 text-xs outline-none focus:border-blue-500 dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-100"
+                                        >
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 flex items-center justify-between">
+                                        <span>Login Password</span>
+                                        <span className="text-slate-400 font-normal">Can log in with Phone / ID</span>
+                                    </label>
+                                    <div className="relative mt-1">
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            placeholder="Default: Pass1234!"
+                                            className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 pr-10 text-xs text-slate-800 outline-none focus:border-blue-500 dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-100 placeholder:text-slate-400"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword((prev) => !prev)}
+                                            className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                                        >
+                                            {showPassword ? <FiEyeOff /> : <FiEye />}
+                                        </button>
                                     </div>
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Home Address</label>
-                                <input type="text" autoComplete="off" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Downtown Chair 01, Barber Shop lounge"
-                                    className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-855 dark:text-slate-150" />
+                            {/* Submit & Cancel */}
+                            <div className="flex items-center gap-3 pt-2">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="flex-1 h-11 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-750 transition"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="flex-2 h-11 rounded-xl bg-blue-600 text-xs font-semibold text-white hover:bg-blue-700 transition shadow-sm flex items-center justify-center gap-1.5"
+                                >
+                                    <FiCheck className="text-sm" />
+                                    {formMode === "create" ? "Add Employee" : "Save Changes"}
+                                </button>
                             </div>
-
-                            <button type="submit" className="w-full h-11 mt-6 rounded-xl bg-blue-600 text-xs font-semibold text-white hover:bg-blue-700 transition shadow-sm">
-                                {formMode === "create" ? "Add to Directory" : "Update Profile"}
-                            </button>
                         </form>
                     </motion.div>
                 </div>

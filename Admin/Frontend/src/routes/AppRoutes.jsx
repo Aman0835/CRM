@@ -1,21 +1,21 @@
 import { lazy, Suspense } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 
 // Lazy-loaded pages — each is a separate JS chunk
-const Dashboard     = lazy(() => import("../pages/Dashboard"));
-const Employees     = lazy(() => import("../pages/Employees"));
+const Dashboard = lazy(() => import("../pages/Dashboard"));
+const Employees = lazy(() => import("../pages/Employees"));
 const EmployeeDetail = lazy(() => import("../pages/Employees/EmployeeDetail"));
-const Attendance    = lazy(() => import("../pages/Attendance"));
-const Leave         = lazy(() => import("../pages/Leave"));
-const Holidays      = lazy(() => import("../pages/Holidays"));
-const Payroll       = lazy(() => import("../pages/Payroll"));
+const Attendance = lazy(() => import("../pages/Attendance"));
+const Payroll = lazy(() => import("../pages/Payroll"));
 const PayrollDetail = lazy(() => import("../pages/Payroll/PayrollDetail"));
-const Reports       = lazy(() => import("../pages/Reports"));
-const Settings      = lazy(() => import("../pages/Settings"));
-const Login         = lazy(() => import("../pages/Login/Login"));
-const NotFound      = lazy(() => import("../pages/NotFound/NotFound"));
-const AdminProfile  = lazy(() => import("../pages/Profile"));
+const Reports = lazy(() => import("../pages/Reports"));
+const Settings = lazy(() => import("../pages/Settings"));
+const LeadsHub = lazy(() => import("../pages/Leads/LeadsHub"));
+const LeadDetails = lazy(() => import("../pages/Leads/LeadDetails"));
+const Login = lazy(() => import("../pages/Login/Login"));
+const NotFound = lazy(() => import("../pages/NotFound/NotFound"));
+const AdminProfile = lazy(() => import("../pages/Profile"));
 
 // Shared loading fallback shown while a chunk is being downloaded
 function PageLoader() {
@@ -29,8 +29,7 @@ function PageLoader() {
         minHeight: "100vh",
         background: "var(--color-app-bg, #0f1117)",
         gap: "1rem",
-      }}
-    >
+      }}>
       <div
         style={{
           width: 48,
@@ -46,8 +45,7 @@ function PageLoader() {
           fontSize: "0.875rem",
           color: "var(--color-text-muted, #9ca3af)",
           fontWeight: 500,
-        }}
-      >
+        }}>
         Loading...
       </p>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -99,23 +97,6 @@ export default function AppRoutes() {
           }
         />
 
-        <Route
-          path="/leave"
-          element={
-            <ProtectedRoute>
-              <Leave />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/holidays"
-          element={
-            <ProtectedRoute>
-              <Holidays />
-            </ProtectedRoute>
-          }
-        />
 
         <Route
           path="/payroll"
@@ -154,6 +135,24 @@ export default function AppRoutes() {
         />
 
         <Route
+          path="/leads"
+          element={
+            <ProtectedRoute>
+              <LeadsHub />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/leads/:id"
+          element={
+            <ProtectedRoute>
+              <LeadDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/profile"
           element={
             <ProtectedRoute>
@@ -167,4 +166,3 @@ export default function AppRoutes() {
     </Suspense>
   );
 }
-

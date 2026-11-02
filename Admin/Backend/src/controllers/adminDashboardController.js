@@ -1,6 +1,5 @@
 import Attendance from "../models/Attendance.js";
 import Employee from "../models/Employee.js";
-import LeaveRequest from "../models/LeaveRequest.js";
 import Payroll from "../models/Payroll.js";
 
 const getTodayDate = () => new Date().toISOString().split("T")[0];
@@ -14,13 +13,11 @@ export const getDashboard = async (req, res) => {
       totalEmployees,
       activeEmployees,
       todayAttendance,
-      pendingLeaves,
       generatedPayrolls,
     ] = await Promise.all([
       Employee.countDocuments(),
       Employee.countDocuments({ status: "active" }),
       Attendance.countDocuments({ date: getTodayDate() }),
-      LeaveRequest.countDocuments({ status: "pending" }),
       Payroll.countDocuments({ status: "generated" }),
     ]);
 
@@ -30,7 +27,6 @@ export const getDashboard = async (req, res) => {
         totalEmployees,
         activeEmployees,
         todayAttendance,
-        pendingLeaves,
         generatedPayrolls,
       },
     });
@@ -51,11 +47,9 @@ export const getDashboardStats = async (req, res) => {
   try {
     const [
       employeeCount,
-      leaveCount,
       payrollCount,
     ] = await Promise.all([
       Employee.countDocuments(),
-      LeaveRequest.countDocuments(),
       Payroll.countDocuments(),
     ]);
 
@@ -63,7 +57,6 @@ export const getDashboardStats = async (req, res) => {
       success: true,
       data: {
         employees: employeeCount,
-        leaves: leaveCount,
         payrolls: payrollCount,
       },
     });
@@ -154,50 +147,15 @@ export const getPayrollSummary = async (req, res) => {
 };
 
 
-// Leave Summary
-
-export const getLeaveSummary = async (req, res) => {
-  try {
-    const leaves = await LeaveRequest.aggregate([
-      {
-        $group: {
-          _id: "$status",
-          count: {
-            $sum: 1,
-          },
-        },
-      },
-    ]);
-
-    res.status(200).json({
-      success: true,
-      data: leaves,
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-
 // Recent Activities
 
 export const getRecentActivities = async (req, res) => {
   try {
     const [
       recentEmployees,
-      recentLeaves,
       recentPayrolls,
     ] = await Promise.all([
       Employee.find()
-        .sort({ createdAt: -1 })
-        .limit(5),
-
-      LeaveRequest.find()
         .sort({ createdAt: -1 })
         .limit(5),
 
@@ -210,7 +168,6 @@ export const getRecentActivities = async (req, res) => {
       success: true,
       data: {
         recentEmployees,
-        recentLeaves,
         recentPayrolls,
       },
     });

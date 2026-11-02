@@ -1,6 +1,5 @@
 import Attendance from "../models/Attendance.js";
 import Employee from "../models/Employee.js";
-import LeaveRequest from "../models/LeaveRequest.js";
 import Payroll from "../models/Payroll.js";
 
 
@@ -53,29 +52,6 @@ export const getPayrollReport = async (req, res) => {
 };
 
 
-// Leave Report
-
-export const getLeaveReport = async (req, res) => {
-  try {
-    const leaves = await LeaveRequest.find().sort({
-      createdAt: -1,
-    });
-
-    res.status(200).json({
-      success: true,
-      count: leaves.length,
-      data: leaves,
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
 
 // Employee Report
 
@@ -124,8 +100,6 @@ export const getMonthlyReport = async (req, res) => {
         : {}
     );
 
-    const leaves = await LeaveRequest.find();
-
     res.status(200).json({
       success: true,
       data: {
@@ -133,7 +107,6 @@ export const getMonthlyReport = async (req, res) => {
         year: year || null,
         attendance,
         payrolls,
-        leaves,
       },
     });
   } catch (error) {

@@ -7,13 +7,12 @@ import { useAuth } from "../context/AuthContext";
 const Login       = lazy(() => import("../pages/Login/Login"));
 const Dashboard   = lazy(() => import("../pages/Dashboard"));
 const Attendance  = lazy(() => import("../pages/Attendance"));
-const Leave       = lazy(() => import("../pages/Leave"));
+
 const Payroll     = lazy(() => import("../pages/Payroll"));
-const Holidays    = lazy(() => import("../pages/Holidays"));
 const Profile     = lazy(() => import("../pages/Profile"));
 const Settings    = lazy(() => import("../pages/Settings"));
 const NotFound    = lazy(() => import("../pages/NotFound/NotFound"));
-const LeadHubPage     = lazy(() => import("../leads/pages/LeadHubPage"));
+const FollowUpsPage   = lazy(() => import("../leads/pages/FollowUpsPage"));
 const MyLeadsPage     = lazy(() => import("../leads/pages/MyLeadsPage"));
 const CreateLeadPage  = lazy(() => import("../leads/pages/CreateLeadPage"));
 const LeadDetailsPage = lazy(() => import("../leads/pages/LeadDetailsPage"));
@@ -96,27 +95,23 @@ export default function AppRoutes() {
                     }
                 />
 
-                {/* <Route
-                    path="/leave"
-                    element={
-                        <ProtectedRoute>
-                            <Leave />
-                        </ProtectedRoute>
-                    }
-                /> */}
                 <Route
                     path="/leads"
                     element={
                         <ProtectedRoute>
-                            <LeadHubPage />
+                            <MyLeadsPage />
                         </ProtectedRoute>
                     }
                 />
                 <Route
                     path="/leads/my"
+                    element={<Navigate to="/leads" replace />}
+                />
+                <Route
+                    path="/follow-ups"
                     element={
                         <ProtectedRoute>
-                            <MyLeadsPage />
+                            <FollowUpsPage />
                         </ProtectedRoute>
                     }
                 />
@@ -146,14 +141,6 @@ export default function AppRoutes() {
                     }
                 />
 
-                <Route
-                    path="/holidays"
-                    element={
-                        <ProtectedRoute>
-                            <Holidays />
-                        </ProtectedRoute>
-                    }
-                />
 
                 <Route
                     path="/profile"

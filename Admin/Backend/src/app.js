@@ -12,8 +12,7 @@ import adminAttendanceRoutes from "./routes/adminAttendanceRoutes.js";
 import adminAuthRoutes from "./routes/adminAuthRoutes.js";
 import dashboardRoutes from "./routes/adminDashboardRoutes.js";
 import adminEmployeeRoutes from "./routes/adminEmployeeRoutes.js";
-import holidayRoutes from "./routes/adminHolidayRoutes.js";
-import leaveRoutes from "./routes/adminLeaveRoutes.js";
+
 import payrollRoutes from "./routes/adminPayrollRoutes.js";
 import reportRoutes from "./routes/adminReportRoutes.js";
 import settingsRoutes from "./routes/adminSettingsRoutes.js";
@@ -89,13 +88,19 @@ app.get("/", (req, res) => {
   });
 });
 
+app.get("/api/", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "CRM API Backend Live & Healthy",
+  });
+});
+
 app.use("/api/admin/auth", adminAuthRoutes);
 app.use("/api/admin/dashboard", dashboardRoutes);
 app.use("/api/admin/employees", adminEmployeeRoutes);
 app.use("/api/admin/attendance", adminAttendanceRoutes);
-app.use("/api/admin/leaves", leaveRoutes);
+
 app.use("/api/admin/payroll", payrollRoutes);
-app.use("/api/admin/holidays", holidayRoutes);
 app.use("/api/admin/reports", reportRoutes);
 app.use("/api/admin/settings", settingsRoutes);
 app.use("/api/notifications", notificationRoutes);

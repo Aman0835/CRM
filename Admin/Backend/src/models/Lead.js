@@ -12,12 +12,6 @@ const leadSchema = new mongoose.Schema(
       required: [true, "Phone number is required"],
       trim: true,
     },
-    email: {
-      type: String,
-      trim: true,
-      lowercase: true,
-      default: "",
-    },
     location: {
       type: String,
       trim: true,

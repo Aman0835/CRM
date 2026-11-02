@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import Employee from "../models/Employee.js";
+import Settings from "../models/Settings.js";
 import { broadcastRealtime } from "../utils/realtime.js";
 
 const generateEmployeeId = () => `EMP-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -17,19 +18,30 @@ export const getEmployees = async (req, res) => {
     const query = {};
 
     if (search) {
-      const words = search.trim().split(/\s+/);
+      const trimmed = search.trim();
+      const words = trimmed.split(/\s+/);
       if (words.length === 1) {
         query.$or = [
-          { firstName: { $regex: search, $options: "i" } },
-          { lastName: { $regex: search, $options: "i" } },
-          { employeeId: { $regex: search, $options: "i" } },
-          { email: { $regex: search, $options: "i" } },
+          { name: { $regex: trimmed, $options: "i" } },
+          { firstName: { $regex: trimmed, $options: "i" } },
+          { lastName: { $regex: trimmed, $options: "i" } },
+          { employeeId: { $regex: trimmed, $options: "i" } },
+          { email: { $regex: trimmed, $options: "i" } },
+          { phone: { $regex: trimmed, $options: "i" } },
+          { vendor: { $regex: trimmed, $options: "i" } },
+          { sourcing: { $regex: trimmed, $options: "i" } },
+          { sourcingManager: { $regex: trimmed, $options: "i" } },
         ];
       } else {
         query.$and = words.map((word) => ({
           $or: [
+            { name: { $regex: word, $options: "i" } },
             { firstName: { $regex: word, $options: "i" } },
             { lastName: { $regex: word, $options: "i" } },
+            { phone: { $regex: word, $options: "i" } },
+            { vendor: { $regex: word, $options: "i" } },
+            { sourcing: { $regex: word, $options: "i" } },
+            { sourcingManager: { $regex: word, $options: "i" } },
           ],
         }));
       }
@@ -49,6 +61,9 @@ export const getEmployees = async (req, res) => {
       if (!obj.visiblePassword) {
         obj.visiblePassword = "Pass1234!";
       }
+      obj.name = obj.name || `${obj.firstName || ""} ${obj.lastName || ""}`.trim();
+      obj.sourcing = obj.sourcing || obj.sourcingManager || "";
+      obj.sourcingManager = obj.sourcing;
       return obj;
     });
 
@@ -128,6 +143,9 @@ export const getEmployeeById = async (req, res) => {
     }
 
     const empObj = employee.toObject();
+    empObj.name = empObj.name || `${empObj.firstName || ""} ${empObj.lastName || ""}`.trim();
+    empObj.sourcing = empObj.sourcing || empObj.sourcingManager || "";
+    empObj.sourcingManager = empObj.sourcing;
 
     res.status(200).json({
       success: true,
@@ -148,16 +166,54 @@ export const createEmployee = async (req, res) => {
     const rawPassword = typeof req.body.password === "string" ? req.body.password.trim() : "";
     const finalPassword = rawPassword || "Pass1234!";
     const finalEmployeeId = (req.body.employeeId || "").trim() || generateEmployeeId();
+    const rawSourcing = (req.body.sourcing || req.body.sourcingManager || "").trim();
+    const rawVendor = (req.body.vendor || "").trim();
+    const rawPerDay = req.body.perDayPayout !== undefined ? Number(req.body.perDayPayout) || 0 : 0;
 
     const employeeData = {
       ...req.body,
       employeeId: finalEmployeeId,
       password: finalPassword,
       visiblePassword: finalPassword,
+      vendor: rawVendor,
+      sourcing: rawSourcing,
+      sourcingManager: rawSourcing,
+      perDayPayout: rawPerDay,
     };
+
+    if (rawPerDay > 0 && (!employeeData.monthlySalary || Number(employeeData.monthlySalary) === 0)) {
+      employeeData.monthlySalary = rawPerDay * 30;
+    }
+
+    if (req.body.name && typeof req.body.name === "string" && req.body.name.trim()) {
+      const parts = req.body.name.trim().split(/\s+/);
+      employeeData.name = req.body.name.trim();
+      employeeData.firstName = parts[0] || req.body.name.trim();
+      employeeData.lastName = parts.slice(1).join(" ") || "";
+    }
 
     const employee = await Employee.create(employeeData);
     const employeeResponse = employee.toObject();
+    employeeResponse.name = employeeResponse.name || `${employeeResponse.firstName || ""} ${employeeResponse.lastName || ""}`.trim();
+    employeeResponse.sourcing = employeeResponse.sourcing || employeeResponse.sourcingManager || "";
+    employeeResponse.sourcingManager = employeeResponse.sourcing;
+
+    // Auto-save any new vendor or sourcing to Settings for future dropdowns
+    if (rawVendor || rawSourcing) {
+      Settings.findOne().then((settings) => {
+        if (!settings) return;
+        let changed = false;
+        if (rawVendor && !settings.vendors.includes(rawVendor)) {
+          settings.vendors.push(rawVendor);
+          changed = true;
+        }
+        if (rawSourcing && !settings.sourcingManagers.includes(rawSourcing)) {
+          settings.sourcingManagers.push(rawSourcing);
+          changed = true;
+        }
+        if (changed) settings.save().catch(() => {});
+      }).catch(() => {});
+    }
 
     req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "employee", action: "created", entity: "employee", data: employeeResponse });
 
@@ -193,6 +249,43 @@ export const updateEmployee = async (req, res) => {
       delete updates.visiblePassword;
     }
 
+    if (updates.name && typeof updates.name === "string" && updates.name.trim()) {
+      const parts = updates.name.trim().split(/\s+/);
+      updates.firstName = parts[0] || updates.name.trim();
+      updates.lastName = parts.slice(1).join(" ") || "";
+    }
+
+    if (updates.sourcing !== undefined || updates.sourcingManager !== undefined) {
+      const sourcingVal = (updates.sourcing || updates.sourcingManager || "").trim();
+      updates.sourcing = sourcingVal;
+      updates.sourcingManager = sourcingVal;
+    }
+
+    if (updates.perDayPayout !== undefined) {
+      updates.perDayPayout = Number(updates.perDayPayout) || 0;
+      if (updates.perDayPayout > 0) {
+        updates.monthlySalary = updates.perDayPayout * 30;
+      }
+    }
+
+    const rawVendor = updates.vendor?.trim();
+    const rawSourcing = updates.sourcing?.trim();
+    if (rawVendor || rawSourcing) {
+      Settings.findOne().then((settings) => {
+        if (!settings) return;
+        let changed = false;
+        if (rawVendor && !settings.vendors.includes(rawVendor)) {
+          settings.vendors.push(rawVendor);
+          changed = true;
+        }
+        if (rawSourcing && !settings.sourcingManagers.includes(rawSourcing)) {
+          settings.sourcingManagers.push(rawSourcing);
+          changed = true;
+        }
+        if (changed) settings.save().catch(() => {});
+      }).catch(() => {});
+    }
+
     const employee = await Employee.findByIdAndUpdate(
       req.params.id,
       updates,
@@ -216,6 +309,9 @@ export const updateEmployee = async (req, res) => {
     }
 
     const empObj = employee.toObject();
+    empObj.name = empObj.name || `${empObj.firstName || ""} ${empObj.lastName || ""}`.trim();
+    empObj.sourcing = empObj.sourcing || empObj.sourcingManager || "";
+    empObj.sourcingManager = empObj.sourcing;
 
     req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "employee", action: "updated", entity: "employee", data: empObj });
 

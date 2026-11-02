@@ -70,7 +70,6 @@ export default function Attendance() {
     const [currentMonth, setCurrentMonth] = useState(() => new Date());
     const {
         attendance,
-        leaves,
         todayAttendance,
         presentDays,
         absentDays,
@@ -85,23 +84,7 @@ export default function Attendance() {
         [attendance],
     );
 
-    const approvedLeaveDays = useMemo(() => {
-        const daysSet = new Set();
-
-        leaves
-            .filter((leave) => leave.status === "approved")
-            .forEach((leave) => {
-                const cursor = new Date(leave.fromDate);
-                const end = new Date(leave.toDate);
-
-                while (cursor <= end) {
-                    daysSet.add(cursor.toISOString().split("T")[0]);
-                    cursor.setDate(cursor.getDate() + 1);
-                }
-            });
-
-        return daysSet;
-    }, [leaves]);
+    const approvedLeaveDays = useMemo(() => new Set(), []);
 
     const monthAttendance = useMemo(() => (
         attendance.filter((item) => sameMonth(new Date(item.date), currentMonth))

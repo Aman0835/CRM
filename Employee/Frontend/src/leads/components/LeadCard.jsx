@@ -1,7 +1,8 @@
 import React from "react";
-import { FiPhone, FiCalendar, FiArrowRight, FiMessageSquare } from "react-icons/fi";
+import { FiPhone, FiCalendar, FiArrowRight } from "react-icons/fi";
+import { FaWhatsapp } from "react-icons/fa";
 import StatusBadge from "./StatusBadge";
-import { formatFollowUp } from "../utils/leadUtils";
+import { formatFollowUp, cleanPhoneForWa } from "../utils/leadUtils";
 
 export default function LeadCard({ lead, onClick }) {
   const followUp = formatFollowUp(lead?.nextFollowUp?.date, lead?.nextFollowUp?.time);
@@ -43,16 +44,29 @@ export default function LeadCard({ lead, onClick }) {
         </div>
       )}
 
-      {/* Phone Call Bar */}
+      {/* Phone Call & WhatsApp Action Buttons */}
       {lead.phone && (
-        <div className="mt-3 flex items-center justify-between">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
           <a
             href={`tel:${lead.phone}`}
             onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#233555] px-3 py-1.5 text-[12px] font-semibold text-blue-300 transition-colors hover:bg-blue-600 hover:text-white"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-[#233555] px-3 py-1.5 text-[12px] font-semibold text-blue-300 transition-colors hover:bg-blue-600 hover:text-white"
+            title="Call Client"
           >
             <FiPhone className="h-3.5 w-3.5 text-blue-400" />
             <span>{lead.phone}</span>
+          </a>
+
+          <a
+            href={`https://wa.me/${cleanPhoneForWa(lead.phone)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-[#143d2c] border border-[#1b583f] px-3 py-1.5 text-[12px] font-bold text-emerald-400 transition-all hover:bg-[#25D366] hover:text-slate-950 active:scale-95 shadow-sm"
+            title="Chat on WhatsApp"
+          >
+            <FaWhatsapp className="h-4 w-4 text-[#25D366] group-hover/wa:text-slate-950" />
+            <span>WhatsApp</span>
           </a>
         </div>
       )}

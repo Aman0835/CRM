@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FiArrowLeft,
@@ -7,15 +7,16 @@ import {
   FiMail,
   FiMapPin,
   FiHome,
-  FiDollarSign,
   FiCheck,
   FiCalendar,
   FiClock,
   FiFileText,
+  FiChevronDown,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import DashboardLayout from "../../components/layout/DashboardLayout";
 import { createLead } from "../services/leadService";
+import SchedulePicker from "../components/SchedulePicker";
 import {
   CONFIG_OPTIONS,
   BUDGET_OPTIONS,
@@ -24,6 +25,52 @@ import {
   NEXT_ACTION_OPTIONS,
   QUICK_RESPONSES,
 } from "../utils/leadUtils";
+
+const CustomSelect = ({ value, onChange, options, placeholder }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="mt-1.5 h-11 w-full flex items-center justify-between rounded-2xl border border-[#243552] bg-[#141e31] px-3 text-xs text-white outline-none focus:border-[#2f6cf6] transition-colors"
+      >
+        <span className="truncate">{value || placeholder}</span>
+        <FiChevronDown className={`text-[#7d93ba] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+      
+      {isOpen && (
+        <div className="absolute z-50 mt-2 w-full max-h-60 overflow-y-auto rounded-2xl border border-[#243552] bg-[#141e31] py-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          {options.map((opt) => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => {
+                onChange(opt);
+                setIsOpen(false);
+              }}
+              className={`w-full text-left px-4 py-2.5 text-xs transition-colors hover:bg-[#1a263d] ${value === opt ? "text-[#2f6cf6] font-bold bg-[#1a263d]" : "text-[#93aacf]"}`}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function CreateLeadPage() {
   const navigate = useNavigate();
@@ -34,13 +81,12 @@ export default function CreateLeadPage() {
     // Client Info
     name: "",
     phone: "",
-    email: "",
     location: "",
     // Requirements
     project: "",
     configuration: "2 BHK",
     budget: "₹1 Cr – ₹1.5 Cr",
-    source: "Direct Call",
+    source: "",
     // First Interaction
     interactionType: "CALL",
     clientResponse: "",
@@ -104,7 +150,7 @@ export default function CreateLeadPage() {
       if (res?.data?._id) {
         navigate(`/leads/${res.data._id}`);
       } else {
-        navigate("/leads/my");
+        navigate("/leads");
       }
     } catch (err) {
       console.error("Create Lead Error:", err);
@@ -122,6 +168,14 @@ export default function CreateLeadPage() {
     }
   };
 
+  const handleBack = () => {
+    if (window.history.state && window.history.state.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate("/leads");
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-5 pb-8 pt-1">
@@ -129,8 +183,9 @@ export default function CreateLeadPage() {
         <div className="flex items-center gap-3 px-1">
           <button
             type="button"
-            onClick={() => navigate("/leads")}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#182338] text-[#8ea4cb] hover:text-white transition-colors"
+            onClick={handleBack}
+            aria-label="Go back"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#182338] text-[#8ea4cb] hover:text-white active:scale-95 transition-all"
           >
             <FiArrowLeft className="h-5 w-5" />
           </button>
@@ -198,19 +253,6 @@ export default function CreateLeadPage() {
                 />
               </div>
             </div>
-
-            <div>
-              <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
-                Email (Optional)
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleChange("email", e.target.value)}
-                placeholder="client@example.com"
-                className="mt-1.5 h-11 w-full rounded-2xl border border-[#243552] bg-[#141e31] px-4 text-xs text-white placeholder-[#506385] outline-none focus:border-[#2f6cf6]"
-              />
-            </div>
           </div>
 
           {/* SECTION 2: REQUIREMENTS */}
@@ -242,53 +284,38 @@ export default function CreateLeadPage() {
                 <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
                   Configuration
                 </label>
-                <select
+                <CustomSelect 
                   value={formData.configuration}
-                  onChange={(e) => handleChange("configuration", e.target.value)}
-                  className="mt-1.5 h-11 w-full rounded-2xl border border-[#243552] bg-[#141e31] px-3 text-xs text-white outline-none focus:border-[#2f6cf6]"
-                >
-                  {CONFIG_OPTIONS.map((c) => (
-                    <option key={c} value={c} className="bg-[#101827] text-white">
-                      {c}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => handleChange("configuration", val)}
+                  options={CONFIG_OPTIONS}
+                  placeholder="Select config"
+                />
               </div>
 
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
                   Budget Range
                 </label>
-                <select
+                <CustomSelect 
                   value={formData.budget}
-                  onChange={(e) => handleChange("budget", e.target.value)}
-                  className="mt-1.5 h-11 w-full rounded-2xl border border-[#243552] bg-[#141e31] px-3 text-xs text-white outline-none focus:border-[#2f6cf6]"
-                >
-                  {BUDGET_OPTIONS.map((b) => (
-                    <option key={b} value={b} className="bg-[#101827] text-white">
-                      {b}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => handleChange("budget", val)}
+                  options={BUDGET_OPTIONS}
+                  placeholder="Select budget"
+                />
               </div>
             </div>
 
             <div>
               <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
-                Lead Source
+                Lead Source (CP Firm)
               </label>
-              <select
+              <input
+                type="text"
                 value={formData.source}
                 onChange={(e) => handleChange("source", e.target.value)}
-                className="mt-1.5 h-11 w-full rounded-2xl border border-[#243552] bg-[#141e31] px-3 text-xs text-white outline-none focus:border-[#2f6cf6]"
-              >
-                <option value="Direct Call" className="bg-[#101827]">Direct Call</option>
-                <option value="WhatsApp Inquiry" className="bg-[#101827]">WhatsApp Inquiry</option>
-                <option value="Walk-in" className="bg-[#101827]">Walk-in / Office</option>
-                <option value="Website" className="bg-[#101827]">Website Portal</option>
-                <option value="Referral" className="bg-[#101827]">Referral / Existing Client</option>
-                <option value="Campaign" className="bg-[#101827]">Marketing Campaign</option>
-              </select>
+                placeholder="e.g. ABC CP Firm"
+                className="mt-1.5 h-11 w-full rounded-2xl border border-[#243552] bg-[#141e31] px-4 text-xs text-white placeholder-[#506385] outline-none focus:border-[#2f6cf6]"
+              />
             </div>
           </div>
 
@@ -301,34 +328,6 @@ export default function CreateLeadPage() {
               <h2 className="text-[14px] font-bold text-white uppercase tracking-wider">
                 First Interaction
               </h2>
-            </div>
-
-            {/* Type selector */}
-            <div>
-              <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
-                Interaction Mode
-              </label>
-              <div className="mt-2 grid grid-cols-4 gap-2">
-                {INTERACTION_TYPES.slice(0, 4).map((t) => {
-                  const Icon = t.icon;
-                  const isSelected = formData.interactionType === t.id;
-                  return (
-                    <button
-                      key={t.id}
-                      type="button"
-                      onClick={() => handleChange("interactionType", t.id)}
-                      className={`flex flex-col items-center justify-center rounded-2xl p-2.5 transition-all ${
-                        isSelected
-                          ? "bg-[#2f6cf6] text-white shadow-[0_4px_12px_rgba(47,108,246,0.35)]"
-                          : "bg-[#141e31] text-[#7d93ba] hover:bg-[#1a263d]"
-                      }`}
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span className="mt-1 text-[11px] font-bold">{t.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
             </div>
 
             {/* Notes / What client said */}
@@ -369,62 +368,36 @@ export default function CreateLeadPage() {
                 <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
                   Outcome <span className="text-red-400">*</span>
                 </label>
-                <select
+                <CustomSelect 
                   value={formData.outcome}
-                  onChange={(e) => handleChange("outcome", e.target.value)}
-                  className="mt-1.5 h-11 w-full rounded-2xl border border-[#243552] bg-[#141e31] px-3 text-xs text-white outline-none focus:border-[#2f6cf6]"
-                >
-                  {OUTCOME_OPTIONS.map((opt) => (
-                    <option key={opt} value={opt} className="bg-[#101827] text-white">
-                      {opt}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => handleChange("outcome", val)}
+                  options={OUTCOME_OPTIONS}
+                  placeholder="Select outcome"
+                />
               </div>
 
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
                   Next Action <span className="text-red-400">*</span>
                 </label>
-                <select
+                <CustomSelect 
                   value={formData.nextAction}
-                  onChange={(e) => handleChange("nextAction", e.target.value)}
-                  className="mt-1.5 h-11 w-full rounded-2xl border border-[#243552] bg-[#141e31] px-3 text-xs text-white outline-none focus:border-[#2f6cf6]"
-                >
-                  {NEXT_ACTION_OPTIONS.map((act) => (
-                    <option key={act} value={act} className="bg-[#101827] text-white">
-                      {act}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => handleChange("nextAction", val)}
+                  options={NEXT_ACTION_OPTIONS}
+                  placeholder="Select action"
+                />
               </div>
             </div>
 
             {/* Follow-up Date & Time */}
-            <div className="rounded-2xl border border-[#23334d] bg-[#141e31] p-3.5 space-y-2">
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#fbbf24]">
-                Schedule Follow-up
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <input
-                    type="date"
-                    value={formData.followUpDate}
-                    onChange={(e) => handleChange("followUpDate", e.target.value)}
-                    className="h-10 w-full rounded-xl border border-[#243552] bg-[#101827] px-3 text-xs text-white outline-none focus:border-[#2f6cf6]"
-                  />
-                </div>
-                <div>
-                  <input
-                    type="text"
-                    value={formData.followUpTime}
-                    onChange={(e) => handleChange("followUpTime", e.target.value)}
-                    placeholder="11:00 AM"
-                    className="h-10 w-full rounded-xl border border-[#243552] bg-[#101827] px-3 text-xs text-white outline-none focus:border-[#2f6cf6]"
-                  />
-                </div>
-              </div>
-            </div>
+            <SchedulePicker
+              date={formData.followUpDate}
+              onDateChange={(val) => handleChange("followUpDate", val)}
+              time={formData.followUpTime}
+              onTimeChange={(val) => handleChange("followUpTime", val)}
+              title="Schedule Follow-up"
+              optional={true}
+            />
           </div>
 
           {/* SUBMIT BUTTON */}

@@ -56,15 +56,18 @@ export const checkIn = async (req, res) => {
     }
 
     // Retrieve active shift settings
-    const settings = (await Settings.findOne()) || { checkInTime: "09:00", checkOutTime: "20:00" };
+    const settings = (await Settings.findOne()) || { checkInTime: "09:00", checkOutTime: "20:00", lateGraceMinutes: 15 };
 
     const now = new Date();
     const [targetHour, targetMin] = (settings.checkInTime || "09:00").split(":").map(Number);
-    const targetCheckInDate = new Date(now);
-    targetCheckInDate.setHours(targetHour || 9, targetMin || 0, 0, 0);
+    const graceMinutes = settings.lateGraceMinutes ?? 15;
 
-    // Flag as "Late" if checked in after configured check-in time
-    const status = now > targetCheckInDate ? "Late" : "Present";
+    // Deadline = configured check-in time + grace buffer
+    const deadlineDate = new Date(now);
+    deadlineDate.setHours(targetHour || 9, (targetMin || 0) + graceMinutes, 0, 0);
+
+    // Flag as "Late" only if checked in AFTER configured check-in time + grace period
+    const status = now > deadlineDate ? "Late" : "Present";
 
     attendance = await Attendance.create({
       employeeId: rawId,

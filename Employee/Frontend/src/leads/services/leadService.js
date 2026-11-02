@@ -23,6 +23,14 @@ export const getMyLeads = async ({ search = "", status = "all", page = 1, limit 
 };
 
 /**
+ * Get active leads that need follow-up today or are overdue.
+ */
+export const getMyReminders = async () => {
+  const response = await api.get("/employee/leads/my/reminders");
+  return response.data;
+};
+
+/**
  * Get single lead details.
  */
 export const getLeadById = async (leadId) => {

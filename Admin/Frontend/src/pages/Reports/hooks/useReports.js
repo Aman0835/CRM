@@ -5,24 +5,22 @@ import * as employeeService from "../../../services/employeeService";
 
 export function useReports() {
     const [loading, setLoading] = useState(true);
-    const [stats, setStats] = useState({ avgAttendance: 0, avgHours: 0, totalPayout: 0, leaveCount: 0 });
+    const [stats, setStats] = useState({ avgAttendance: 0, avgHours: 0, totalPayout: 0 });
     const [rankingList, setRankingList] = useState([]);
     const [chartData, setChartData] = useState([]);
 
     const fetchReportsData = async () => {
         setLoading(true);
         try {
-            const [attRes, payRes, leaveRes, empRes] = await Promise.all([
+            const [attRes, payRes, empRes] = await Promise.all([
                 reportService.getAttendanceReport(),
                 reportService.getPayrollReport(),
-                reportService.getLeaveReport(),
                 employeeService.getEmployees({ limit: 100 })
             ]);
 
             if (empRes.success) {
                 const attData = attRes.success ? attRes.data : [];
                 const payData = payRes.success ? payRes.data : [];
-                const leaveData = leaveRes.success ? leaveRes.data : [];
                 const empList = empRes.data;
 
                 const totalAttLogs = attData.length;
@@ -34,9 +32,7 @@ export function useReports() {
                 const avgHours = workingHoursLogs.length > 0 ? (totalHours / workingHoursLogs.length).toFixed(1) : 8.2;
 
                 const totalPayout = payData.reduce((sum, p) => sum + p.netSalary, 0);
-                const leaveCount = leaveData.filter(l => l.status === "approved").length;
-
-                setStats({ avgAttendance, avgHours, totalPayout, leaveCount });
+                setStats({ avgAttendance, avgHours, totalPayout });
 
                 const rankings = empList
                     .map(emp => {
@@ -83,8 +79,7 @@ export function useReports() {
             let csvContent = "SYSTEM OVERVIEW STATS\n";
             csvContent += `Avg Attendance Rate,${stats.avgAttendance}%\n`;
             csvContent += `Avg Shift Hours,${stats.avgHours} hours/day\n`;
-            csvContent += `Cumulative Payout,$${stats.totalPayout}\n`;
-            csvContent += `Approved Leave Periods,${stats.leaveCount}\n\n`;
+            csvContent += `Cumulative Payout,₹${stats.totalPayout}\n\n`;
             csvContent += "STAFF ATTENDANCE RANKS\n";
             csvContent += "Rank,Employee ID,First Name,Last Name,Role,Attendance Rate,Logs Count,Status\n";
             rankingList.forEach((emp, index) => {

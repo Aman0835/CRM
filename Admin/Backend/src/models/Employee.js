@@ -19,51 +19,66 @@ const employeeSchema = new mongoose.Schema(
       trim: true,
     },
 
+    name: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
     firstName: {
       type: String,
-      required: true,
       trim: true,
-      minlength: 3,
-      maxlength: 50,
+      default: "",
     },
     lastName: {
       type: String,
-      required: true,
       trim: true,
-      minlength: 3,
-      maxlength: 50,
+      default: "",
     },
 
     gender: {
       type: String,
       lowercase: true,
       trim: true,
-      required: true,
       enum: ["male", "female", "other"],
+      default: "other",
     },
 
     email: {
       type: String,
-      required: true,
-      unique: true,
       lowercase: true,
       trim: true,
-      validate(value) {
-        if (!validator.isEmail(value)) {
-          throw new Error("Invalid email");
-        }
-      },
+      default: "",
     },
 
     phone: {
       type: String,
       required: true,
       trim: true,
-      validate(value) {
-        if (!validator.isMobilePhone(value, "any")) {
-          throw new Error("Invalid phone number");
-        }
-      },
+    },
+
+    vendor: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    sourcing: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    sourcingManager: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    perDayPayout: {
+      type: Number,
+      default: 0,
+      min: 0,
     },
 
     role: {
@@ -98,11 +113,6 @@ const employeeSchema = new mongoose.Schema(
     profileImage: {
       type: String,
       default: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400",
-      validate(value) {
-        if (value && !value.startsWith("data:image/") && !validator.isURL(value)) {
-          throw new Error("Invalid image URL");
-        }
-      },
     },
 
     address: {
@@ -112,7 +122,7 @@ const employeeSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["active", "inactive", "on_leave"],
+      enum: ["active", "inactive"],
       default: "active",
     },
   },
@@ -123,13 +133,43 @@ const employeeSchema = new mongoose.Schema(
 
 employeeSchema.index({
   employeeId: 1,
-  email: 1,
+  phone: 1,
 });
 
 employeeSchema.pre("validate", function (next) {
   if (!this.employeeId || !this.employeeId.trim()) {
     this.employeeId = generateEmployeeId();
   }
+
+  // Sync name <-> firstName / lastName
+  if (this.name && this.name.trim()) {
+    const parts = this.name.trim().split(/\s+/);
+    this.firstName = parts[0] || this.name.trim();
+    this.lastName = parts.slice(1).join(" ") || "";
+  } else if (this.firstName || this.lastName) {
+    this.name = `${this.firstName || ""} ${this.lastName || ""}`.trim();
+  }
+
+  // Sync sourcing <-> sourcingManager
+  if (this.sourcing && !this.sourcingManager) {
+    this.sourcingManager = this.sourcing.trim();
+  } else if (this.sourcingManager && !this.sourcing) {
+    this.sourcing = this.sourcingManager.trim();
+  }
+
+  // Ensure unique placeholder email if omitted
+  if (!this.email || !this.email.trim()) {
+    const cleanId = (this.employeeId || "emp").toLowerCase().replace(/[^a-z0-9]/g, "");
+    this.email = `${cleanId}@clipper.internal`;
+  }
+
+  // Keep monthly salary and perDayPayout in sync
+  if (this.perDayPayout > 0 && (!this.monthlySalary || this.monthlySalary === 0)) {
+    this.monthlySalary = this.perDayPayout * 30;
+  } else if (this.monthlySalary > 0 && (!this.perDayPayout || this.perDayPayout === 0)) {
+    this.perDayPayout = Math.round(this.monthlySalary / 30);
+  }
+
   next();
 });
 
