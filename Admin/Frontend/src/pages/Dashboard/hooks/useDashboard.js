@@ -107,7 +107,7 @@ export function useDashboard() {
             subtext: "Ready for in-store visits",
             growth: "Needs follow-up",
             icon: FiCalendar,
-            path: "/leads",
+            path: "/visits",
             iconBg: "bg-violet-50 text-violet-600 border border-violet-100 dark:bg-violet-950/20 dark:text-violet-400 dark:border-violet-900/30",
             hoverShadow: "hover:shadow-[0_8px_30px_rgba(139,92,246,0.06)]",
             glowColor: "bg-violet-500/5",

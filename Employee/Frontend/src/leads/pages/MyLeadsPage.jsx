@@ -1,16 +1,17 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FiArrowLeft,
   FiSearch,
   FiPlus,
-  FiFilter,
   FiRefreshCw,
   FiUserPlus,
+  FiAlertTriangle,
 } from "react-icons/fi";
+import toast from "react-hot-toast";
 import DashboardLayout from "../../components/layout/DashboardLayout";
 import LeadCard from "../components/LeadCard";
-import { getMyLeads } from "../services/leadService";
+import { getMyLeads, deleteLead } from "../services/leadService";
 import { LEAD_STATUSES } from "../utils/leadUtils";
 
 export default function MyLeadsPage() {
@@ -21,6 +22,10 @@ export default function MyLeadsPage() {
   const [search, setSearch] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [summary, setSummary] = useState({ totalActive: 0, todaysFollowUps: 0 });
+
+  // Delete confirmation state
+  const [leadToDelete, setLeadToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchLeads = async () => {
     setLoading(true);
@@ -46,7 +51,7 @@ export default function MyLeadsPage() {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchLeads();
-    }, 250); // slight debounce for search
+    }, 250);
     return () => clearTimeout(timeoutId);
   }, [search, selectedStatus]);
 
@@ -58,6 +63,31 @@ export default function MyLeadsPage() {
     } else {
       navigate("/dashboard");
     }
+  };
+
+  const handleDeleteRequest = (lead) => {
+    setLeadToDelete(lead);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!leadToDelete) return;
+    setIsDeleting(true);
+    try {
+      await deleteLead(leadToDelete._id);
+      // Remove from local state immediately for instant feedback
+      setLeads((prev) => prev.filter((l) => l._id !== leadToDelete._id));
+      toast.success(`"${leadToDelete.name}" deleted`);
+      setLeadToDelete(null);
+    } catch (err) {
+      console.error("Delete Lead Error:", err);
+      toast.error(err?.response?.data?.message || "Failed to delete lead");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    if (!isDeleting) setLeadToDelete(null);
   };
 
   return (
@@ -176,11 +206,53 @@ export default function MyLeadsPage() {
                 key={lead._id}
                 lead={lead}
                 onClick={() => navigate(`/leads/${lead._id}`)}
+                onDelete={handleDeleteRequest}
               />
             ))
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {leadToDelete && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm px-4 pb-6">
+          <div
+            className="w-full max-w-[390px] rounded-[28px] border border-red-500/30 bg-[#1a1e2e] p-6 space-y-4 shadow-[0_-20px_60px_rgba(0,0,0,0.5)]"
+            style={{ animation: "slideUp 0.25s ease-out" }}
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-red-500/15 border border-red-500/30">
+                <FiAlertTriangle className="h-5 w-5 text-red-400" />
+              </div>
+              <div>
+                <h3 className="text-[16px] font-black text-white">Delete Lead?</h3>
+                <p className="text-[12px] text-[#8ea4cb] mt-0.5">This cannot be undone.</p>
+              </div>
+            </div>
+            <p className="text-[13px] text-[#9db4db] leading-relaxed">
+              You are about to permanently delete <span className="font-bold text-white">{leadToDelete.name}</span>'s lead along with all interaction history.
+            </p>
+            <div className="flex gap-3 pt-1">
+              <button
+                type="button"
+                onClick={handleDeleteCancel}
+                disabled={isDeleting}
+                className="flex-1 h-12 rounded-2xl border border-[#2d3f5c] bg-[#1d2840] text-[13px] font-bold text-[#8ea4cb] hover:text-white transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+                className="flex-1 h-12 rounded-2xl bg-red-500 text-[13px] font-bold text-white shadow-[0_8px_20px_rgba(239,68,68,0.4)] active:scale-[0.98] disabled:opacity-60 transition-all"
+              >
+                {isDeleting ? "Deleting..." : "Yes, Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

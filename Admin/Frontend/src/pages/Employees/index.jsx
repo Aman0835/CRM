@@ -22,9 +22,9 @@ export default function Employees() {
         statusDropdownRef, isFormOpen, setIsFormOpen, formMode,
         handleClearFilters, handleOpenCreate, handleOpenEdit, handleDelete, handleFormSubmit,
         employeeId, name, setName, phone, setPhone,
-        vendor, setVendor, vendorOptions, handleAddVendor,
+        vendor, setVendor, vendorOptions, handleAddVendor, handleRemoveVendor,
         perDayPayout, setPerDayPayout,
-        sourcingManager, setSourcingManager, sourcingManagerOptions, handleAddSourcingManager,
+        sourcingManager, setSourcingManager, sourcingManagerOptions, handleAddSourcingManager, handleRemoveSourcing,
         password, setPassword, status, setStatus,
     } = useEmployees();
 
@@ -148,12 +148,14 @@ export default function Employees() {
                 setVendor={setVendor}
                 vendorOptions={vendorOptions}
                 onAddVendor={handleAddVendor}
+                onRemoveVendor={handleRemoveVendor}
                 perDayPayout={perDayPayout}
                 setPerDayPayout={setPerDayPayout}
                 sourcingManager={sourcingManager}
                 setSourcingManager={setSourcingManager}
                 sourcingManagerOptions={sourcingManagerOptions}
                 onAddSourcingManager={handleAddSourcingManager}
+                onRemoveSourcing={handleRemoveSourcing}
                 password={password}
                 setPassword={setPassword}
                 status={status}

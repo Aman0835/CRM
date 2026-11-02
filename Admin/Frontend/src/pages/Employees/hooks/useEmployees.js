@@ -126,12 +126,24 @@ export function useEmployees() {
         });
     };
 
+    const handleRemoveVendor = (vendorToRemove) => {
+        setVendorOptions((prev) => prev.filter((v) => v !== vendorToRemove));
+        // Clear selection if the removed vendor was selected
+        setVendor((prev) => (prev === vendorToRemove ? "" : prev));
+    };
+
     const handleAddSourcing = (newSourcing) => {
         if (!newSourcing) return;
         setSourcingOptions((prev) => {
             if (prev.includes(newSourcing)) return prev;
             return [...prev, newSourcing];
         });
+    };
+
+    const handleRemoveSourcing = (sourcingToRemove) => {
+        setSourcingOptions((prev) => prev.filter((s) => s !== sourcingToRemove));
+        // Clear selection if the removed sourcing was selected
+        setSourcing((prev) => (prev === sourcingToRemove ? "" : prev));
     };
 
     const handleOpenCreate = () => {
@@ -253,10 +265,12 @@ export function useEmployees() {
         setVendor,
         vendorOptions,
         handleAddVendor,
+        handleRemoveVendor,
         sourcing,
         setSourcing,
         sourcingOptions,
         handleAddSourcing,
+        handleRemoveSourcing,
         // Backwards compatibility aliases
         sourcingManager: sourcing,
         setSourcingManager: setSourcing,

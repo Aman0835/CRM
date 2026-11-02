@@ -1,10 +1,10 @@
 import React from "react";
-import { FiPhone, FiCalendar, FiArrowRight } from "react-icons/fi";
+import { FiPhone, FiCalendar, FiArrowRight, FiTrash2 } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import StatusBadge from "./StatusBadge";
 import { formatFollowUp, cleanPhoneForWa } from "../utils/leadUtils";
 
-export default function LeadCard({ lead, onClick }) {
+export default function LeadCard({ lead, onClick, onDelete }) {
   const followUp = formatFollowUp(lead?.nextFollowUp?.date, lead?.nextFollowUp?.time);
   const latestResponse = lead?.latestInteraction?.clientResponse;
 
@@ -13,7 +13,7 @@ export default function LeadCard({ lead, onClick }) {
       onClick={onClick}
       className="group relative cursor-pointer overflow-hidden rounded-[24px] border border-[#243552] bg-[#1d2840] p-4.5 shadow-[0_12px_28px_rgba(0,0,0,0.25)] transition-all duration-200 active:scale-[0.98] hover:border-[#38517c]"
     >
-      {/* Top Header: Name & Status */}
+      {/* Top Header: Name, Status & Delete */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <h3 className="truncate text-[17px] font-black text-white group-hover:text-blue-200">
@@ -25,7 +25,24 @@ export default function LeadCard({ lead, onClick }) {
             </p>
           )}
         </div>
-        <StatusBadge status={lead.status} />
+
+        <div className="flex items-center gap-2 shrink-0">
+          <StatusBadge status={lead.status} />
+          {onDelete && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(lead);
+              }}
+              aria-label="Delete lead"
+              title="Delete lead"
+              className="flex h-7 w-7 items-center justify-center rounded-full bg-red-500/0 border border-transparent text-[#506385] hover:bg-red-500/15 hover:border-red-500/30 hover:text-red-400 active:scale-95 transition-all"
+            >
+              <FiTrash2 className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Project & Requirements */}

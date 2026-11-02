@@ -4,12 +4,15 @@ import jwt from "jsonwebtoken";
 import {
   addInteraction,
   createLead,
+  deleteLead,
   getAllLeads,
   getLeadById,
   getLeadInteractions,
   getMyLeads,
   getMyReminders,
   updateLead,
+  getVisitsAnalytics,
+  updateVisitStatus,
 } from "../controllers/leadController.js";
 
 dotenv.config();
@@ -54,8 +57,11 @@ router.post("/", createLead);
 router.get("/", getAllLeads);
 router.get("/my", getMyLeads);
 router.get("/my/reminders", getMyReminders);
+router.get("/visits/analytics", getVisitsAnalytics);
+router.patch("/:leadId/visit-status", updateVisitStatus);
 router.get("/:leadId", getLeadById);
 router.patch("/:leadId", updateLead);
+router.delete("/:leadId", deleteLead);
 router.post("/:leadId/interactions", addInteraction);
 router.get("/:leadId/interactions", getLeadInteractions);
 

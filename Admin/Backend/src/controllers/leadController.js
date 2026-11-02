@@ -396,6 +396,57 @@ export const updateLead = async (req, res) => {
 };
 
 /**
+ * DELETE /api/employee/leads/:leadId
+ * Delete a lead and all its associated interactions.
+ * Only the assigned employee or admin/manager can delete a lead.
+ */
+export const deleteLead = async (req, res) => {
+  try {
+    const employee = req.employee || req.user;
+    if (!employee || !employee._id) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const { leadId } = req.params;
+    const lead = await Lead.findById(leadId);
+
+    if (!lead) {
+      return res.status(404).json({ success: false, message: "Lead not found" });
+    }
+
+    const isStaffOrAdmin = employee.role === "admin" || employee.role === "manager";
+    const isAssigned = lead.assignedTo?.toString() === employee._id?.toString();
+
+    if (!isAssigned && !isStaffOrAdmin) {
+      return res.status(403).json({ success: false, message: "Unauthorized to delete this lead" });
+    }
+
+    // Delete all interactions associated with this lead
+    await Interaction.deleteMany({ leadId: lead._id });
+
+    // Delete the lead itself
+    await Lead.findByIdAndDelete(leadId);
+
+    const io = req.app?.get("io");
+    if (io) {
+      broadcastRealtime(io, {
+        type: "LEAD_DELETED",
+        leadId: lead._id,
+        employeeId: employee._id,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Lead deleted successfully",
+    });
+  } catch (error) {
+    console.error("deleteLead error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
  * POST /api/employee/leads/:leadId/interactions
  * Add a new interaction to an existing lead.
  * Crucial CRM Rule: DOES NOT create a new lead; attaches to the existing lead.
@@ -551,3 +602,225 @@ export const getLeadInteractions = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+/**
+ * GET /api/leads/visits/analytics
+ * Retrieve rich visit statistics, trends, and scheduled/completed visits list.
+ */
+export const getVisitsAnalytics = async (req, res) => {
+  try {
+    const { timeRange = "all", status = "all", search = "" } = req.query;
+
+    const visitLeadsQuery = {
+      $or: [
+        { status: { $in: ["Visit Scheduled", "Visit Completed"] } },
+        { "latestInteraction.interactionType": "SITE_VISIT" },
+        { "nextFollowUp.action": { $regex: /visit/i } },
+      ],
+    };
+
+    if (search && search.trim()) {
+      const term = search.trim();
+      visitLeadsQuery.$and = [
+        {
+          $or: [
+            { name: { $regex: term, $options: "i" } },
+            { phone: { $regex: term, $options: "i" } },
+            { project: { $regex: term, $options: "i" } },
+            { location: { $regex: term, $options: "i" } },
+          ],
+        },
+      ];
+    }
+
+    if (status && status !== "all") {
+      if (status === "scheduled") {
+        visitLeadsQuery.status = "Visit Scheduled";
+      } else if (status === "completed") {
+        visitLeadsQuery.status = "Visit Completed";
+      } else if (status === "won") {
+        visitLeadsQuery.status = "Won";
+      } else if (status === "lost") {
+        visitLeadsQuery.status = "Lost";
+      } else {
+        visitLeadsQuery.status = status;
+      }
+    }
+
+    const now = new Date();
+    if (timeRange === "today") {
+      const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+      visitLeadsQuery.updatedAt = { $gte: start, $lte: end };
+    } else if (timeRange === "week") {
+      const start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      visitLeadsQuery.updatedAt = { $gte: start };
+    } else if (timeRange === "month") {
+      const start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      visitLeadsQuery.updatedAt = { $gte: start };
+    }
+
+    const [allVisitLeads, totalAllLeads, visitInteractions] = await Promise.all([
+      Lead.find(visitLeadsQuery)
+        .populate("assignedTo", "firstName lastName employeeId profileImage")
+        .sort({ "nextFollowUp.date": 1, updatedAt: -1 }),
+      Lead.find().populate("assignedTo", "firstName lastName employeeId profileImage"),
+      Interaction.find({ type: "SITE_VISIT" }).populate("employeeId", "firstName lastName employeeId profileImage"),
+    ]);
+
+    const scheduled = totalAllLeads.filter((l) => l.status === "Visit Scheduled").length;
+    const completed = totalAllLeads.filter((l) => l.status === "Visit Completed").length;
+    const wonFromVisits = totalAllLeads.filter(
+      (l) => l.status === "Won" && (l.latestInteraction?.interactionType === "SITE_VISIT" || (l.nextFollowUp?.action && /visit/i.test(l.nextFollowUp.action)))
+    ).length;
+
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+    const todayScheduled = totalAllLeads.filter((l) => {
+      if (l.status !== "Visit Scheduled") return false;
+      if (!l.nextFollowUp?.date) return false;
+      const d = new Date(l.nextFollowUp.date);
+      return d >= startOfToday && d <= endOfToday;
+    }).length;
+
+    const conversionRate = completed > 0 ? Math.round((wonFromVisits / completed) * 100) : 0;
+
+    // Trend calculation: last 7 days visits scheduled vs completed
+    const daysTrend = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(now.getDate() - (6 - i));
+      const dayLabel = d.toLocaleDateString("en-US", { weekday: "short" });
+      const dayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const dayEnd = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
+
+      const scheduledCount = totalAllLeads.filter((l) => {
+        if (!l.nextFollowUp?.date) return false;
+        const vDate = new Date(l.nextFollowUp.date);
+        return vDate >= dayStart && vDate <= dayEnd;
+      }).length;
+
+      const completedCount = visitInteractions.filter((it) => {
+        const cDate = new Date(it.createdAt);
+        return cDate >= dayStart && cDate <= dayEnd;
+      }).length;
+
+      return {
+        date: dayLabel,
+        Scheduled: scheduledCount,
+        Completed: completedCount,
+      };
+    });
+
+    // Breakdown by Project
+    const byProjectMap = {};
+    totalAllLeads.forEach((l) => {
+      if (l.status === "Visit Scheduled" || l.status === "Visit Completed") {
+        const proj = l.project || l.location || "General In-Store";
+        byProjectMap[proj] = (byProjectMap[proj] || 0) + 1;
+      }
+    });
+    const byProject = Object.entries(byProjectMap)
+      .map(([project, count]) => ({ project, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    // Breakdown by Employee
+    const byEmpMap = {};
+    totalAllLeads.forEach((l) => {
+      if (l.status === "Visit Scheduled" || l.status === "Visit Completed") {
+        const empName = l.assignedTo ? `${l.assignedTo.firstName} ${l.assignedTo.lastName}` : "Unassigned";
+        if (!byEmpMap[empName]) {
+          byEmpMap[empName] = {
+            name: empName,
+            scheduled: 0,
+            completed: 0,
+            profileImage: l.assignedTo?.profileImage || "",
+            employeeId: l.assignedTo?.employeeId || "",
+          };
+        }
+        if (l.status === "Visit Scheduled") byEmpMap[empName].scheduled += 1;
+        if (l.status === "Visit Completed") byEmpMap[empName].completed += 1;
+      }
+    });
+    const byEmployee = Object.values(byEmpMap);
+
+    res.status(200).json({
+      success: true,
+      summary: {
+        totalVisits: scheduled + completed,
+        scheduled,
+        completed,
+        todayScheduled,
+        wonFromVisits,
+        conversionRate,
+      },
+      trend: daysTrend,
+      byProject,
+      byEmployee,
+      data: allVisitLeads,
+    });
+  } catch (error) {
+    console.error("getVisitsAnalytics error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * PATCH /api/leads/:leadId/visit-status
+ * Update status or reschedule a visit directly
+ */
+export const updateVisitStatus = async (req, res) => {
+  try {
+    const { leadId } = req.params;
+    const { status, nextActionDate, nextActionTime, note } = req.body;
+
+    const lead = await Lead.findById(leadId);
+    if (!lead) {
+      return res.status(404).json({ success: false, message: "Lead not found" });
+    }
+
+    if (status) {
+      lead.status = status;
+    }
+
+    if (nextActionDate) {
+      lead.nextFollowUp = {
+        date: new Date(nextActionDate),
+        time: nextActionTime || lead.nextFollowUp?.time || "",
+        action: status === "Visit Scheduled" ? "Site Visit" : lead.nextFollowUp?.action || "Follow-up",
+      };
+    }
+
+    if (note && note.trim()) {
+      const interaction = new Interaction({
+        leadId: lead._id,
+        employeeId: lead.assignedTo || null,
+        employeeName: "Admin",
+        type: "SITE_VISIT",
+        clientResponse: note.trim(),
+        outcome: status === "Visit Completed" ? "Visit Completed" : status || "Visit Update",
+        nextAction: status === "Visit Scheduled" ? "Conduct Visit" : "Follow Up Call",
+        nextActionDate: nextActionDate ? new Date(nextActionDate) : null,
+        nextActionTime: nextActionTime || "",
+      });
+      await interaction.save();
+
+      lead.latestInteraction = {
+        interactionType: "SITE_VISIT",
+        clientResponse: note.trim(),
+        outcome: status || "Updated",
+        nextAction: status === "Visit Scheduled" ? "Conduct Visit" : "Follow Up",
+        date: new Date(),
+      };
+    }
+
+    await lead.save();
+
+    res.status(200).json({ success: true, message: "Visit updated successfully", data: lead });
+  } catch (error) {
+    console.error("updateVisitStatus error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+

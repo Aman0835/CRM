@@ -61,3 +61,11 @@ export const getLeadInteractions = async (leadId) => {
   const response = await api.get(`/employee/leads/${leadId}/interactions`);
   return response.data;
 };
+
+/**
+ * Delete a lead and all its interactions.
+ */
+export const deleteLead = async (leadId) => {
+  const response = await api.delete(`/employee/leads/${leadId}`);
+  return response.data;
+};

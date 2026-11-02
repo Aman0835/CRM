@@ -5,6 +5,7 @@ import {
   FiCalendar,
   FiClock,
   FiHome,
+  FiMapPin,
   FiSettings,
   FiUsers,
 } from "react-icons/fi";
@@ -14,6 +15,7 @@ const mainNavigation = [
   { to: "/dashboard", label: "Dashboard", icon: FiHome },
   { to: "/employees", label: "Employees", icon: FiUsers },
   { to: "/leads", label: "Leads", icon: FiBriefcase },
+  { to: "/visits", label: "Visits", icon: FiMapPin },
   { to: "/attendance", label: "Attendance", icon: FiCalendar },
   { to: "/payroll", label: "Payroll", icon: FiBriefcase },
 ];

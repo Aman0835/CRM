@@ -308,3 +308,14 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
     height: 0;
     display: none;
 }
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

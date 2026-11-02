@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FiX, FiPlus, FiCheck, FiUser, FiPhone, FiBriefcase, FiUsers, FiDollarSign, FiEye, FiEyeOff, FiKey, FiChevronDown } from "react-icons/fi";
+import { FiX, FiPlus, FiCheck, FiUser, FiPhone, FiBriefcase, FiUsers, FiDollarSign, FiEye, FiEyeOff, FiKey, FiChevronDown, FiTrash2 } from "react-icons/fi";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function EmployeeFormModal({
@@ -16,10 +16,12 @@ export default function EmployeeFormModal({
     setVendor,
     vendorOptions = [],
     onAddVendor,
+    onRemoveVendor,
     sourcing,
     setSourcing,
     sourcingOptions = [],
     onAddSourcing,
+    onRemoveSourcing,
     sourcingManager,
     setSourcingManager,
     sourcingManagerOptions,
@@ -123,8 +125,6 @@ export default function EmployeeFormModal({
                                     className="w-full h-11 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-xs text-slate-800 outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-100 placeholder:text-slate-400 transition"
                                 />
                             </div>
-
-                            {/* 2. Mobile Number (Phone number) */}
                             <div>
                                 <label className="flex items-center gap-1.5 text-[11px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">
                                     <FiPhone className="text-emerald-500" /> 2. Phone Number <span className="text-red-500">*</span>
@@ -218,7 +218,7 @@ export default function EmployeeFormModal({
                                                     className="absolute z-50 mt-1.5 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl overflow-hidden"
                                                 >
                                                     <div className="py-1.5 max-h-48 overflow-y-auto">
-                                                        {vendorOptions.map((v) => (
+                                                         {vendorOptions.map((v) => (
                                                             <button
                                                                 key={v}
                                                                 type="button"
@@ -230,7 +230,19 @@ export default function EmployeeFormModal({
                                                                     <span className={`h-2 w-2 rounded-full ${vendor === v ? "bg-amber-500" : "bg-slate-200 dark:bg-slate-600"}`}></span>
                                                                     {v}
                                                                 </span>
-                                                                {vendor === v && <FiCheck className="text-amber-500 shrink-0" />}
+                                                                <div className="flex items-center gap-1 shrink-0">
+                                                                    {vendor === v && <FiCheck className="text-amber-500" />}
+                                                                    {onRemoveVendor && (
+                                                                        <button
+                                                                            type="button"
+                                                                            title="Remove option"
+                                                                            onClick={(e) => { e.stopPropagation(); onRemoveVendor(v); }}
+                                                                            className="ml-1 flex h-5 w-5 items-center justify-center rounded-md text-slate-300 hover:bg-red-100 hover:text-red-500 dark:text-slate-600 dark:hover:bg-red-900/30 dark:hover:text-red-400 transition"
+                                                                        >
+                                                                            <FiTrash2 className="h-3 w-3" />
+                                                                        </button>
+                                                                    )}
+                                                                </div>
                                                             </button>
                                                         ))}
                                                         {vendor && !vendorOptions.includes(vendor) && (
@@ -329,7 +341,19 @@ export default function EmployeeFormModal({
                                                                     <span className={`h-2 w-2 rounded-full ${currentSourcing === m ? "bg-indigo-500" : "bg-slate-200 dark:bg-slate-600"}`}></span>
                                                                     {m}
                                                                 </span>
-                                                                {currentSourcing === m && <FiCheck className="text-indigo-500 shrink-0" />}
+                                                                <div className="flex items-center gap-1 shrink-0">
+                                                                    {currentSourcing === m && <FiCheck className="text-indigo-500" />}
+                                                                    {(onRemoveSourcing || handleAddNewSourcing) && onRemoveSourcing && (
+                                                                        <button
+                                                                            type="button"
+                                                                            title="Remove option"
+                                                                            onClick={(e) => { e.stopPropagation(); onRemoveSourcing(m); }}
+                                                                            className="ml-1 flex h-5 w-5 items-center justify-center rounded-md text-slate-300 hover:bg-red-100 hover:text-red-500 dark:text-slate-600 dark:hover:bg-red-900/30 dark:hover:text-red-400 transition"
+                                                                        >
+                                                                            <FiTrash2 className="h-3 w-3" />
+                                                                        </button>
+                                                                    )}
+                                                                </div>
                                                             </button>
                                                         ))}
                                                         {currentSourcing && !currentSourcingOptions.includes(currentSourcing) && (
@@ -365,7 +389,7 @@ export default function EmployeeFormModal({
                                 />
 
                                 <div className="grid grid-cols-4 gap-2 mt-1.5">
-                                    {["850", "900", "950", "1000"].map((amount) => {
+                                    {[ "950", "1000", "1100"].map((amount) => {
                                         const isSelected = String(perDayPayout) === amount;
                                         return (
                                             <button

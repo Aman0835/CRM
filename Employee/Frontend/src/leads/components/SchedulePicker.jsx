@@ -1,5 +1,6 @@
-import React, { useRef } from "react";
+import React, { useState, useRef } from "react";
 import { FiCalendar, FiClock, FiX } from "react-icons/fi";
+import RoundClockModal from "./RoundClockModal";
 
 export function formatTime24To12(time24) {
   if (!time24) return "";
@@ -34,7 +35,7 @@ export default function SchedulePicker({
   optional = true,
 }) {
   const dateInputRef = useRef(null);
-  const timeInputRef = useRef(null);
+  const [isClockOpen, setIsClockOpen] = useState(false);
 
   const todayStr = new Date().toISOString().split("T")[0];
 
@@ -137,47 +138,33 @@ export default function SchedulePicker({
           </div>
         </div>
 
-        {/* Time Selector (Clock) */}
+        {/* Time Selector (Round Clock Trigger) */}
         <div>
           <label className="text-[10px] uppercase font-bold text-[#8ba2c8] mb-1 flex items-center gap-1">
             <FiClock className="text-amber-400" /> Clock Time
           </label>
-          <div
-            onClick={() => {
-              try {
-                timeInputRef.current?.showPicker?.();
-              } catch {
-                timeInputRef.current?.focus();
-              }
-            }}
-            className="relative flex items-center gap-2 h-11 w-full rounded-xl border border-[#243552] bg-[#101827] px-3 cursor-pointer hover:border-[#2f6cf6] transition select-none text-white"
+          <button
+            type="button"
+            onClick={() => setIsClockOpen(true)}
+            className="flex items-center gap-2 h-11 w-full rounded-xl border border-[#243552] bg-[#101827] px-3 cursor-pointer hover:border-[#2f6cf6] active:scale-[0.99] transition select-none text-white text-left"
           >
             <FiClock className="shrink-0 text-sm text-amber-400" />
-            <span className="text-xs flex-1 truncate font-medium">
-              {time ? formatTime24To12(time) : "Choose Time from Clock"}
+            <span className="text-xs flex-1 truncate font-bold text-white">
+              {time ? formatTime24To12(time) : "Tap to open clock"}
             </span>
-
-            <input
-              ref={timeInputRef}
-              type="time"
-              value={time12To24(time)}
-              onChange={(e) => {
-                const val = e.target.value;
-                onTimeChange(formatTime24To12(val));
-              }}
-              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-              style={{ colorScheme: "dark" }}
-            />
-          </div>
+            <span className="text-[10px] font-semibold text-[#38bdf8] bg-[#142646] px-2 py-0.5 rounded-lg border border-[#223e72]">
+              Change
+            </span>
+          </button>
 
           {/* Quick Clock Presets */}
-          <div className="flex gap-1 mt-1.5 flex-wrap">
+          <div className="flex gap-1.5 mt-1.5 overflow-x-auto pb-0.5 [&::-webkit-scrollbar]:hidden">
             {["10:00 AM", "12:00 PM", "03:00 PM", "05:00 PM", "07:00 PM"].map((t) => (
               <button
                 key={t}
                 type="button"
                 onClick={() => onTimeChange(t)}
-                className={`px-1.5 py-0.5 rounded-md border text-[9.5px] transition cursor-pointer ${
+                className={`shrink-0 px-2 py-0.5 rounded-md border text-[10px] transition cursor-pointer ${
                   formatTime24To12(time) === t
                     ? "bg-[#2f6cf6] border-[#2f6cf6] text-white font-bold"
                     : "bg-[#182337] border-[#253652] text-slate-300 hover:text-white"
@@ -189,6 +176,14 @@ export default function SchedulePicker({
           </div>
         </div>
       </div>
+
+      {/* Round Clock Time Picker Modal */}
+      <RoundClockModal
+        isOpen={isClockOpen}
+        onClose={() => setIsClockOpen(false)}
+        initialTime={time}
+        onSelectTime={(selected) => onTimeChange(selected)}
+      />
     </div>
   );
 }

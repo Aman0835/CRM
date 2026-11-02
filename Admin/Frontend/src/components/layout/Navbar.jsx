@@ -17,7 +17,8 @@ import {
     FiCheckCircle,
     FiInfo,
     FiAlertTriangle,
-    FiTrash2
+    FiTrash2,
+    FiMapPin
 } from "react-icons/fi";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -28,6 +29,8 @@ import * as notificationService from "../../services/notificationService";
 const mainNavigation = [
     { to: "/dashboard", label: "Dashboard", icon: FiHome },
     { to: "/employees", label: "Employees", icon: FiUsers },
+    { to: "/leads", label: "Leads", icon: FiBriefcase },
+    { to: "/visits", label: "Visits", icon: FiMapPin },
     { to: "/attendance", label: "Attendance", icon: FiCalendar },
     { to: "/payroll", label: "Payroll", icon: FiBriefcase },
 ];

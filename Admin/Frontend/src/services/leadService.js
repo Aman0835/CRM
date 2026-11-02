@@ -20,3 +20,14 @@ export const getLeadInteractions = async (id) => {
   const response = await api.get(`/leads/${id}/interactions`);
   return response.data;
 };
+
+export const getVisitsAnalytics = async (params = {}) => {
+  const response = await api.get("/leads/visits/analytics", { params });
+  return response.data;
+};
+
+export const updateVisitStatus = async (id, data) => {
+  const response = await api.patch(`/leads/${id}/visit-status`, data);
+  return response.data;
+};
+
