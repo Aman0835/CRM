@@ -7,6 +7,7 @@ import api from "../../../services/api";
 
 const DEFAULT_VENDORS = ["Direct / Internal", "Apex Staffing", "Elite Salon Associates", "Freelance Network"];
 const DEFAULT_SOURCING = ["Walk-in", "Direct / Internal", "Referral", "Agency / Staffing", "Social Media", "Freelance Network"];
+const DEFAULT_PAYOUTS = [950, 1000, 1100];
 
 export function useEmployees() {
     const [employees, setEmployees] = useState([]);
@@ -39,6 +40,7 @@ export function useEmployees() {
     // Dynamic dropdown options
     const [vendorOptions, setVendorOptions] = useState(DEFAULT_VENDORS);
     const [sourcingOptions, setSourcingOptions] = useState(DEFAULT_SOURCING);
+    const [payoutOptions, setPayoutOptions] = useState(DEFAULT_PAYOUTS);
 
     // Fetch settings to get persisted vendors / managers
     const fetchSettings = async () => {
@@ -52,6 +54,9 @@ export function useEmployees() {
                 const serverSourcing = s.sourcings || s.sourcingManagers;
                 if (Array.isArray(serverSourcing) && serverSourcing.length > 0) {
                     setSourcingOptions((prev) => Array.from(new Set([...prev, ...serverSourcing])));
+                }
+                if (Array.isArray(s.payoutOptions) && s.payoutOptions.length > 0) {
+                    setPayoutOptions((prev) => Array.from(new Set([...prev, ...s.payoutOptions.map(Number)])));
                 }
             }
         } catch {
@@ -144,6 +149,12 @@ export function useEmployees() {
         setSourcingOptions((prev) => prev.filter((s) => s !== sourcingToRemove));
         // Clear selection if the removed sourcing was selected
         setSourcing((prev) => (prev === sourcingToRemove ? "" : prev));
+    };
+
+    const handleAddPayout = (amount) => {
+        const numericAmount = Number(amount);
+        if (!Number.isFinite(numericAmount) || numericAmount <= 0) return;
+        setPayoutOptions((prev) => Array.from(new Set([...prev, numericAmount])).sort((a, b) => a - b));
     };
 
     const handleOpenCreate = () => {
@@ -278,6 +289,8 @@ export function useEmployees() {
         handleAddSourcingManager: handleAddSourcing,
         perDayPayout,
         setPerDayPayout,
+        payoutOptions,
+        handleAddPayout,
         employeeId,
         setEmployeeId,
         password,

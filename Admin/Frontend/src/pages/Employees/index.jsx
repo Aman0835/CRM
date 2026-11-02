@@ -24,6 +24,7 @@ export default function Employees() {
         employeeId, name, setName, phone, setPhone,
         vendor, setVendor, vendorOptions, handleAddVendor, handleRemoveVendor,
         perDayPayout, setPerDayPayout,
+        payoutOptions, handleAddPayout,
         sourcingManager, setSourcingManager, sourcingManagerOptions, handleAddSourcingManager, handleRemoveSourcing,
         password, setPassword, status, setStatus,
     } = useEmployees();
@@ -151,6 +152,8 @@ export default function Employees() {
                 onRemoveVendor={handleRemoveVendor}
                 perDayPayout={perDayPayout}
                 setPerDayPayout={setPerDayPayout}
+                payoutOptions={payoutOptions}
+                onAddPayout={handleAddPayout}
                 sourcingManager={sourcingManager}
                 setSourcingManager={setSourcingManager}
                 sourcingManagerOptions={sourcingManagerOptions}

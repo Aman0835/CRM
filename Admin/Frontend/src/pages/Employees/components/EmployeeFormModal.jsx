@@ -28,6 +28,8 @@ export default function EmployeeFormModal({
     onAddSourcingManager,
     perDayPayout,
     setPerDayPayout,
+    payoutOptions = [950, 1000, 1100],
+    onAddPayout,
     password,
     setPassword,
     status,
@@ -38,6 +40,8 @@ export default function EmployeeFormModal({
     const [customVendor, setCustomVendor] = useState("");
     const [isAddingCustomSourcing, setIsAddingCustomSourcing] = useState(false);
     const [customSourcing, setCustomSourcing] = useState("");
+    const [isAddingCustomPayout, setIsAddingCustomPayout] = useState(false);
+    const [customPayout, setCustomPayout] = useState("");
     const [vendorOpen, setVendorOpen] = useState(false);
     const [sourcingOpen, setSourcingOpen] = useState(false);
     const vendorRef = useRef(null);
@@ -58,6 +62,10 @@ export default function EmployeeFormModal({
         ? sourcingOptions
         : (sourcingManagerOptions || ["Walk-in", "Direct / Internal", "Referral", "Agency / Staffing", "Social Media", "Freelance Network"]);
     const handleAddNewSourcing = onAddSourcing || onAddSourcingManager;
+    const currentPayoutOptions = Array.from(new Set([
+        ...payoutOptions,
+        ...(perDayPayout ? [Number(perDayPayout)] : []),
+    ])).filter((amount) => Number.isFinite(amount) && amount > 0).sort((a, b) => a - b);
 
     const handleConfirmCustomVendor = () => {
         const val = customVendor.trim();
@@ -77,6 +85,15 @@ export default function EmployeeFormModal({
             setCustomSourcing("");
             setIsAddingCustomSourcing(false);
         }
+    };
+
+    const handleConfirmCustomPayout = () => {
+        const value = Number(customPayout);
+        if (!Number.isFinite(value) || value <= 0) return;
+        if (onAddPayout) onAddPayout(value);
+        setPerDayPayout(String(value));
+        setCustomPayout("");
+        setIsAddingCustomPayout(false);
     };
 
     return (
@@ -373,10 +390,6 @@ export default function EmployeeFormModal({
 
                             {/* 5. Per Day Payout (₹ Amount) */}
                             <div>
-                                <label className="flex items-center gap-1.5 text-[11px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider mb-2">
-                                    <FiDollarSign className="text-violet-500" /> 5. Per Day Payout (₹) <span className="text-red-500">*</span>
-                                </label>
-
                                 {/* Hidden required input for form validation */}
                                 <input
                                     type="text"
@@ -388,14 +401,51 @@ export default function EmployeeFormModal({
                                     aria-hidden="true"
                                 />
 
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <label className="flex items-center gap-1.5 text-[11px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">
+                                        <FiDollarSign className="text-violet-500" /> 5. Payment / Day
+                                    </label>
+                                    {!isAddingCustomPayout && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsAddingCustomPayout(true)}
+                                            className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold hover:underline flex items-center gap-1"
+                                        >
+                                            <FiPlus className="text-[11px]" /> Add Amount
+                                        </button>
+                                    )}
+                                </div>
+
+                                {isAddingCustomPayout && (
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            autoFocus
+                                            value={customPayout}
+                                            onChange={(e) => setCustomPayout(e.target.value)}
+                                            placeholder="Enter ₹ / day"
+                                            className="flex-1 h-10 rounded-xl border border-violet-400 bg-violet-50/30 px-3 text-xs outline-none text-slate-800 dark:bg-slate-800 dark:border-violet-500 dark:text-slate-100"
+                                            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleConfirmCustomPayout(); } }}
+                                        />
+                                        <button type="button" onClick={handleConfirmCustomPayout} className="h-10 px-3 rounded-xl bg-violet-500 text-white font-medium hover:bg-violet-600 transition flex items-center gap-1">
+                                            <FiCheck /> Add
+                                        </button>
+                                        <button type="button" onClick={() => setIsAddingCustomPayout(false)} className="h-10 px-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                                            <FiX />
+                                        </button>
+                                    </div>
+                                )}
+
                                 <div className="grid grid-cols-4 gap-2 mt-1.5">
-                                    {[ "950", "1000", "1100"].map((amount) => {
-                                        const isSelected = String(perDayPayout) === amount;
+                                    {currentPayoutOptions.map((amount) => {
+                                        const amountValue = String(amount);
+                                        const isSelected = String(perDayPayout) === amountValue;
                                         return (
                                             <button
-                                                key={amount}
+                                                key={amountValue}
                                                 type="button"
-                                                onClick={() => setPerDayPayout(amount)}
+                                                onClick={() => setPerDayPayout(amountValue)}
                                                 className={`relative flex flex-col items-center justify-center py-3 rounded-2xl border-2 transition-all duration-150 select-none
                                                     ${isSelected
                                                         ? "border-violet-500 bg-violet-50 dark:bg-violet-950/40 shadow-sm"
@@ -406,7 +456,7 @@ export default function EmployeeFormModal({
                                                     ₹ / day
                                                 </span>
                                                 <span className={`text-base font-black leading-none ${isSelected ? "text-violet-600 dark:text-violet-400" : "text-slate-700 dark:text-slate-200"}`}>
-                                                    {amount}
+                                                    {amountValue}
                                                 </span>
                                                 {isSelected && (
                                                     <span className="absolute top-1.5 right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-violet-500">

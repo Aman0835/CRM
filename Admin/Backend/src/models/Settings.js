@@ -38,6 +38,10 @@ const settingsSchema = new mongoose.Schema(
       type: [String],
       default: ["Self / Walk-in", "Aman Sharma", "Rohan Verma", "Neha Patel"],
     },
+    payoutOptions: {
+      type: [Number],
+      default: [950, 1000, 1100],
+    },
   },
   {
     timestamps: true,

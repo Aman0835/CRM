@@ -199,7 +199,7 @@ export const createEmployee = async (req, res) => {
     employeeResponse.sourcingManager = employeeResponse.sourcing;
 
     // Auto-save any new vendor or sourcing to Settings for future dropdowns
-    if (rawVendor || rawSourcing) {
+    if (rawVendor || rawSourcing || rawPerDay > 0) {
       Settings.findOne().then((settings) => {
         if (!settings) return;
         let changed = false;
@@ -209,6 +209,10 @@ export const createEmployee = async (req, res) => {
         }
         if (rawSourcing && !settings.sourcingManagers.includes(rawSourcing)) {
           settings.sourcingManagers.push(rawSourcing);
+          changed = true;
+        }
+        if (rawPerDay > 0 && !settings.payoutOptions.includes(rawPerDay)) {
+          settings.payoutOptions.push(rawPerDay);
           changed = true;
         }
         if (changed) settings.save().catch(() => {});
@@ -270,7 +274,8 @@ export const updateEmployee = async (req, res) => {
 
     const rawVendor = updates.vendor?.trim();
     const rawSourcing = updates.sourcing?.trim();
-    if (rawVendor || rawSourcing) {
+    const rawPerDay = updates.perDayPayout || 0;
+    if (rawVendor || rawSourcing || rawPerDay > 0) {
       Settings.findOne().then((settings) => {
         if (!settings) return;
         let changed = false;
@@ -280,6 +285,10 @@ export const updateEmployee = async (req, res) => {
         }
         if (rawSourcing && !settings.sourcingManagers.includes(rawSourcing)) {
           settings.sourcingManagers.push(rawSourcing);
+          changed = true;
+        }
+        if (rawPerDay > 0 && !settings.payoutOptions.includes(rawPerDay)) {
+          settings.payoutOptions.push(rawPerDay);
           changed = true;
         }
         if (changed) settings.save().catch(() => {});

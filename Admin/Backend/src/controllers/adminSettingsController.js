@@ -45,6 +45,11 @@ export const updateSettings = async (req, res) => {
     if (lateGraceMinutes !== undefined) settings.lateGraceMinutes = Number(lateGraceMinutes);
     if (Array.isArray(req.body.vendors)) settings.vendors = req.body.vendors;
     if (Array.isArray(req.body.sourcingManagers)) settings.sourcingManagers = req.body.sourcingManagers;
+    if (Array.isArray(req.body.payoutOptions)) {
+      settings.payoutOptions = req.body.payoutOptions
+        .map(Number)
+        .filter((amount) => Number.isFinite(amount) && amount > 0);
+    }
 
     await settings.save();
 
