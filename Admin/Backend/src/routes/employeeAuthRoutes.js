@@ -41,7 +41,7 @@ router.post("/login", async (req, res) => {
             orConditions.push({ phone: last10 });
         }
 
-        const employee = await Employee.findOne({ $or: orConditions });
+        const employee = await Employee.findOne({ $or: orConditions }).populate("assignedOffice");
 
         if (!employee) {
             return res.status(401).json({ success: false, message: "No account found with this Mobile Number, Employee ID or Email" });
@@ -99,6 +99,7 @@ router.post("/login", async (req, res) => {
                 profileImage: employee.profileImage,
                 address: employee.address,
                 status: employee.status,
+                assignedOffice: employee.assignedOffice || null,
             },
         });
     } catch (error) {
@@ -116,7 +117,7 @@ router.get("/me", async (req, res) => {
         }
 
         const decoded = jwt.verify(token, JWT_SECRET);
-        const employee = await Employee.findById(decoded._id).select("-password");
+        const employee = await Employee.findById(decoded._id).select("-password").populate("assignedOffice");
 
         if (!employee) {
             return res.status(404).json({ success: false, message: "Employee not found" });

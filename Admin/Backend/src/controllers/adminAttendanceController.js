@@ -1,7 +1,10 @@
 import Attendance from "../models/Attendance.js";
+import Employee from "../models/Employee.js";
 import Notification from "../models/Notification.js";
 import Settings from "../models/Settings.js";
 import { broadcastRealtime } from "../utils/realtime.js";
+import { calculateDistance, isValidCoordinate, isAccuracyAcceptable } from "../utils/geoUtils.js";
+
 const format12HourTime = (timeStr) => {
   if (!timeStr) return "08:00 PM";
   const [hStr, mStr] = timeStr.split(":");
@@ -32,16 +35,90 @@ export const createAttendance = async (req, res) => {
   }
 };
 
-// Check In with Shift Start Time Evaluation
+// Check In with Shift Start Time Evaluation & Server-Side Geofencing
 export const checkIn = async (req, res) => {
   try {
-    const rawId = (req.body.employeeId || "").trim();
+    const rawId = (req.body.employeeId || req.employee?.employeeId || "").trim();
     if (!rawId) {
       return res.status(400).json({ success: false, message: "Employee ID is required" });
     }
 
     const searchRegex = new RegExp(`^${rawId}$`, "i");
     const today = new Date().toISOString().split("T")[0];
+
+    // Verify employee and assigned office location
+    const employee = await Employee.findOne({ employeeId: { $regex: searchRegex } }).populate("assignedOffice");
+    if (!employee) {
+      return res.status(404).json({ success: false, message: "Employee not found" });
+    }
+
+    const { latitude, longitude, accuracy } = req.body;
+    let checkInLocData = {
+      latitude: null,
+      longitude: null,
+      accuracy: null,
+      distance: null,
+      verified: false,
+      timestamp: null,
+    };
+    let officeLocationId = null;
+    let officeName = "";
+
+    // If request comes from an employee (or contains GPS coordinates), strictly validate geofence
+    // req.employee is set when called via employee portal route
+    const isEmployeeCaller = Boolean(req.employee) || (latitude !== undefined && longitude !== undefined);
+
+    if (isEmployeeCaller) {
+      if (!employee.assignedOffice) {
+        return res.status(400).json({
+          success: false,
+          message: "No office location assigned. Please contact your administrator.",
+        });
+      }
+
+      if (!employee.assignedOffice.isActive) {
+        return res.status(400).json({
+          success: false,
+          message: "Assigned office location is currently inactive. Please contact your administrator.",
+        });
+      }
+
+      if (latitude === undefined || longitude === undefined || !isValidCoordinate(latitude, longitude)) {
+        return res.status(400).json({
+          success: false,
+          message: "Valid GPS coordinates are required for check-in.",
+        });
+      }
+
+      if (!isAccuracyAcceptable(accuracy)) {
+        return res.status(400).json({
+          success: false,
+          message: `GPS accuracy too low (reported accuracy: ${Math.round(accuracy)}m). High-accuracy GPS is required.`,
+        });
+      }
+
+      const office = employee.assignedOffice;
+      const distance = calculateDistance(latitude, longitude, office.latitude, office.longitude);
+      const allowedRadius = office.allowedRadius || 100;
+
+      if (distance > allowedRadius) {
+        return res.status(400).json({
+          success: false,
+          message: `Outside permitted office area. You are ${Math.round(distance)}m away from ${office.officeName} (allowed radius: ${allowedRadius}m).`,
+        });
+      }
+
+      officeLocationId = office._id;
+      officeName = office.officeName;
+      checkInLocData = {
+        latitude: Number(latitude),
+        longitude: Number(longitude),
+        accuracy: accuracy !== undefined && accuracy !== null ? Number(accuracy) : null,
+        distance,
+        verified: true,
+        timestamp: new Date(),
+      };
+    }
 
     let attendance = await Attendance.findOne({
       employeeId: { $regex: searchRegex },
@@ -74,6 +151,10 @@ export const checkIn = async (req, res) => {
       date: today,
       checkIn: now,
       status,
+      officeLocation: officeLocationId || (employee.assignedOffice ? employee.assignedOffice._id : null),
+      officeName: officeName || (employee.assignedOffice ? employee.assignedOffice.officeName : ""),
+      checkInLocation: checkInLocData,
+      locationVerified: checkInLocData.verified,
     });
 
     if (status === "Late") {
@@ -105,10 +186,10 @@ export const checkIn = async (req, res) => {
   }
 };
 
-// Check Out with Standard Working Hours Enforcement & Early Approval Check
+// Check Out with Standard Working Hours Enforcement & Server-Side Geofencing
 export const checkOut = async (req, res) => {
   try {
-    const rawId = (req.body.employeeId || "").trim();
+    const rawId = (req.body.employeeId || req.employee?.employeeId || "").trim();
     if (!rawId) {
       return res.status(400).json({ success: false, message: "Employee ID is required" });
     }
@@ -135,16 +216,76 @@ export const checkOut = async (req, res) => {
       });
     }
 
+    // Verify employee and assigned office location for check-out
+    const employee = await Employee.findOne({ employeeId: { $regex: searchRegex } }).populate("assignedOffice");
+
+    const { latitude, longitude, accuracy } = req.body;
+    const isEmployeeCaller = Boolean(req.employee) || (latitude !== undefined && longitude !== undefined);
+
+    let checkOutLocData = {
+      latitude: null,
+      longitude: null,
+      accuracy: null,
+      distance: null,
+      verified: false,
+      timestamp: null,
+    };
+
+    if (isEmployeeCaller && employee?.assignedOffice) {
+      if (!employee.assignedOffice.isActive) {
+        return res.status(400).json({
+          success: false,
+          message: "Assigned office location is currently inactive. Please contact your administrator.",
+        });
+      }
+
+      if (latitude === undefined || longitude === undefined || !isValidCoordinate(latitude, longitude)) {
+        return res.status(400).json({
+          success: false,
+          message: "Valid GPS coordinates are required for check-out.",
+        });
+      }
+
+      if (!isAccuracyAcceptable(accuracy)) {
+        return res.status(400).json({
+          success: false,
+          message: `GPS accuracy too low (reported accuracy: ${Math.round(accuracy)}m). High-accuracy GPS is required.`,
+        });
+      }
+
+      const office = employee.assignedOffice;
+      const distance = calculateDistance(latitude, longitude, office.latitude, office.longitude);
+      const allowedRadius = office.allowedRadius || 100;
+
+      if (distance > allowedRadius) {
+        return res.status(400).json({
+          success: false,
+          message: `Outside permitted office area. You are ${Math.round(distance)}m away from ${office.officeName} (allowed radius: ${allowedRadius}m).`,
+        });
+      }
+
+      checkOutLocData = {
+        latitude: Number(latitude),
+        longitude: Number(longitude),
+        accuracy: accuracy !== undefined && accuracy !== null ? Number(accuracy) : null,
+        distance,
+        verified: true,
+        timestamp: new Date(),
+      };
+    }
+
     const now = new Date();
     const settings = (await Settings.findOne()) || { checkOutTime: "20:00" };
     const [targetOutHour, targetOutMin] = (settings.checkOutTime || "20:00").split(":").map(Number);
     const targetCheckOutDate = new Date(now);
     targetCheckOutDate.setHours(targetOutHour || 20, targetOutMin || 0, 0, 0);
 
-    // Checkout allowed anytime freely
-
     // Checkout allowed
     attendance.checkOut = now;
+    attendance.checkOutLocation = checkOutLocData;
+    if (checkOutLocData.verified) {
+      attendance.locationVerified = true;
+    }
 
     // Calculate total working hours
     const totalWorkingHours = (attendance.checkOut - attendance.checkIn) / (1000 * 60 * 60);

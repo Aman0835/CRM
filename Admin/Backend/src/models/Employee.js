@@ -125,6 +125,12 @@ const employeeSchema = new mongoose.Schema(
       enum: ["active", "inactive"],
       default: "active",
     },
+
+    assignedOffice: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "OfficeLocation",
+      default: null,
+    },
   },
   {
     timestamps: true,

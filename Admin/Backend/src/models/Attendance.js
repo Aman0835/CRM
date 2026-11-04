@@ -48,7 +48,42 @@ const attendanceSchema = new mongoose.Schema(
     earlyCheckoutReason: {
       type: String,
       default: "",
-    }
+    },
+
+    officeLocation: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "OfficeLocation",
+      default: null,
+    },
+
+    officeName: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    checkInLocation: {
+      latitude: { type: Number, default: null },
+      longitude: { type: Number, default: null },
+      accuracy: { type: Number, default: null },
+      distance: { type: Number, default: null },
+      verified: { type: Boolean, default: false },
+      timestamp: { type: Date, default: null },
+    },
+
+    checkOutLocation: {
+      latitude: { type: Number, default: null },
+      longitude: { type: Number, default: null },
+      accuracy: { type: Number, default: null },
+      distance: { type: Number, default: null },
+      verified: { type: Boolean, default: false },
+      timestamp: { type: Date, default: null },
+    },
+
+    locationVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true

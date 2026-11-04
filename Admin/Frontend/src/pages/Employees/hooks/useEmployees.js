@@ -35,10 +35,23 @@ export function useEmployees() {
     const [employeeId, setEmployeeId] = useState("");
     const [password, setPassword] = useState("Pass1234!");
     const [status, setStatus] = useState("active");
+    const [assignedOffice, setAssignedOffice] = useState("");
+    const [officeLocations, setOfficeLocations] = useState([]);
 
     // Dynamic dropdown options
     const [vendorOptions, setVendorOptions] = useState(DEFAULT_VENDORS);
     const [sourcingOptions, setSourcingOptions] = useState(DEFAULT_SOURCING);
+
+    const fetchOfficeLocations = async () => {
+        try {
+            const res = await api.get("/admin/locations");
+            if (res.data?.success) {
+                setOfficeLocations(res.data.data || []);
+            }
+        } catch {
+            // Keep empty on error
+        }
+    };
 
     // Fetch settings to get persisted vendors / managers
     const fetchSettings = async () => {
@@ -89,6 +102,7 @@ export function useEmployees() {
 
     useEffect(() => {
         fetchSettings();
+        fetchOfficeLocations();
     }, []);
 
     useEffect(() => {
@@ -156,6 +170,8 @@ export function useEmployees() {
         setPerDayPayout("");
         setPassword("Pass1234!");
         setStatus("active");
+        setAssignedOffice("");
+        fetchOfficeLocations();
         setIsFormOpen(true);
     };
 
@@ -172,6 +188,11 @@ export function useEmployees() {
         setPerDayPayout(emp.perDayPayout || (emp.monthlySalary ? Math.round(emp.monthlySalary / 30) : ""));
         setPassword("");
         setStatus(emp.status || "active");
+        const officeId = typeof emp.assignedOffice === "object" && emp.assignedOffice !== null
+            ? emp.assignedOffice._id
+            : (emp.assignedOffice || "");
+        setAssignedOffice(officeId);
+        fetchOfficeLocations();
         setIsFormOpen(true);
     };
 
@@ -209,6 +230,7 @@ export function useEmployees() {
             perDayPayout: Number(perDayPayout) || 0,
             status,
             employeeId,
+            assignedOffice: assignedOffice || null,
         };
 
         if (formMode === "create") {
@@ -284,5 +306,8 @@ export function useEmployees() {
         setPassword,
         status,
         setStatus,
+        assignedOffice,
+        setAssignedOffice,
+        officeLocations,
     };
 }

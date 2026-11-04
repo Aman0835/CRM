@@ -20,6 +20,7 @@ import employeeAuthRoutes from "./routes/employeeAuthRoutes.js";
 import employeeRoutes from "./routes/employeeRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import leadRoutes from "./routes/leadRoutes.js";
+import officeLocationRoutes from "./routes/officeLocationRoutes.js";
 
 dotenv.config();
 
@@ -99,6 +100,7 @@ app.use("/api/admin/auth", adminAuthRoutes);
 app.use("/api/admin/dashboard", dashboardRoutes);
 app.use("/api/admin/employees", adminEmployeeRoutes);
 app.use("/api/admin/attendance", adminAttendanceRoutes);
+app.use("/api/admin/locations", officeLocationRoutes);
 
 app.use("/api/admin/payroll", payrollRoutes);
 app.use("/api/admin/reports", reportRoutes);

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiMapPin, FiCheckCircle } from "react-icons/fi";
 import DashboardLayout from "../../components/layout/DashboardLayout";
+import { useAuth } from "../../context/AuthContext";
 import { useDashboard } from "../Dashboard/hooks/useDashboard";
 
 const days = ["S", "M", "T", "W", "T", "F", "S"];
@@ -67,6 +68,7 @@ function getDayTone(status) {
 }
 
 export default function Attendance() {
+    const { employee } = useAuth();
     const [currentMonth, setCurrentMonth] = useState(() => new Date());
     const {
         attendance,
@@ -116,11 +118,32 @@ export default function Attendance() {
                     <p className="mt-1 text-[14px] text-[#7d93ba]">{monthTitle}</p>
                 </div>
 
+                {employee?.assignedOffice && (
+                    <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-[#1d2840] border border-[#2e3f64] text-xs text-[#8ca3c7]">
+                        <FiMapPin className="text-blue-400 shrink-0 text-base" />
+                        <div>
+                            <span className="font-semibold text-white">
+                                {employee.assignedOffice.officeName || "Assigned Office"}
+                            </span>
+                            <span className="mx-1.5 text-slate-500">·</span>
+                            <span>Geofence Radius: <strong className="text-blue-400">{employee.assignedOffice.allowedRadius || 100}m</strong></span>
+                            <p className="text-[11px] text-[#63799f] line-clamp-1 mt-0.5">{employee.assignedOffice.address}</p>
+                        </div>
+                    </div>
+                )}
+
                 <div className="rounded-[28px] bg-[#1d2840] p-5">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-[16px] font-black text-white">
-                            Today · {today.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                        </h2>
+                        <div>
+                            <h2 className="text-[16px] font-black text-white">
+                                Today · {today.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                            </h2>
+                            {todayAttendance?.locationVerified && (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 mt-0.5">
+                                    <FiCheckCircle className="w-3 h-3" /> Location Verified
+                                </span>
+                            )}
+                        </div>
                         <span className={["rounded-full px-4 py-2 text-[13px] font-bold", todayAttendance?.status === "Present" ? "bg-[#0d6c63] text-[#17e0a0]" : "bg-[#5a4a1f] text-[#ffc400]"].join(" ")}>
                             {todayAttendance?.status ?? "Pending"}
                         </span>

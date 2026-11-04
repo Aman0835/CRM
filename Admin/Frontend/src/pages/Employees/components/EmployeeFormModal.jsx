@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FiX, FiPlus, FiCheck, FiUser, FiPhone, FiBriefcase, FiUsers, FiDollarSign, FiEye, FiEyeOff, FiKey, FiChevronDown, FiTrash2 } from "react-icons/fi";
+import { FiX, FiPlus, FiCheck, FiUser, FiPhone, FiBriefcase, FiUsers, FiDollarSign, FiEye, FiEyeOff, FiKey, FiChevronDown, FiTrash2, FiMapPin } from "react-icons/fi";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function EmployeeFormModal({
@@ -32,6 +32,9 @@ export default function EmployeeFormModal({
     setPassword,
     status,
     setStatus,
+    assignedOffice,
+    setAssignedOffice,
+    officeLocations = [],
 }) {
     const [showPassword, setShowPassword] = useState(false);
     const [isAddingCustomVendor, setIsAddingCustomVendor] = useState(false);
@@ -424,6 +427,55 @@ export default function EmployeeFormModal({
                                         <span className="ml-1.5 text-slate-400">≈ ₹{(Number(perDayPayout) * 30).toLocaleString()}/month</span>
                                     </p>
                                 )}
+                            </div>
+
+                            {/* Attendance Location (Geofenced Office Assignment) */}
+                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-850/50 p-4 space-y-2.5">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                                        <FiMapPin className="text-blue-500" /> Attendance Location & Geofencing
+                                    </span>
+                                    <span className="text-[10px] text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded-md font-medium">
+                                        GPS Verification
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 block mb-1">
+                                        Assigned Office / Branch
+                                    </label>
+                                    <select
+                                        value={assignedOffice || ""}
+                                        onChange={(e) => setAssignedOffice(e.target.value)}
+                                        className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs outline-none focus:border-blue-500 dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-100"
+                                    >
+                                        <option value="">-- No Office Assigned (Unrestricted / Manual) --</option>
+                                        {officeLocations.map((loc) => (
+                                            <option key={loc._id} value={loc._id}>
+                                                {loc.officeName} ({loc.allowedRadius}m radius) {!loc.isActive ? "- [Inactive]" : ""}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {assignedOffice && (() => {
+                                    const selectedLoc = officeLocations.find(l => l._id === assignedOffice);
+                                    if (!selectedLoc) return null;
+                                    return (
+                                        <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] space-y-1">
+                                            <div className="font-semibold text-slate-700 dark:text-slate-200">
+                                                {selectedLoc.officeName}
+                                            </div>
+                                            <div className="text-slate-500 dark:text-slate-400 line-clamp-1">
+                                                {selectedLoc.address}
+                                            </div>
+                                            <div className="flex items-center gap-3 text-slate-400 text-[10px] pt-1">
+                                                <span>Allowed Radius: <strong className="text-blue-600 dark:text-blue-400">{selectedLoc.allowedRadius}m</strong></span>
+                                                <span>Status: <strong className={selectedLoc.isActive ? "text-emerald-600" : "text-amber-600"}>{selectedLoc.isActive ? "Active" : "Inactive"}</strong></span>
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
                             </div>
 
                             {/* Collapsible/Info Box for Login Credentials and Status */}

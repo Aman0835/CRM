@@ -220,6 +220,15 @@ export default function Profile() {
                                 day: "numeric",
                             }) : "--"}
                         />
+                        <DetailRow
+                            icon={FiMapPin}
+                            label="Assigned Office"
+                            value={
+                                employee?.assignedOffice
+                                    ? `${employee.assignedOffice.officeName || "Office"} (${employee.assignedOffice.allowedRadius || 100}m radius)`
+                                    : "Unassigned (Contact Admin)"
+                            }
+                        />
                         <DetailRow icon={FiMapPin} label="Address" value={employee?.address || "Not provided"} />
                     </div>
 
