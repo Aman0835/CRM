@@ -8,6 +8,7 @@ import {
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import * as notificationService from "../../services/notificationService";
+import { joinRoom, subscribeNotification, subscribeRealtime } from "../../services/realtime";
 
 const mobileNav = [
     { to: "/dashboard",  label: "Dashboard",  icon: FiHome },
@@ -45,8 +46,60 @@ export default function Navbar() {
 
     useEffect(() => {
         fetchNotifications();
-        const interval = setInterval(fetchNotifications, 30000);
-        return () => clearInterval(interval);
+        if (!employee?.employeeId) return;
+
+        joinRoom("employee");
+        joinRoom(`employee-${employee.employeeId}`);
+        joinRoom(`employee-${employee.employeeId.toLowerCase()}`);
+        joinRoom(`employee-${employee.employeeId.toUpperCase()}`);
+
+        const interval = setInterval(fetchNotifications, 10000);
+
+        const unsubscribeRealtime = subscribeRealtime(() => {
+            fetchNotifications();
+        });
+
+        const unsubscribeNotif = subscribeNotification((data) => {
+            const myId = (employee.employeeId || "").toLowerCase();
+            const targetIds = (data?.targetEmployees || []).map((id) => String(id).toLowerCase());
+            const appliesToMe = !data?.employeeId && targetIds.length === 0
+                ? true
+                : (data?.employeeId && String(data.employeeId).toLowerCase() === myId) || targetIds.includes(myId);
+
+            if (appliesToMe) {
+                fetchNotifications();
+                if (data?.title && data?.message) {
+                    toast(
+                        (t) => (
+                            <div className="flex flex-col gap-1 cursor-pointer" onClick={() => { toast.dismiss(t.id); setNotifOpen(true); }}>
+                                <div className="flex items-center gap-2">
+                                    <span className="font-bold text-xs text-white">{data.title}</span>
+                                    <span className="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold uppercase">Reminder</span>
+                                </div>
+                                <span className="text-[11px] text-slate-300 leading-snug">{data.message}</span>
+                            </div>
+                        ),
+                        {
+                            icon: "⏰",
+                            duration: 9000,
+                            style: {
+                                background: "#0f172a",
+                                border: "1px solid #334155",
+                                color: "#f8fafc",
+                                padding: "12px 16px",
+                                borderRadius: "16px",
+                                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.4)",
+                            },
+                        }
+                    );
+                }
+            }
+        });
+        return () => {
+            clearInterval(interval);
+            unsubscribeRealtime();
+            unsubscribeNotif();
+        };
     }, [employee?.employeeId]);
 
     // Close notifications on outside click
@@ -286,7 +339,7 @@ export default function Navbar() {
                     <aside className="absolute left-0 top-0 h-full w-72 bg-white dark:bg-slate-900 flex flex-col shadow-2xl">
                         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-slate-800">
                             <span className="text-base font-bold text-slate-800 dark:text-slate-100">
-                                Diva — Employee
+                                Dosti — Employee
                             </span>
                             <button
                                 onClick={() => setMobileOpen(false)}

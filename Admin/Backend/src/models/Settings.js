@@ -4,12 +4,12 @@ const settingsSchema = new mongoose.Schema(
   {
     shopName: {
       type: String,
-      default: "Diva The Salon",
+      default: "Dosti Real Estate",
       trim: true,
     },
     contactEmail: {
       type: String,
-      default: "admin@divathesalon.com",
+      default: "admin@dostirealestate.com",
       trim: true,
     },
     checkInTime: {
@@ -32,7 +32,7 @@ const settingsSchema = new mongoose.Schema(
     },
     vendors: {
       type: [String],
-      default: ["Direct / Internal", "Apex Staffing", "Elite Salon Associates", "Freelance Network"],
+      default: ["Direct / Internal", "Apex Staffing", "Elite Real Estate Associates", "Freelance Network"],
     },
     sourcingManagers: {
       type: [String],

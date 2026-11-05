@@ -5,6 +5,11 @@ export const getAttendanceList = async () => {
     return response.data;
 };
 
+export const getTodayAttendance = async () => {
+    const response = await api.get("/admin/attendance/getTodayAttendance");
+    return response.data;
+};
+
 export const getAttendanceByEmployee = async (employeeId) => {
     const response = await api.get(`/admin/attendance/getAttendanceByEmployee/${employeeId}`);
     return response.data;

@@ -2,7 +2,7 @@ import {
     FiCalendar,
     FiBriefcase,
     FiHome,
-    FiScissors,
+
     FiSettings,
     FiUser,
     FiLogOut,
@@ -62,11 +62,11 @@ export default function Sidebar() {
             {/* Brand */}
             <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/10">
-                    <FiScissors className="text-lg rotate-90" />
+                    <FiHome className="text-lg" />
                 </div>
                 <div>
                     <h1 className="text-base font-bold text-slate-800 dark:text-slate-100 tracking-wide">
-                        Diva
+                        Dosti
                     </h1>
                     <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none mt-0.5">
                         Employee Portal

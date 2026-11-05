@@ -57,7 +57,7 @@ export default function PwaInstallPrompt() {
                         📱
                     </div>
                     <div>
-                        <h4 className="text-xs font-bold tracking-wide">Install Diva Employee App</h4>
+                        <h4 className="text-xs font-bold tracking-wide">Install Dosti Employee App</h4>
                         <p className="text-[11px] text-slate-300 mt-0.5">
                             {isIos
                                 ? "Tap Share icon below → Add to Home Screen"

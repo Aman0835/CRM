@@ -2,6 +2,7 @@ import Attendance from "../models/Attendance.js";
 import Employee from "../models/Employee.js";
 import Notification from "../models/Notification.js";
 import Settings from "../models/Settings.js";
+import { broadcastRealtime } from "../utils/realtime.js";
 
 /**
  * POST /api/admin/attendance/send-reminders
@@ -51,11 +52,31 @@ export const sendAttendanceReminders = async (req, res) => {
         const io = req.app?.get("io");
         if (io) {
             notCheckedIn.forEach((emp) => {
-                io.to(`employee-${emp.employeeId}`).emit("notification", {
+                const notifPayload = {
                     title: "⏰ Don't forget to Check In!",
-                    message: `Hi ${emp.firstName}, you haven't checked in yet today.`,
+                    message: `Hi ${emp.firstName || "there"}, you haven't checked in yet today. Please check in as soon as you arrive.`,
                     type: "attendance",
-                });
+                    employeeId: emp.employeeId,
+                    timestamp: new Date().toISOString(),
+                };
+                io.to(`employee-${emp.employeeId}`).emit("notification", notifPayload);
+                io.to(`employee-${emp.employeeId.toLowerCase()}`).emit("notification", notifPayload);
+                io.to(`employee-${emp.employeeId.toUpperCase()}`).emit("notification", notifPayload);
+            });
+
+            // Also emit to the general 'employee' room
+            io.to("employee").emit("notification", {
+                title: "⏰ Don't forget to Check In!",
+                message: "Please remember to check in today.",
+                type: "attendance",
+                targetEmployees: notCheckedIn.map((e) => e.employeeId),
+            });
+
+            // Broadcast general realtime update so all clients trigger a refresh
+            broadcastRealtime(io, {
+                type: "notification",
+                subType: "attendance_reminder",
+                targetEmployees: notCheckedIn.map((e) => e.employeeId),
             });
         }
 

@@ -113,7 +113,8 @@ app.use("/api/employee", employeeRoutes);
 app.use("/api/leads", leadRoutes);
 
 io.on("connection", (socket) => {
-  socket.on("join", ({ room }) => {
+  socket.on("join", (data) => {
+    const room = typeof data === "string" ? data : data?.room;
     if (room) socket.join(room);
   });
 

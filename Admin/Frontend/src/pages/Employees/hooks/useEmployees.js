@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useSearchParams } from "react-router-dom";
 import * as employeeService from "../../../services/employeeService";
+import * as attendanceService from "../../../services/attendanceService";
 import { subscribeRealtime } from "../../../services/realtime";
 import api from "../../../services/api";
 
-const DEFAULT_VENDORS = ["Direct / Internal", "Apex Staffing", "Elite Salon Associates", "Freelance Network"];
+const DEFAULT_VENDORS = ["Direct / Internal", "Apex Staffing", "Elite Real Estate Associates", "Freelance Network"];
 const DEFAULT_SOURCING = ["Walk-in", "Direct / Internal", "Referral", "Agency / Staffing", "Social Media", "Freelance Network"];
 const DEFAULT_PAYOUTS = [950, 1000, 1100];
 
@@ -13,6 +14,7 @@ export function useEmployees() {
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
     const [totalEmployees, setTotalEmployees] = useState(0);
+    const [presentTodayCount, setPresentTodayCount] = useState(0);
 
     const [searchParams, setSearchParams] = useSearchParams();
     const search = searchParams.get("search") || "";
@@ -77,6 +79,25 @@ export function useEmployees() {
         }
     };
 
+    const fetchTodayAttendance = async () => {
+        try {
+            const res = await attendanceService.getTodayAttendance();
+            if (res && res.success && Array.isArray(res.data)) {
+                const presentSet = new Set(
+                    res.data
+                        .filter((a) => {
+                            const s = (a.status || "").toLowerCase();
+                            return (s === "present" || s === "late" || s === "half day") && s !== "absent";
+                        })
+                        .map((a) => a.employeeId)
+                );
+                setPresentTodayCount(presentSet.size);
+            }
+        } catch (err) {
+            console.error("Failed to fetch today attendance:", err);
+        }
+    };
+
     const fetchEmployees = async (isInitial = false) => {
         if (isInitial) setLoading(true);
         try {
@@ -108,6 +129,7 @@ export function useEmployees() {
     useEffect(() => {
         fetchSettings();
         fetchOfficeLocations();
+        fetchTodayAttendance();
     }, []);
 
     useEffect(() => {
@@ -117,6 +139,7 @@ export function useEmployees() {
     useEffect(() => {
         const unsubscribe = subscribeRealtime(() => {
             fetchEmployees(false);
+            fetchTodayAttendance();
         });
         return unsubscribe;
     }, []);
@@ -268,10 +291,18 @@ export function useEmployees() {
         }
     };
 
+    const activeEmployeesCount = employees.filter((e) => (e.status || "active").toLowerCase() === "active").length;
+    const notCheckedInCount = Math.max(0, (totalEmployees || employees.length) - presentTodayCount);
+    const turnoutRate = totalEmployees > 0 ? Math.round((presentTodayCount / totalEmployees) * 100) : 0;
+
     return {
         employees,
         loading,
         totalEmployees,
+        presentTodayCount,
+        activeEmployeesCount,
+        notCheckedInCount,
+        turnoutRate,
         search,
         page,
         setPage,

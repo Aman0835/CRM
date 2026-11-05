@@ -1,4 +1,4 @@
-const CACHE_NAME = "diva-emp-v4";
+const CACHE_NAME = "dosti-emp-v1";
 const STATIC_ASSETS = ["/", "/index.html", "/manifest.json", "/favicon.svg", "/logo.svg"];
 
 self.addEventListener("install", (event) => {

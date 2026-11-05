@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 180" width="100%" height="100%">
   <style>
-    .brand-title { font-family: 'Montserrat', 'Helvetica', 'Inter', sans-serif; font-size: 38px; font-weight: 300; fill: #0f172a; letter-spacing: 12px; }
-    .brand-sub { font-family: 'Montserrat', 'Helvetica', 'Inter', sans-serif; font-size: 10px; font-weight: 500; fill: #94a3b8; letter-spacing: 8px; }
+    .brand-title { font-family: 'Montserrat', 'Helvetica', 'Inter', sans-serif; font-size: 36px; font-weight: 400; fill: #0f172a; letter-spacing: 10px; }
+    .brand-sub { font-family: 'Montserrat', 'Helvetica', 'Inter', sans-serif; font-size: 10px; font-weight: 600; fill: #94a3b8; letter-spacing: 5px; }
   </style>
 
   <!-- Logo Mark -->
@@ -9,19 +9,18 @@
     <!-- Thin Ring Outer -->
     <circle cx="60" cy="60" r="54" fill="none" stroke="#e2e8f0" stroke-width="1.5" />
     
-    <!-- Minimalist Scissors -->
-    <!-- Pivot Dot -->
-    <circle cx="60" cy="60" r="3" fill="#0f172a" />
-    <!-- Blade Line Left -->
-    <line x1="40" y1="35" x2="80" y2="85" stroke="#0f172a" stroke-width="2" stroke-linecap="round" />
-    <!-- Blade Line Right -->
-    <line x1="80" y1="35" x2="40" y2="85" stroke="#0f172a" stroke-width="2" stroke-linecap="round" />
-    <!-- Minimal Rings -->
-    <circle cx="37" cy="89" r="6" fill="none" stroke="#0f172a" stroke-width="1.5" />
-    <circle cx="83" cy="89" r="6" fill="none" stroke="#0f172a" stroke-width="1.5" />
+    <!-- Minimalist Real Estate Structure -->
+    <!-- Modern Roofline Peak -->
+    <path d="M35 64 L60 38 L85 64" fill="none" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <!-- Main Structure Frame -->
+    <path d="M43 56 V84 H77 V56" fill="none" stroke="#0f172a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    <!-- Modern Entrance Gateway -->
+    <path d="M54 84 V68 H66 V84" fill="none" stroke="#0f172a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    <!-- Architectural Accent Window -->
+    <circle cx="60" cy="52" r="2.5" fill="#0f172a" />
   </g>
 
   <!-- Typography -->
-  <text x="210" y="88" class="brand-title">DIVA</text>
-  <text x="213" y="112" class="brand-sub">SALON</text>
+  <text x="195" y="86" class="brand-title">DOSTI</text>
+  <text x="198" y="110" class="brand-sub">REAL ESTATE</text>
 </svg>

@@ -209,6 +209,7 @@ export function useDashboard() {
         loading,
         metrics,
         weeklyData: getWeeklyProductivityData(),
+        topLeadSources: getTopLeadSources(),
         topBarbers: getTopLeadSources(),
         upcomingAppointments: getUpcomingFollowUps(),
     };

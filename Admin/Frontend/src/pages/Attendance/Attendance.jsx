@@ -85,7 +85,7 @@ export default function Attendance() {
     const handleActionSubmit = async (e) => {
         e.preventDefault();
         if (!selectedEmployeeId) {
-            toast.error("Please select a barber");
+            toast.error("Please select an employee");
             return;
         }
 
@@ -203,15 +203,15 @@ export default function Attendance() {
             <section className="grid gap-4 grid-cols-2 lg:grid-cols-4 text-slate-800 dark:text-slate-100">
                 <div className="panel-surface rounded-2xl p-4 shadow-sm">
                     <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase block tracking-wider font-bold">Present Today</span>
-                    <strong className="text-xl font-bold block mt-1.5 text-emerald-650 dark:text-emerald-500">{presentCount} Barbers</strong>
+                    <strong className="text-xl font-bold block mt-1.5 text-emerald-650 dark:text-emerald-500">{presentCount} {presentCount === 1 ? "Employee" : "Employees"}</strong>
                 </div>
                 <div className="panel-surface rounded-2xl p-4 shadow-sm">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase block tracking-wider font-bold">Absent Today</span>
-                    <strong className="text-xl font-bold block mt-1.5 text-red-500">{absentCount} Barbers</strong>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase block tracking-wider font-bold">On Leave / Absent</span>
+                    <strong className="text-xl font-bold block mt-1.5 text-rose-500">{absentCount} {absentCount === 1 ? "Employee" : "Employees"}</strong>
                 </div>
                 <div className="panel-surface rounded-2xl p-4 shadow-sm">
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase block tracking-wider font-bold">Rostered Staff</span>
-                    <strong className="text-xl font-bold block mt-1.5 text-slate-800 dark:text-slate-250">{employees.length} Crew</strong>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase block tracking-wider font-bold">Total Employees</span>
+                    <strong className="text-xl font-bold block mt-1.5 text-blue-600 dark:text-blue-400">{employees.length} {employees.length === 1 ? "Employee" : "Employees"}</strong>
                 </div>
             </section>
 
@@ -226,7 +226,7 @@ export default function Attendance() {
                             <FiSearch />
                             <input
                                 type="text"
-                                placeholder="Search barber..."
+                                placeholder="Search employee..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 className="bg-transparent outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400"
@@ -252,7 +252,7 @@ export default function Attendance() {
                         <table className="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                                    <th className="py-3 px-4">Barber</th>
+                                    <th className="py-3 px-4">Employee</th>
                                     <th className="py-3 px-4">Emp ID</th>
                                     <th className="py-3 px-4">Date</th>
                                     <th className="py-3 px-4">Check In</th>
@@ -268,7 +268,7 @@ export default function Attendance() {
                                     return (
                                         <tr key={log._id} className="border-b border-slate-100 dark:border-slate-800/60 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-850/10 transition-colors">
                                             <td className="py-3.5 px-4 font-bold text-slate-800 dark:text-slate-200">
-                                                {emp ? `${emp.firstName} ${emp.lastName}` : "Unknown Barber"}
+                                                {emp ? `${emp.firstName} ${emp.lastName}` : "Unknown Employee"}
                                             </td>
                                             <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400 font-medium">
                                                 {log.employeeId}

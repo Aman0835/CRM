@@ -198,7 +198,7 @@ export default function Dashboard() {
         return {
           name: `${emp.firstName} ${emp.lastName}`,
           specialty:
-            emp.role === "manager" ? "Shop Manager" : "Fade Specialist",
+            emp.role === "manager" ? "Branch Manager" : "Property Advisor",
           rating: ratingScore,
           hasLogs: empLogs.length > 0,
         };
@@ -228,8 +228,9 @@ export default function Dashboard() {
           client: `${emp.firstName} ${emp.lastName}`,
           service:
             emp.role === "manager"
-              ? "Shop Management Shift"
-              : "Styling Chair Shift",
+              ? "Operations Management Shift"
+              : "Client Consultation Shift",
+          status: log.status,
           barber: log.status,
         });
       }
@@ -277,7 +278,7 @@ export default function Dashboard() {
   return (
     <DashboardLayout
       title="Overview"
-      subtitle={`${formattedDate} · Diva The Salon`}
+      subtitle={`${formattedDate} · Dosti Real Estate`}
       action={
         <button
           type="button"
@@ -429,7 +430,7 @@ export default function Dashboard() {
                         {appointment.time}
                       </span>
                       <span className="text-slate-450 dark:text-slate-500 mt-0.5 block font-bold uppercase text-[9px] tracking-wide">
-                        {appointment.barber}
+                        {appointment.status || appointment.barber}
                       </span>
                     </div>
                   </div>
@@ -445,12 +446,12 @@ export default function Dashboard() {
             {/* Best Performing Barbers */}
             <div className="panel-surface rounded-3xl p-6 shadow-sm">
               <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-4">
-                Best Performing Barbers
+                Top Performing Employees
               </h3>
               <div className="space-y-3.5">
-                {topBarbers.map((barber, index) => (
+                {topBarbers.map((emp, index) => (
                   <div
-                    key={barber.name}
+                    key={emp.name}
                     className="flex items-center justify-between p-3 rounded-2xl border border-slate-100 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-950/20">
                     <div className="flex items-center gap-3">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
@@ -458,16 +459,16 @@ export default function Dashboard() {
                       </div>
                       <div>
                         <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                          {barber.name}
+                          {emp.name}
                         </p>
                         <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
-                          {barber.specialty}
+                          {emp.specialty}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 text-xs text-amber-500 font-bold bg-amber-50 dark:bg-amber-950/30 px-2 py-1 rounded-lg">
                       <FiStar className="fill-current" />
-                      <span>{barber.rating}</span>
+                      <span>{emp.rating}</span>
                     </div>
                   </div>
                 ))}

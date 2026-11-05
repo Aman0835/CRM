@@ -1,5 +1,5 @@
 import React from "react";
-import { FiPlus, FiUsers, FiChevronDown, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiPlus, FiUsers, FiUserCheck, FiCheckCircle, FiClock, FiChevronDown, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { AnimatePresence, motion } from "framer-motion";
 
 import DashboardLayout from "../../components/layout/DashboardLayout";
@@ -28,12 +28,13 @@ export default function Employees() {
         sourcingManager, setSourcingManager, sourcingManagerOptions, handleAddSourcingManager, handleRemoveSourcing,
         password, setPassword, status, setStatus,
         assignedOffice, setAssignedOffice, officeLocations,
+        presentTodayCount, activeEmployeesCount, notCheckedInCount, turnoutRate,
     } = useEmployees();
 
     return (
         <DashboardLayout
             title="Employees"
-            subtitle="Manage your barber staff profile files, contacts, schedules, and payroll parameters."
+            subtitle="Manage your employee directory, contacts, schedules, and payroll parameters."
             action={
                 <button onClick={handleOpenCreate} type="button"
                     className="inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-4 text-xs font-semibold text-white transition hover:bg-blue-700 shadow-sm">
@@ -41,13 +42,100 @@ export default function Employees() {
                 </button>
             }
         >
+            {/* Employee Statistics Overview */}
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                {/* 1. Total Employees */}
+                <div className="relative overflow-hidden rounded-3xl border border-slate-100/80 bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] dark:border-slate-800/80 dark:bg-slate-900/20 text-slate-800 dark:text-slate-100 transition-all duration-200 hover:-translate-y-0.5">
+                    <div className="absolute top-0 right-0 h-24 w-24 translate-x-8 -translate-y-8 rounded-full bg-blue-500/5 blur-xl pointer-events-none"></div>
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">Total Employees</p>
+                            <h3 className="mt-2 text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+                                {totalEmployees}
+                            </h3>
+                        </div>
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-100/60 dark:border-blue-900/40">
+                            <FiUsers className="text-lg" />
+                        </div>
+                    </div>
+                    <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                        <span className="inline-block h-2 w-2 rounded-full bg-blue-500"></span>
+                        <span>{activeEmployeesCount} active rostered</span>
+                    </div>
+                </div>
+
+                {/* 2. Total Present Today */}
+                <div className="relative overflow-hidden rounded-3xl border border-slate-100/80 bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] dark:border-slate-800/80 dark:bg-slate-900/20 text-slate-800 dark:text-slate-100 transition-all duration-200 hover:-translate-y-0.5">
+                    <div className="absolute top-0 right-0 h-24 w-24 translate-x-8 -translate-y-8 rounded-full bg-emerald-500/5 blur-xl pointer-events-none"></div>
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">Present Today</p>
+                            <h3 className="mt-2 text-3xl font-black tracking-tight text-emerald-600 dark:text-emerald-400">
+                                {presentTodayCount}
+                            </h3>
+                        </div>
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-100/60 dark:border-emerald-900/40">
+                            <FiUserCheck className="text-lg" />
+                        </div>
+                    </div>
+                    <div className="mt-3 flex items-center justify-between text-xs font-medium">
+                        <span className="text-slate-500 dark:text-slate-400">
+                            of {totalEmployees} scheduled
+                        </span>
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/50 dark:border-emerald-800/40">
+                            {turnoutRate}% turnout
+                        </span>
+                    </div>
+                </div>
+
+                {/* 3. Active Staff */}
+                <div className="relative overflow-hidden rounded-3xl border border-slate-100/80 bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] dark:border-slate-800/80 dark:bg-slate-900/20 text-slate-800 dark:text-slate-100 transition-all duration-200 hover:-translate-y-0.5">
+                    <div className="absolute top-0 right-0 h-24 w-24 translate-x-8 -translate-y-8 rounded-full bg-indigo-500/5 blur-xl pointer-events-none"></div>
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">Active Profiles</p>
+                            <h3 className="mt-2 text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+                                {activeEmployeesCount}
+                            </h3>
+                        </div>
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400 border border-indigo-100/60 dark:border-indigo-900/40">
+                            <FiCheckCircle className="text-lg" />
+                        </div>
+                    </div>
+                    <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                        <span className="inline-block h-2 w-2 rounded-full bg-indigo-500"></span>
+                        <span>Configured on payroll</span>
+                    </div>
+                </div>
+
+                {/* 4. Not Checked In / Pending */}
+                <div className="relative overflow-hidden rounded-3xl border border-slate-100/80 bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] dark:border-slate-800/80 dark:bg-slate-900/20 text-slate-800 dark:text-slate-100 transition-all duration-200 hover:-translate-y-0.5">
+                    <div className="absolute top-0 right-0 h-24 w-24 translate-x-8 -translate-y-8 rounded-full bg-amber-500/5 blur-xl pointer-events-none"></div>
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">Not Checked In</p>
+                            <h3 className="mt-2 text-3xl font-black tracking-tight text-amber-600 dark:text-amber-400">
+                                {notCheckedInCount}
+                            </h3>
+                        </div>
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-100/60 dark:border-amber-900/40">
+                            <FiClock className="text-lg" />
+                        </div>
+                    </div>
+                    <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                        <span className={`inline-block h-2 w-2 rounded-full ${notCheckedInCount === 0 ? "bg-emerald-500" : "bg-amber-500"}`}></span>
+                        <span>{notCheckedInCount === 0 ? "100% attendance achieved" : "Pending clock-in or leave"}</span>
+                    </div>
+                </div>
+            </section>
+
             {/* Filters panel */}
             <section className="mt-2 rounded-3xl border border-slate-100 bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] dark:border-slate-800/80 dark:bg-slate-900/20 text-slate-800 dark:text-slate-100">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div>
                         <h2 className="text-base font-black text-slate-855 dark:text-slate-200">Staff Directory</h2>
                         <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
-                            Search and filter standard barber files · <span className="font-bold text-blue-600 dark:text-blue-400">{totalEmployees} total</span>
+                            Search and filter employee directory · <span className="font-bold text-blue-600 dark:text-blue-400">{totalEmployees} total</span> · <span className="font-bold text-emerald-600 dark:text-emerald-400">{presentTodayCount} present today</span>
                         </p>
                     </div>
                     <div className="flex flex-col gap-3 sm:flex-row items-stretch sm:items-center">
@@ -114,8 +202,8 @@ export default function Employees() {
                         </div>
                     ) : (
                         <section className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                            {employees.map((barber) => (
-                                <EmployeeCard key={barber._id} barber={barber} onEdit={handleOpenEdit} onDelete={handleDelete} />
+                            {employees.map((emp) => (
+                                <EmployeeCard key={emp._id} employee={emp} onEdit={handleOpenEdit} onDelete={handleDelete} />
                             ))}
                         </section>
                     )}

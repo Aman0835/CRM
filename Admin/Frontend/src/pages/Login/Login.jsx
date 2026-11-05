@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
-import { FiMail, FiLock, FiScissors, FiEye, FiEyeOff } from "react-icons/fi";
+import { FiMail, FiLock, FiHome, FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function Login() {
     const { login, admin, loading: authLoading } = useAuth();
     const navigate = useNavigate();
-    const [email, setEmail] = useState("admin@diva.com"); // Updated default to .env value
+    const [email, setEmail] = useState("admin@dosti.com"); // Updated default to .env value
     const [password, setPassword] = useState("admin123"); // Updated default to .env value
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false); // New state for password visibility
@@ -55,13 +55,13 @@ export default function Login() {
                 <div className="relative rounded-[24px] border border-slate-200 bg-white p-8 shadow-[0_20px_50px_rgba(0,0,0,0.06)]">
                     <div className="flex flex-col items-center text-center">
                         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-[22px] text-white shadow-md shadow-blue-500/10">
-                            <FiScissors className="rotate-90" />
+                            <FiHome />
                         </div>
                         <h2 className="mt-4 text-xl font-bold tracking-tight text-slate-800">
-                            Diva
+                            Dosti
                         </h2>
                         <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mt-1">
-                            The Salon Admin System
+                            Real Estate Admin System
                         </p>
                     </div>
 
@@ -74,7 +74,7 @@ export default function Login() {
                                 <FiMail className="shrink-0 text-sm" />
                                 <input
                                     type="email"
-                                    placeholder="admin@diva.com"
+                                    placeholder="admin@dosti.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="w-full bg-transparent text-xs text-slate-800 outline-none placeholder:text-slate-400"

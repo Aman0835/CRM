@@ -4,8 +4,8 @@ import * as holidayService from "../../../services/holidayService";
 import * as settingsService from "../../../services/settingsService";
 
 export function useSettings() {
-    const [shopName, setShopName] = useState("Diva The Salon");
-    const [contactEmail, setContactEmail] = useState("admin@divathesalon.com");
+    const [shopName, setShopName] = useState("Dosti Real Estate");
+    const [contactEmail, setContactEmail] = useState("admin@dostirealestate.com");
     const [checkInTime, setCheckInTime] = useState("09:00");
     const [checkOutTime, setCheckOutTime] = useState("20:00");
     const [overtimeRate, setOvertimeRate] = useState(25);

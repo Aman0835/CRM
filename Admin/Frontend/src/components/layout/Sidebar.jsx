@@ -32,8 +32,8 @@ const getAdminInfo = () => {
     const photo = localStorage.getItem("admin_profile_photo");
     if (saved) {
       const parsed = JSON.parse(saved);
-      const firstName = parsed.firstName || "Alex";
-      const lastName = parsed.lastName || "Rivera";
+      let firstName = (parsed.firstName && !["diva", "divya"].includes(parsed.firstName.toLowerCase())) ? parsed.firstName : "Dosti";
+      let lastName = (parsed.lastName && (firstName !== "Dosti" || parsed.lastName.toLowerCase() !== "rivera")) ? parsed.lastName : "Admin";
       return {
         name: `${firstName} ${lastName}`.trim(),
         initials: `${firstName[0] || "A"}${lastName[0] || "R"}`.toUpperCase(),
@@ -97,7 +97,7 @@ export default function Sidebar() {
         className="flex items-center px-5 py-4 border-b border-slate-100 dark:border-slate-800 hover:opacity-90 transition">
         <img
           src="/logo.svg"
-          alt="Diva Salon Logo"
+          alt="Dosti Real Estate Logo"
           className="h-10 w-auto dark:invert"
         />
       </Link>

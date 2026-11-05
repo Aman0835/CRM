@@ -1,7 +1,7 @@
 {
-  "name": "barbershop-admin-backend",
+  "name": "dosti-realestate-backend",
   "version": "1.0.0",
-  "description": "Admin dashboard backend for the barber shop employee management system.",
+  "description": "Admin dashboard backend for the Dosti Real Estate employee management system.",
   "main": "./src/app.js",
   "type": "module",
   "scripts": {

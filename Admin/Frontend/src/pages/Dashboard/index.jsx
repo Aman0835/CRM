@@ -19,6 +19,7 @@ export default function Dashboard() {
     loading,
     metrics,
     weeklyData,
+    topLeadSources,
     topBarbers,
     upcomingAppointments,
   } = useDashboard();
@@ -53,7 +54,7 @@ export default function Dashboard() {
   return (
     <DashboardLayout
       title="Overview"
-      subtitle={`${formattedDate} · Diva The Salon`}
+      subtitle={`${formattedDate} · Dosti Real Estate`}
       action={
         <button
           type="button"
@@ -74,6 +75,7 @@ export default function Dashboard() {
           />
           <DashboardBottomRow
             upcomingAppointments={upcomingAppointments}
+            topLeadSources={topLeadSources}
             topBarbers={topBarbers}
           />
         </div>

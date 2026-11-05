@@ -13,7 +13,7 @@ export function useAdminProfile(logout, theme, toggleTheme) {
             lastName: "Rivera",
             email: "admin@gmail.com",
             phone: "+91 9876543210",
-            bio: "Lead Salon Operations Manager & Operations Director at Diva The Salon. 8+ years in premium barbershop administration.",
+            bio: "Lead Operations Manager & Operations Director at Dosti Real Estate. 8+ years in premium real estate administration.",
             gender: "Male",
             dob: "1990-05-15",
             address: "12, Connaught Place Outer Circle",

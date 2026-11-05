@@ -160,8 +160,8 @@ export default function PayrollDetail() {
                         <table class="header-table">
                             <tr>
                                 <td>
-                                    <div class="logo-title">Diva</div>
-                                    <div class="logo-subtitle">The Salon</div>
+                                    <div class="logo-title">Dosti</div>
+                                    <div class="logo-subtitle">Real Estate</div>
                                 </td>
                                 <td class="invoice-label">
                                     <h1>Salary Statement</h1>
@@ -324,8 +324,8 @@ export default function PayrollDetail() {
             <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 40px; color: #334155; background-color: #ffffff; width: 720px; font-size: 12px; line-height: 1.5;">
                 <div style="display: flex; justify-content: space-between; align-items: start; border-bottom: 2px solid #cbd5e1; padding-bottom: 20px; margin-bottom: 25px; flex-direction: row;">
                     <div style="float: left;">
-                        <h4 style="font-size: 24px; font-weight: 900; color: #1e3a8a; margin: 0; letter-spacing: -0.02em;">Diva</h4>
-                        <p style="font-size: 9px; text-transform: uppercase; font-weight: bold; color: #64748b; margin: 2px 0 0 0; letter-spacing: 0.1em;">The Salon</p>
+                        <h4 style="font-size: 24px; font-weight: 900; color: #1e3a8a; margin: 0; letter-spacing: -0.02em;">Dosti</h4>
+                        <p style="font-size: 9px; text-transform: uppercase; font-weight: bold; color: #64748b; margin: 2px 0 0 0; letter-spacing: 0.1em;">Real Estate</p>
                         <p style="font-size: 10px; color: #64748b; margin: 10px 0 0 0; line-height: 1.4;">
                             12, Connaught Place Outer Circle<br/>
                             New Delhi, DL 110001
@@ -849,10 +849,10 @@ function SalarySlipCard({
       <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-5">
         <div>
           <h4 className="text-lg font-black text-slate-850 dark:text-slate-55 tracking-tight">
-            Diva
+            Dosti
           </h4>
           <p className="text-[9px] uppercase font-bold text-slate-400 tracking-widest mt-0.5">
-            The Salon
+            Real Estate
           </p>
           <p className="text-[9px] text-slate-400 mt-1.5 leading-relaxed font-medium">
             12, Connaught Place Outer Circle

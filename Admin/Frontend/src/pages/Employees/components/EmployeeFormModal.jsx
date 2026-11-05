@@ -480,7 +480,7 @@ export default function EmployeeFormModal({
                             </div>
 
                             {/* Attendance Location (Geofenced Office Assignment) */}
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-850/50 p-4 space-y-2.5">
+                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50 p-4 space-y-2.5">
                                 <div className="flex items-center justify-between">
                                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                                         <FiMapPin className="text-blue-500" /> Attendance Location & Geofencing
@@ -529,7 +529,7 @@ export default function EmployeeFormModal({
                             </div>
 
                             {/* Collapsible/Info Box for Login Credentials and Status */}
-                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-850/50 p-4 space-y-3">
+                            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50 p-4 space-y-3">
                                 <div className="flex items-center justify-between">
                                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                                         <FiKey className="text-blue-500" /> Access & Credentials

@@ -160,7 +160,7 @@ export default function Attendance() {
                 presentCount={presentCount}
                 leaveCount={leaveCount}
                 absentCount={absentCount}
-                totalBarbers={employees.length}
+                totalEmployees={employees.length}
             />
 
             <section className="panel-surface rounded-[24px] p-5 shadow-sm mt-6 text-slate-800 dark:text-slate-100">

@@ -210,7 +210,7 @@ export default function LeadsHub() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Leads Pipeline</h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage and track your salon's potential clients</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage and track your real estate potential clients</p>
           </div>
           <form onSubmit={handleSearch} className="flex flex-wrap items-center gap-3">
             <div className="relative">

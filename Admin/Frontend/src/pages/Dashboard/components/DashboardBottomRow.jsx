@@ -1,9 +1,12 @@
 import { FiClock, FiTrendingUp } from "react-icons/fi";
 
 export default function DashboardBottomRow({
-  upcomingAppointments,
-  topBarbers,
+  upcomingAppointments = [],
+  topBarbers = [],
+  topLeadSources,
 }) {
+  const sources = topLeadSources || topBarbers || [];
+
   return (
     <section className="grid gap-6 lg:grid-cols-2">
       <div className="panel-surface rounded-3xl p-6 shadow-sm">
@@ -51,7 +54,7 @@ export default function DashboardBottomRow({
           Top Lead Sources
         </h3>
         <div className="space-y-3.5">
-          {topBarbers.map((source, index) => (
+          {sources.map((source, index) => (
             <div
               key={source.name}
               className="flex items-center justify-between p-3 rounded-2xl border border-slate-100 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-950/20">
@@ -74,7 +77,7 @@ export default function DashboardBottomRow({
               </div>
             </div>
           ))}
-          {topBarbers.length === 0 && (
+          {sources.length === 0 && (
             <p className="text-center text-xs text-slate-450 dark:text-slate-500 py-6">
               No lead sources recorded yet.
             </p>

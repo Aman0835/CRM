@@ -15,7 +15,7 @@ export default function AttendanceTable({ loading, filteredLogs, employees, onDe
             <table className="w-full text-left text-xs border-collapse">
                 <thead>
                     <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                        <th className="py-3 px-4">Barber</th>
+                        <th className="py-3 px-4">Employee</th>
                         <th className="py-3 px-4">Emp ID</th>
                         <th className="py-3 px-4">Date</th>
                         <th className="py-3 px-4">Location</th>
@@ -35,7 +35,7 @@ export default function AttendanceTable({ loading, filteredLogs, employees, onDe
                         return (
                             <tr key={log._id} className="border-b border-slate-100 dark:border-slate-800/60 last:border-0 hover:bg-slate-50/80 dark:hover:bg-white/5 transition-colors">
                                 <td className="py-3.5 px-4 font-bold text-slate-800 dark:text-slate-200">
-                                    {emp ? `${emp.firstName} ${emp.lastName}` : "Unknown Barber"}
+                                    {emp ? `${emp.firstName} ${emp.lastName}` : "Unknown Employee"}
                                 </td>
                                 <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400 font-medium">
                                     {log.employeeId}

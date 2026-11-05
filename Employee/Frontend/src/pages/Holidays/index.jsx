@@ -76,7 +76,7 @@ export default function Holidays() {
   return (
     <DashboardLayout
       title="Holidays"
-      subtitle="Salon holiday calendar — plan your time off">
+      subtitle="Real estate holiday calendar — plan your time off">
       <div className="space-y-6">
         {/* Header controls */}
         <div className="flex items-center justify-between">

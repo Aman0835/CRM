@@ -61,7 +61,7 @@ export function useAttendance() {
     const handleActionSubmit = async (e) => {
         e.preventDefault();
         if (!selectedEmployeeId) {
-            toast.error("Please select a barber");
+            toast.error("Please select an employee");
             return;
         }
 
@@ -94,9 +94,12 @@ export function useAttendance() {
 
     // Stats calculations
     const todayLogs = attendanceList.filter(l => l.date === new Date().toISOString().split("T")[0]);
-    const presentCount = todayLogs.filter(l => l.status === "Present").length;
-    const absentCount = todayLogs.filter(l => l.status === "Absent").length;
-    const leaveCount = todayLogs.filter(l => l.status === "Leave").length;
+    const presentCount = todayLogs.filter(l => {
+        const s = (l.status || "").toLowerCase();
+        return s === "present" || s === "late" || s === "half day";
+    }).length;
+    const absentCount = Math.max(0, employees.length - presentCount);
+    const leaveCount = absentCount;
 
     return {
         attendanceList,

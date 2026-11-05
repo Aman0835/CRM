@@ -19,12 +19,12 @@ const seedDefaultNotifications = async (role, employeeId = null) => {
       {
         recipientRole: "admin",
         title: "System Ready",
-        message: "Diva The Salon management system initialized successfully.",
+        message: "Dosti Real Estate management system initialized successfully.",
         type: "system",
       },
       {
         recipientRole: "all",
-        title: "Welcome to Diva",
+        title: "Welcome to Dosti",
         message: "Track your attendance, leave, and payroll all in one place.",
         type: "system",
       },
@@ -61,14 +61,16 @@ export const getAdminNotifications = async (req, res) => {
 // GET Employee Notifications
 export const getEmployeeNotifications = async (req, res) => {
   try {
-    const { employeeId } = req.params;
+    const rawId = (req.params.employeeId || "").trim();
+    const employeeId = rawId;
+    const idRegex = new RegExp(`^${rawId}$`, "i");
     await seedDefaultNotifications("employee", employeeId);
 
     const query = {
       $or: [
         { recipientRole: "all" },
         { recipientRole: "employee", employeeId: null },
-        { recipientRole: "employee", employeeId },
+        { recipientRole: "employee", employeeId: { $regex: idRegex } },
       ],
     };
 
@@ -111,6 +113,7 @@ export const markNotificationRead = async (req, res) => {
 export const markAllNotificationsRead = async (req, res) => {
   try {
     const { role, employeeId } = req.body;
+    const idRegex = new RegExp(`^${(employeeId || "").trim()}$`, "i");
     let query = {};
     if (role === "admin") {
       query = { recipientRole: { $in: ["admin", "all"] } };
@@ -119,7 +122,7 @@ export const markAllNotificationsRead = async (req, res) => {
         $or: [
           { recipientRole: "all" },
           { recipientRole: "employee", employeeId: null },
-          { recipientRole: "employee", employeeId },
+          { recipientRole: "employee", employeeId: { $regex: idRegex } },
         ],
       };
     }
@@ -147,6 +150,7 @@ export const deleteNotification = async (req, res) => {
 export const clearAllNotifications = async (req, res) => {
   try {
     const { role, employeeId } = req.body;
+    const idRegex = new RegExp(`^${(employeeId || "").trim()}$`, "i");
     let query = {};
     if (role === "admin") {
       query = { recipientRole: { $in: ["admin", "all"] } };
@@ -155,7 +159,7 @@ export const clearAllNotifications = async (req, res) => {
         $or: [
           { recipientRole: "all" },
           { recipientRole: "employee", employeeId: null },
-          { recipientRole: "employee", employeeId },
+          { recipientRole: "employee", employeeId: { $regex: idRegex } },
         ],
       };
     }

@@ -46,7 +46,7 @@ export default function AttendanceFilters({ search, setSearch, dateFilter, setDa
                     <FiSearch />
                     <input
                         type="text"
-                        placeholder="Search barber..."
+                        placeholder="Search employee..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         className="bg-transparent outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 w-36"

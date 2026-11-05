@@ -3,10 +3,11 @@ import { FiSettings, FiSliders, FiClock, FiSave, FiShield } from "react-icons/fi
 import toast from "react-hot-toast";
 import DashboardLayout from "../../components/layout/DashboardLayout";
 import api from "../../services/api";
+import TimeClockPicker from "./components/TimeClockPicker";
 
 export default function Settings() {
-    const [shopName, setShopName] = useState("Diva The Salon");
-    const [contactEmail, setContactEmail] = useState("admin@divathesalon.com");
+    const [shopName, setShopName] = useState("Dosti Real Estate");
+    const [contactEmail, setContactEmail] = useState("admin@dostirealestate.com");
     const [checkInTime, setCheckInTime] = useState("09:00");
     const [checkOutTime, setCheckOutTime] = useState("20:00");
     const [lateGraceMinutes, setLateGraceMinutes] = useState(15);
@@ -19,8 +20,8 @@ export default function Settings() {
                 const res = await api.get("/admin/settings");
                 if (res.data?.success && res.data?.data) {
                     const s = res.data.data;
-                    setShopName(s.shopName ?? "Diva The Salon");
-                    setContactEmail(s.contactEmail ?? "admin@divathesalon.com");
+                    setShopName(s.shopName ?? "Dosti Real Estate");
+                    setContactEmail(s.contactEmail ?? "admin@dostirealestate.com");
                     setCheckInTime(s.checkInTime ?? "09:00");
                     setCheckOutTime(s.checkOutTime ?? "20:00");
                     setLateGraceMinutes(s.lateGraceMinutes ?? 15);
@@ -81,7 +82,7 @@ export default function Settings() {
     return (
         <DashboardLayout
             title="Settings"
-            subtitle="Configure your salon parameters, working hours, and attendance rules."
+            subtitle="Configure your real estate parameters, working hours, and attendance rules."
         >
             <div className="max-w-2xl text-slate-800 dark:text-slate-100">
                 <section className="panel-surface rounded-[24px] p-6 shadow-sm text-xs">
@@ -132,24 +133,10 @@ export default function Settings() {
                             </h4>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Check-in Start Time</label>
-                                    <input
-                                        type="time"
-                                        value={checkInTime}
-                                        onChange={(e) => setCheckInTime(e.target.value)}
-                                        className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:focus:bg-slate-800"
-                                        required
-                                    />
+                                    <TimeClockPicker label="Check-in Start Time" value={checkInTime} onChange={setCheckInTime} />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">Standard Check-out Time</label>
-                                    <input
-                                        type="time"
-                                        value={checkOutTime}
-                                        onChange={(e) => setCheckOutTime(e.target.value)}
-                                        className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:focus:bg-slate-800"
-                                        required
-                                    />
+                                    <TimeClockPicker label="Standard Check-out Time" value={checkOutTime} onChange={setCheckOutTime} />
                                 </div>
                             </div>
                         </div>

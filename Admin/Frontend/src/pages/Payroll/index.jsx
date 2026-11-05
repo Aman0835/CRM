@@ -47,7 +47,7 @@ export default function Payroll() {
                     <div className="flex flex-col gap-3 sm:flex-row">
                         <div className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs text-slate-400 focus-within:border-blue-500 focus-within:bg-white transition-all dark:bg-slate-800 dark:border-slate-700 dark:focus-within:bg-slate-855">
                             <FiSearch />
-                            <input type="text" placeholder="Search barber..." value={search} onChange={(e) => setSearch(e.target.value)}
+                            <input type="text" placeholder="Search employee..." value={search} onChange={(e) => setSearch(e.target.value)}
                                 className="bg-transparent outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400" />
                         </div>
                         <select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}
@@ -75,7 +75,7 @@ export default function Payroll() {
                         <table className="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                                    <th className="py-3 px-4">Barber</th>
+                                    <th className="py-3 px-4">Employee</th>
                                     <th className="py-3 px-4">Period</th>
                                     <th className="py-3 px-4">Base Pay</th>
                                     <th className="py-3 px-4">Overtime</th>
@@ -91,7 +91,7 @@ export default function Payroll() {
                                     return (
                                         <tr key={payroll._id} className="border-b border-slate-100 dark:border-slate-800/60 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-850/10 transition-colors">
                                             <td className="py-3.5 px-4 font-bold text-slate-850 dark:text-slate-205">
-                                                {emp ? `${emp.firstName} ${emp.lastName}` : "Unknown Barber"} ({payroll.employeeId})
+                                                {emp ? `${emp.firstName} ${emp.lastName}` : "Unknown Employee"} ({payroll.employeeId})
                                             </td>
                                             <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400 font-medium">{payroll.month}/{payroll.year}</td>
                                             <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400">₹{payroll.baseSalary.toLocaleString()}</td>

@@ -270,7 +270,7 @@ export default function Employees() {
   return (
     <DashboardLayout
       title="Employees"
-      subtitle="Manage your barber staff profile files, contacts, schedules, and payroll parameters."
+      subtitle="Manage your employee directory, contacts, schedules, and payroll parameters."
       action={
         <div className="flex gap-2">
           <button
@@ -296,7 +296,7 @@ export default function Employees() {
               Staff Directory
             </h2>
             <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
-              Search and filter standard barber files ·{" "}
+              Search and filter employee directory ·{" "}
               <span className="font-bold text-blue-600 dark:text-blue-400">
                 {totalEmployees} total
               </span>
@@ -393,49 +393,49 @@ export default function Employees() {
             </div>
           ) : (
             <section className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {employees.map((barber) => (
+              {employees.map((emp) => (
                 <article
-                  key={barber._id}
+                  key={emp._id}
                   className="panel-surface rounded-[24px] p-5 shadow-sm flex flex-col justify-between hover:border-blue-300 dark:hover:border-blue-800 transition-colors text-slate-800 dark:text-slate-100">
                   <div>
                     <div className="flex items-start justify-between gap-4">
                       <div
                         className="flex items-center gap-3.5 cursor-pointer"
-                        onClick={() => navigate(`/employees/${barber._id}`)}>
-                        {barber.profileImage ? (
+                        onClick={() => navigate(`/employees/${emp._id}`)}>
+                        {emp.profileImage ? (
                           <img
-                            src={barber.profileImage}
-                            alt={barber.firstName}
+                            src={emp.profileImage}
+                            alt={emp.firstName}
                             loading="lazy"
                             className="h-14 w-14 rounded-2xl object-cover border border-slate-100 dark:border-slate-800"
                           />
                         ) : (
                           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-base font-semibold text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
-                            {barber.firstName[0]}
-                            {barber.lastName[0]}
+                            {emp.firstName[0]}
+                            {emp.lastName[0]}
                           </div>
                         )}
 
                         <div>
                           <h3 className="text-sm font-bold text-slate-805 dark:text-slate-105 hover:text-blue-600 transition">
-                            {barber.firstName} {barber.lastName}
+                            {emp.firstName} {emp.lastName}
                           </h3>
                           <p className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-semibold mt-0.5">
-                            {barber.role}
+                            {emp.role}
                           </p>
                         </div>
                       </div>
 
                       <div className="flex gap-1.5">
                         <button
-                          onClick={() => handleOpenEdit(barber)}
+                          onClick={() => handleOpenEdit(emp)}
                           type="button"
                           className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 transition"
                           title="Edit Profile">
                           <FiEdit2 className="text-xs" />
                         </button>
                         <button
-                          onClick={() => handleDelete(barber._id)}
+                          onClick={() => handleDelete(emp._id)}
                           type="button"
                           className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-100 bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 dark:border-red-950 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/40 transition"
                           title="Delete Employee">
@@ -450,7 +450,7 @@ export default function Employees() {
                           Wage scale
                         </span>
                         <span className="font-bold block mt-1 text-slate-800 dark:text-slate-200">
-                          ${barber.monthlySalary?.toLocaleString()}/mo
+                          ${emp.monthlySalary?.toLocaleString()}/mo
                         </span>
                       </div>
                       <div className="rounded-xl bg-slate-50 dark:bg-slate-950/20 p-2.5 border border-slate-100 dark:border-slate-800">
@@ -459,13 +459,13 @@ export default function Employees() {
                         </span>
                         <span
                           className={`inline-block px-2 py-0.5 rounded-full text-[9px] font-bold uppercase mt-1 ${
-                            barber.status === "active"
+                            emp.status === "active"
                               ? "bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900"
-                              : barber.status === "on_leave"
+                              : emp.status === "on_leave"
                                 ? "bg-orange-50 text-orange-600 border border-orange-100 dark:bg-orange-950/20 dark:text-orange-400 dark:border-orange-900"
                                 : "bg-slate-100 text-slate-550 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700"
                           }`}>
-                          {barber.status || "active"}
+                          {emp.status || "active"}
                         </span>
                       </div>
                     </div>
@@ -473,23 +473,23 @@ export default function Employees() {
                     <div className="mt-4 space-y-2 text-xs text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800/80 pt-3">
                       <div className="flex items-center gap-2">
                         <FiMail className="text-blue-500 shrink-0" />
-                        <span className="truncate">{barber.email}</span>
+                        <span className="truncate">{emp.email}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <FiPhone className="text-blue-500 shrink-0" />
-                        <span>{barber.phone}</span>
+                        <span>{emp.phone}</span>
                       </div>
-                      {barber.address && (
+                      {emp.address && (
                         <div className="flex items-center gap-2">
                           <FiMapPin className="text-blue-500 shrink-0" />
-                          <span className="truncate">{barber.address}</span>
+                          <span className="truncate">{emp.address}</span>
                         </div>
                       )}
                     </div>
                   </div>
 
                   <button
-                    onClick={() => navigate(`/employees/${barber._id}`)}
+                    onClick={() => navigate(`/employees/${emp._id}`)}
                     className="mt-5 w-full text-xs font-semibold text-blue-600 bg-blue-50/50 py-2 rounded-xl border border-blue-100 hover:bg-blue-50 hover:text-blue-700 transition dark:bg-blue-950/20 dark:border-blue-900 dark:text-blue-400 dark:hover:bg-blue-950/40">
                     View Full Workfile
                   </button>
@@ -649,7 +649,7 @@ export default function Employees() {
                       value={role}
                       onChange={(e) => setRole(e.target.value)}
                       className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150">
-                      <option value="employee">Barber / Stylist</option>
+                      <option value="employee">Real Estate Consultant</option>
                       <option value="manager">Shop Manager</option>
                       <option value="admin">Administrator</option>
                     </select>
@@ -789,7 +789,7 @@ export default function Employees() {
                     type="text"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Downtown Chair 01, Barber Shop lounge"
+                    placeholder="Sales Office Suite 101, Connaught Place"
                     className="w-full h-10 mt-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs outline-none focus:border-blue-500 focus:bg-white dark:bg-slate-800 dark:border-slate-700 dark:focus:bg-slate-850 dark:text-slate-150"
                   />
                 </div>

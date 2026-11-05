@@ -1,8 +1,10 @@
 # CRM Admin 
 
-A production-ready **Employee Management & Payroll System** built specifically for barber shops and salons. The platform enables employees to manage their daily attendance, leave requests, and salary information through a mobile application, while administrators can efficiently manage employees, monitor attendance, approve leave requests, and generate monthly payroll from a centralized dashboard.
+A production-ready **Employee Management & Payroll System** built specifically for real estate enterprises and teams. The platform enables employees to manage their daily attendance, leave requests, and salary information through a mobile application, while administrators can efficiently manage employees, monitor attendance, approve leave requests, and generate monthly payroll from a centralized dashboard.
 
-Prototype link :- https://vivid-custom-72137772.figma.site/
+Employee frontend live link :- https://crm-4ycq.vercel.app
+Admin frontend live link :- https://crm-lilac-tau.vercel.app
+
 ---
 
 ## 📌 Overview
@@ -117,7 +119,7 @@ Admin Dashboard
 ## 📁 Project Structure
 
 ```text
-barber-staff-management-system
+dosti-real-estate-management-system
 │
 ├── mobile-app/
 │

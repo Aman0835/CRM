@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiEye, FiEyeOff, FiScissors, FiLock, FiUser } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiLock, FiUser } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 
@@ -53,7 +53,7 @@ export default function Login() {
 
                 {/* Logo */}
                 <div className="flex items-center relative z-10">
-                    <img src="/logo.svg" alt="Diva Salon Logo" className="h-12 w-auto invert" />
+                    <img src="/logo.svg" alt="Dosti Real Estate Logo" className="h-12 w-auto invert" />
                 </div>
 
                 {/* Center content */}
@@ -81,7 +81,7 @@ export default function Login() {
 
                 {/* Bottom tagline */}
                 <p className="text-blue-300 text-xs relative z-10">
-                    © 2025 Diva The Salon. Employee Portal.
+                    © 2025 Dosti Real Estate. Employee Portal.
                 </p>
             </div>
 
@@ -90,7 +90,7 @@ export default function Login() {
                 <div className="w-full max-w-md">
                     {/* Mobile logo header */}
                     <div className="lg:hidden flex items-center mb-8">
-                        <img src="/logo.svg" alt="Diva Salon Logo" className="h-10 w-auto dark:invert" />
+                        <img src="/logo.svg" alt="Dosti Real Estate Logo" className="h-10 w-auto dark:invert" />
                     </div>
 
                     <h2 className="text-2xl font-extrabold text-slate-800 dark:text-slate-50 tracking-tight">
@@ -124,7 +124,7 @@ export default function Login() {
                                     name="emailOrId"
                                     value={form.emailOrId}
                                     onChange={handleChange}
-                                    placeholder="EMP001 or john@diva.com"
+                                    placeholder="EMP001 or john@dosti.com"
                                     autoComplete="username"
                                     className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 dark:placeholder-slate-500"
                                 />

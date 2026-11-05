@@ -11,7 +11,7 @@ import {
     FiClock,
     FiBriefcase,
     FiBarChart2,
-    FiScissors,
+
     FiSettings,
     FiLogOut,
     FiCheckCircle,
@@ -37,7 +37,7 @@ const mainNavigation = [
 
 const adminNavigation = [
     { to: "/reports", label: "Reports", icon: FiBarChart2 },
-    { to: "/holidays", label: "Holidays", icon: FiScissors },
+    { to: "/holidays", label: "Holidays", icon: FiCalendar },
     { to: "/settings", label: "Settings", icon: FiSettings },
 ];
 
@@ -47,8 +47,8 @@ const getAdminInfo = () => {
         const photo = localStorage.getItem("admin_profile_photo");
         if (saved) {
             const parsed = JSON.parse(saved);
-            const firstName = parsed.firstName || "Alex";
-            const lastName = parsed.lastName || "Rivera";
+            let firstName = (parsed.firstName && !["diva", "divya"].includes(parsed.firstName.toLowerCase())) ? parsed.firstName : "Dosti";
+            let lastName = (parsed.lastName && (firstName !== "Dosti" || parsed.lastName.toLowerCase() !== "rivera")) ? parsed.lastName : "Admin";
             return {
                 name: `${firstName} ${lastName}`.trim(),
                 initials: `${firstName[0] || "A"}${lastName[0] || "R"}`.toUpperCase(),
@@ -335,7 +335,7 @@ export default function Navbar() {
                         {/* Drawer Header */}
                         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-slate-800">
                             <Link to="/dashboard" onClick={() => setMobileOpen(false)}>
-                                <img src="/logo.svg" alt="Diva Salon Logo" className="h-9 w-auto dark:invert" />
+                                <img src="/logo.svg" alt="Dosti Real Estate Logo" className="h-9 w-auto dark:invert" />
                             </Link>
                             <button
                                 type="button"

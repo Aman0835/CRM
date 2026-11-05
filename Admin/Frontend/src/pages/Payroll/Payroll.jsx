@@ -107,7 +107,7 @@ export default function Payroll() {
             let csvContent = "Payroll ID,Employee ID,Staff Name,Month,Year,Base Salary,Overtime Amount,Deductions,Net Salary,Status\n";
             filteredPayrolls.forEach((p) => {
                 const emp = employees.find((e) => e.employeeId === p.employeeId);
-                const staffName = emp ? `${emp.firstName} ${emp.lastName}` : "Unknown Barber";
+                const staffName = emp ? `${emp.firstName} ${emp.lastName}` : "Unknown Employee";
                 const row = [
                     `"${p._id || ""}"`,
                     `"${p.employeeId || ""}"`,
@@ -190,7 +190,7 @@ export default function Payroll() {
                             <FiSearch />
                             <input
                                 type="text"
-                                placeholder="Search barber..."
+                                placeholder="Search employee..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 className="bg-transparent outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400"
@@ -231,7 +231,7 @@ export default function Payroll() {
                         <table className="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                                    <th className="py-3 px-4">Barber</th>
+                                    <th className="py-3 px-4">Employee</th>
                                     <th className="py-3 px-4">Period</th>
                                     <th className="py-3 px-4">Base Pay</th>
                                     <th className="py-3 px-4">Overtime</th>
@@ -247,7 +247,7 @@ export default function Payroll() {
                                     return (
                                         <tr key={payroll._id} className="border-b border-slate-100 dark:border-slate-800/60 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-850/10 transition-colors">
                                             <td className="py-3.5 px-4 font-bold text-slate-850 dark:text-slate-205">
-                                                {emp ? `${emp.firstName} ${emp.lastName}` : "Unknown Barber"} ({payroll.employeeId})
+                                                {emp ? `${emp.firstName} ${emp.lastName}` : "Unknown Employee"} ({payroll.employeeId})
                                             </td>
                                             <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400 font-medium">
                                                 {payroll.month}/{payroll.year}
