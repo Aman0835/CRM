@@ -3,6 +3,7 @@ import { useAuth } from "../../../context/AuthContext";
 import { getMyAttendance } from "../../../services/attendanceService";
 import { getMyPayroll } from "../../../services/payrollService";
 import { getMyLeads, getMyReminders } from "../../../leads/services/leadService";
+import { getMyVisits } from "../../../services/visitService";
 import { subscribeRealtime } from "../../../services/realtime";
 
 export function useDashboard() {
@@ -12,6 +13,7 @@ export function useDashboard() {
     const [payroll, setPayroll] = useState([]);
     const [leads, setLeads] = useState([]);
     const [reminders, setReminders] = useState([]);
+    const [totalVisits, setTotalVisits] = useState(0);
     const [leadsSummary, setLeadsSummary] = useState({
         totalLeads: 0,
         totalActive: 0,
@@ -23,11 +25,12 @@ export function useDashboard() {
         if (!employee?.employeeId) return;
         if (isInitial) setLoading(true);
         try {
-            const [attRes, payRes, leadsRes, remRes] = await Promise.allSettled([
+            const [attRes, payRes, leadsRes, remRes, visitsRes] = await Promise.allSettled([
                 getMyAttendance(employee.employeeId),
                 getMyPayroll(employee.employeeId),
                 getMyLeads({ limit: 5 }),
                 getMyReminders(),
+                getMyVisits(),
             ]);
 
             if (attRes.status === "fulfilled") {
@@ -60,6 +63,12 @@ export function useDashboard() {
             if (remRes.status === "fulfilled") {
                 const rawRem = remRes.value?.data;
                 setReminders(Array.isArray(rawRem) ? rawRem : []);
+            }
+
+            if (visitsRes.status === "fulfilled") {
+                const rawVisits = visitsRes.value?.data;
+                const count = visitsRes.value?.count ?? (Array.isArray(rawVisits) ? rawVisits.length : 0);
+                setTotalVisits(count);
             }
         } catch (err) {
             console.error("Dashboard fetch error", err);
@@ -125,6 +134,7 @@ export function useDashboard() {
         recentAttendance: safeAttendance.slice(0, 5),
         recentLeads: leads,
         leadsSummary,
+        totalVisits,
         reminders,
         fetchAll,
     };

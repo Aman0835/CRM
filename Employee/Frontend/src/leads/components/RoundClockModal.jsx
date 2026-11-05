@@ -131,18 +131,18 @@ export default function RoundClockModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-[320px] overflow-hidden rounded-[32px] border border-[#243552] bg-[#0c1322] p-5 shadow-[0_25px_60px_rgba(0,0,0,0.85)] text-center select-none"
+        className="relative w-full max-w-[320px] overflow-hidden rounded-[32px] border border-[#381C14] bg-[#24110c] p-5 shadow-[0_25px_60px_rgba(0,0,0,0.85)] text-center select-none"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Label */}
         <div className="flex items-center justify-between pb-1">
-          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#fbbf24] flex items-center gap-1.5">
-            <FiClock className="text-amber-400" /> Select Follow-up Time
+          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#D9C4AA] flex items-center gap-1.5">
+            <FiClock className="text-[#962A22]" /> Select Follow-up Time
           </p>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-[#162136] text-[#7d93ba] hover:text-white"
+            className="flex h-7 w-7 items-center justify-center rounded-full border border-[#381C14] bg-[#1a0d09] text-[#D9C4AA] hover:text-[#FBFAF6] transition-colors"
           >
             <FiX className="h-4 w-4" />
           </button>
@@ -156,14 +156,14 @@ export default function RoundClockModal({
             onClick={() => setMode("hours")}
             className={`flex h-14 min-w-[62px] items-center justify-center rounded-2xl border text-3xl font-black transition-all ${
               mode === "hours"
-                ? "border-[#2f6cf6] bg-[#1e345e] text-white shadow-[0_4px_16px_rgba(47,108,246,0.35)]"
-                : "border-[#1e2c44] bg-[#131c2e] text-[#8ea4cb] hover:text-white"
+                ? "border-[#962A22] bg-[#381C14] text-[#FBFAF6] shadow-[0_4px_16px_rgba(150,42,34,0.35)]"
+                : "border-[#381C14] bg-[#1a0d09] text-[#AE9475] hover:text-[#FBFAF6]"
             }`}
           >
             {String(hour).padStart(2, "0")}
           </button>
 
-          <span className="text-2xl font-black text-[#5d7396]">:</span>
+          <span className="text-2xl font-black text-[#AE9475]">:</span>
 
           {/* Minute Box */}
           <button
@@ -171,8 +171,8 @@ export default function RoundClockModal({
             onClick={() => setMode("minutes")}
             className={`flex h-14 min-w-[62px] items-center justify-center rounded-2xl border text-3xl font-black transition-all ${
               mode === "minutes"
-                ? "border-[#2f6cf6] bg-[#1e345e] text-white shadow-[0_4px_16px_rgba(47,108,246,0.35)]"
-                : "border-[#1e2c44] bg-[#131c2e] text-[#8ea4cb] hover:text-white"
+                ? "border-[#962A22] bg-[#381C14] text-[#FBFAF6] shadow-[0_4px_16px_rgba(150,42,34,0.35)]"
+                : "border-[#381C14] bg-[#1a0d09] text-[#AE9475] hover:text-[#FBFAF6]"
             }`}
           >
             {String(minute).padStart(2, "0")}
@@ -185,8 +185,8 @@ export default function RoundClockModal({
               onClick={() => setAmpm("AM")}
               className={`rounded-xl px-3 py-1.5 text-xs font-black transition-all ${
                 ampm === "AM"
-                  ? "bg-[#2f6cf6] text-white shadow-sm"
-                  : "bg-[#141e30] border border-[#202e48] text-[#748bac] hover:text-white"
+                  ? "bg-[#962A22] text-[#FBFAF6] shadow-sm"
+                  : "bg-[#1a0d09] border border-[#381C14] text-[#AE9475] hover:text-[#FBFAF6]"
               }`}
             >
               AM
@@ -196,8 +196,8 @@ export default function RoundClockModal({
               onClick={() => setAmpm("PM")}
               className={`rounded-xl px-3 py-1.5 text-xs font-black transition-all ${
                 ampm === "PM"
-                  ? "bg-[#2f6cf6] text-white shadow-sm"
-                  : "bg-[#141e30] border border-[#202e48] text-[#748bac] hover:text-white"
+                  ? "bg-[#962A22] text-[#FBFAF6] shadow-sm"
+                  : "bg-[#1a0d09] border border-[#381C14] text-[#AE9475] hover:text-[#FBFAF6]"
               }`}
             >
               PM
@@ -206,20 +206,20 @@ export default function RoundClockModal({
         </div>
 
         {/* Mode subtitle switcher tab */}
-        <div className="mt-2 flex justify-center gap-4 text-xs font-bold text-[#7d93ba]">
+        <div className="mt-2 flex justify-center gap-4 text-xs font-bold text-[#AE9475]">
           <span
             onClick={() => setMode("hours")}
             className={`cursor-pointer pb-0.5 transition-colors ${
-              mode === "hours" ? "text-[#38bdf8] border-b-2 border-[#38bdf8]" : "hover:text-white"
+              mode === "hours" ? "text-[#FBFAF6] border-b-2 border-[#962A22]" : "hover:text-[#FBFAF6]"
             }`}
           >
             Set Hour
           </span>
-          <span className="text-slate-600">•</span>
+          <span className="text-[#381C14]">•</span>
           <span
             onClick={() => setMode("minutes")}
             className={`cursor-pointer pb-0.5 transition-colors ${
-              mode === "minutes" ? "text-[#38bdf8] border-b-2 border-[#38bdf8]" : "hover:text-white"
+              mode === "minutes" ? "text-[#FBFAF6] border-b-2 border-[#962A22]" : "hover:text-[#FBFAF6]"
             }`}
           >
             Set Minute
@@ -233,7 +233,7 @@ export default function RoundClockModal({
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
-            className="relative h-[240px] w-[240px] rounded-full border border-[#243552] bg-[#111a2c] shadow-[inset_0_4px_16px_rgba(0,0,0,0.6)] touch-none cursor-pointer"
+            className="relative h-[240px] w-[240px] rounded-full border border-[#381C14] bg-[#1a0d09] shadow-[inset_0_4px_16px_rgba(0,0,0,0.6)] touch-none cursor-pointer"
           >
             {/* Minute tick notches around perimeter */}
             <div className="absolute inset-0 rounded-full pointer-events-none">
@@ -244,7 +244,7 @@ export default function RoundClockModal({
                   <span
                     key={i}
                     style={{ left: `${pt.x}px`, top: `${pt.y}px` }}
-                    className="absolute h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#2a3c5a]"
+                    className="absolute h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#381C14]"
                   />
                 );
               })}
@@ -258,7 +258,7 @@ export default function RoundClockModal({
                 y1={CENTER}
                 x2={handPoint.x}
                 y2={handPoint.y}
-                stroke="#2f6cf6"
+                stroke="#962A22"
                 strokeWidth="2.5"
                 strokeLinecap="round"
               />
@@ -268,13 +268,13 @@ export default function RoundClockModal({
                 cx={handPoint.x}
                 cy={handPoint.y}
                 r="17"
-                fill="#2f6cf6"
+                fill="#962A22"
                 className="transition-all duration-75 shadow-lg"
               />
 
               {/* Center pivot point */}
-              <circle cx={CENTER} cy={CENTER} r="4.5" fill="#60a5fa" />
-              <circle cx={CENTER} cy={CENTER} r="2" fill="#ffffff" />
+              <circle cx={CENTER} cy={CENTER} r="4.5" fill="#D9C4AA" />
+              <circle cx={CENTER} cy={CENTER} r="2" fill="#FBFAF6" />
             </svg>
 
             {/* Dial Number Badges */}
@@ -299,8 +299,8 @@ export default function RoundClockModal({
                       }}
                       className={`absolute flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-[13px] font-bold transition-all z-10 ${
                         isSelected
-                          ? "font-black text-white"
-                          : "text-[#8ea4cb] hover:text-white"
+                          ? "font-black text-[#FBFAF6]"
+                          : "text-[#D9C4AA] hover:text-[#FBFAF6]"
                       }`}
                     >
                       {h}
@@ -326,8 +326,8 @@ export default function RoundClockModal({
                       }}
                       className={`absolute flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-[12px] font-bold transition-all z-10 ${
                         isSelected
-                          ? "font-black text-white"
-                          : "text-[#8ea4cb] hover:text-white"
+                          ? "font-black text-[#FBFAF6]"
+                          : "text-[#D9C4AA] hover:text-[#FBFAF6]"
                       }`}
                     >
                       {String(m).padStart(2, "0")}
@@ -349,7 +349,7 @@ export default function RoundClockModal({
                 setMinute(p.minute);
                 setAmpm(p.ampm);
               }}
-              className="rounded-lg border border-[#233550] bg-[#121c2e] px-2 py-1 text-[10px] font-semibold text-[#8ea4cb] hover:border-[#2f6cf6] hover:text-white"
+              className="rounded-lg border border-[#381C14] bg-[#1a0d09] px-2 py-1 text-[10px] font-semibold text-[#D9C4AA] hover:border-[#962A22] hover:text-[#FBFAF6] transition-colors"
             >
               {preset}
             </button>
@@ -361,14 +361,14 @@ export default function RoundClockModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 rounded-xl border border-[#243552] bg-[#152136] py-2.5 text-xs font-bold text-[#8ea4cb] hover:bg-[#1b2b46] hover:text-white"
+            className="flex-1 rounded-xl border border-[#381C14] bg-[#1a0d09] py-2.5 text-xs font-bold text-[#AE9475] hover:text-[#FBFAF6] transition-colors"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleConfirm}
-            className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#2f6cf6] py-2.5 text-xs font-bold text-white shadow-[0_6px_16px_rgba(47,108,246,0.35)] active:scale-[0.98]"
+            className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#962A22] hover:bg-[#7e221b] border border-[#D9C4AA]/20 py-2.5 text-xs font-bold text-[#FBFAF6] shadow-[0_6px_16px_rgba(150,42,34,0.35)] active:scale-[0.98] transition-all"
           >
             <FiCheck className="h-4 w-4" />
             <span>Set Time</span>

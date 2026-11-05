@@ -47,11 +47,11 @@ export const BUDGET_OPTIONS = [
 ];
 
 export const INTERACTION_TYPES = [
-  { id: "CALL", label: "Call", icon: FiPhone, color: "text-[#2f6cf6] bg-[#1a2d52]" },
+  { id: "CALL", label: "Call", icon: FiPhone, color: "text-[#FBFAF6] bg-[#962A22]" },
   { id: "WHATSAPP", label: "WhatsApp", icon: FiMessageSquare, color: "text-[#10b981] bg-[#12382c]" },
-  { id: "MEETING", label: "Meeting", icon: FiUsers, color: "text-[#a855f7] bg-[#331c4f]" },
-  { id: "SITE_VISIT", label: "Site Visit", icon: FiMapPin, color: "text-[#f59e0b] bg-[#3d2c14]" },
-  { id: "NOTE", label: "Note", icon: FiFileText, color: "text-[#64748b] bg-[#1e293b]" },
+  { id: "MEETING", label: "Meeting", icon: FiUsers, color: "text-[#D9C4AA] bg-[#381C14]" },
+  { id: "SITE_VISIT", label: "Site Visit", icon: FiMapPin, color: "text-[#E9D5BD] bg-[#4a241b]" },
+  { id: "NOTE", label: "Note", icon: FiFileText, color: "text-[#AE9475] bg-[#24110c]" },
 ];
 
 export const OUTCOME_OPTIONS = [
@@ -94,17 +94,17 @@ export function getStatusStyle(status = "New") {
   switch (status) {
     case "New":
       return {
-        bg: "bg-[#1e293b]",
-        text: "text-[#94a3b8]",
-        border: "border-[#334155]",
-        dot: "bg-[#94a3b8]",
+        bg: "bg-[#381C14]",
+        text: "text-[#D9C4AA]",
+        border: "border-[#381C14]",
+        dot: "bg-[#D9C4AA]",
       };
     case "Contacted":
       return {
-        bg: "bg-[#172554]",
-        text: "text-[#60a5fa]",
-        border: "border-[#1d4ed8]/40",
-        dot: "bg-[#60a5fa]",
+        bg: "bg-[#381C14]",
+        text: "text-[#E9D5BD]",
+        border: "border-[#D9C4AA]/30",
+        dot: "bg-[#E9D5BD]",
       };
     case "Interested":
       return {

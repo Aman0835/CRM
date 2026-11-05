@@ -15,6 +15,14 @@ const payrollSchema = new mongoose.Schema(
       type: Number,
       required: true
     },
+    dailyRate: {
+      type: Number,
+      default: 0
+    },
+    presentDays: {
+      type: Number,
+      default: 0
+    },
     baseSalary: {
       type: Number,
       default: 0

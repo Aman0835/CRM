@@ -46,9 +46,9 @@ export default function ReminderProvider({ children }) {
               icon: "🔔",
               duration: 10000,
               style: {
-                background: "#082f36",
-                color: "#16e0a0",
-                border: "1px solid #114f4d",
+                background: "#24110c",
+                color: "#FBFAF6",
+                border: "1px solid #381C14",
               },
             });
 

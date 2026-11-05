@@ -58,80 +58,80 @@ export default function Payroll() {
         <DashboardLayout>
             <div className="space-y-5 pb-4 pt-2">
                 <div className="px-1">
-                    <h1 className="text-[22px] font-black text-white">Salary</h1>
-                    <p className="mt-1 text-[14px] text-[#7d93ba]">{formatMonthYear(currentMonth, currentYear)} statement</p>
+                    <h1 className="text-[22px] font-black text-[#FBFAF6]">Salary</h1>
+                    <p className="mt-1 text-[14px] text-[#D9C4AA]">{formatMonthYear(currentMonth, currentYear)} statement</p>
                 </div>
 
-                <div className="relative overflow-hidden rounded-[30px] bg-[linear-gradient(135deg,#3a2a86_0%,#532ca1_100%)] px-7 py-7 shadow-[0_24px_48px_rgba(83,44,161,0.36)]">
-                    <p className="text-[13px] font-black uppercase tracking-[0.2em] text-[#d0bcff]">
+                <div className="relative overflow-hidden rounded-[30px] border border-[#D9C4AA]/20 bg-[linear-gradient(135deg,#962A22_0%,#4a1511_100%)] px-7 py-7 shadow-[0_24px_48px_rgba(150,42,34,0.36)]">
+                    <p className="text-[13px] font-black uppercase tracking-[0.2em] text-[#D9C4AA]">
                         Net Salary · {formatMonthYear(currentMonth, currentYear)}
                     </p>
-                    <p className="mt-3 font-mono text-[56px] font-black leading-none text-white">{formatMoney(netSalary)}</p>
+                    <p className="mt-3 font-mono text-[56px] font-black leading-none text-[#FBFAF6]">{formatMoney(netSalary)}</p>
                     <div className="mt-5 flex items-center gap-3">
                         <span className={["flex items-center gap-1 rounded-full border px-3 py-1.5 text-[13px] font-bold", trendPercent >= 0 ? "border-[#14cf95]/30 bg-[#0f6e62] text-[#14cf95]" : "border-[#ff6371]/30 bg-[#4f2632] text-[#ff6371]"].join(" ")}>
                             <FiTrendingUp className="h-3.5 w-3.5" />
                             {trendPercent >= 0 ? "+" : ""}{trendPercent.toFixed(1)}% vs prev
                         </span>
-                        <span className="text-[14px] text-[#ceb7ff]">{activePayroll?.status ?? "Awaiting payroll"}</span>
+                        <span className="text-[14px] text-[#D9C4AA]">{activePayroll?.status ?? "Awaiting payroll"}</span>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                     {[
-                        [`${presentCount}d`, "Present", "bg-[#082f36]", "text-[#16e0a0]"],
-                        [`${absentCount}d`, "Absent", "bg-[#311926]", "text-[#ff6371]"],
-                        [`${Math.round(overtimeHours)}h`, "Overtime", "bg-[#221a4a]", "text-[#8f7bff]"],
-                        [`${leaveCount}d`, "Leaves", "bg-[#2b2218]", "text-[#ffc400]"],
-                    ].map(([value, label, bg, tone]) => (
-                        <div key={label} className={["rounded-[24px] p-6", bg].join(" ")}>
+                        [`${presentCount}d`, "Present", "text-[#16e0a0]"],
+                        [`${absentCount}d`, "Absent", "text-[#ff6371]"],
+                        [`${Math.round(overtimeHours)}h`, "Overtime", "text-[#E9D5BD]"],
+                        [`${leaveCount}d`, "Leaves", "text-[#ffc400]"],
+                    ].map(([value, label, tone]) => (
+                        <div key={label} className="rounded-[24px] border border-[#381C14] bg-[#24110c] p-6 shadow-[0_8px_20px_rgba(0,0,0,0.3)]">
                             <p className={["text-[24px] font-black", tone].join(" ")}>{value}</p>
-                            <p className="mt-3 text-[14px] text-[#cfe4ff]">{label}</p>
+                            <p className="mt-3 text-[14px] text-[#D9C4AA]">{label}</p>
                         </div>
                     ))}
                 </div>
 
-                <div className="rounded-[28px] bg-[#1d2840] p-6">
-                    <p className="mb-6 text-[13px] font-black uppercase tracking-[0.18em] text-[#9bb4dc]">Breakdown</p>
+                <div className="rounded-[28px] border border-[#381C14] bg-[#24110c] p-6 shadow-[0_12px_28px_rgba(0,0,0,0.4)]">
+                    <p className="mb-6 text-[13px] font-black uppercase tracking-[0.18em] text-[#D9C4AA]">Breakdown</p>
                     <div className="space-y-4">
                         {[
-                            ["Base Salary", formatMoney(baseSalary), "text-white"],
+                            ["Base Salary", formatMoney(baseSalary), "text-[#FBFAF6]"],
                             ["Performance Bonus", `+${formatMoney(overtimeAmount)}`, "text-[#14cf95]"],
                             ["Deductions", `-${formatMoney(deductions)}`, "text-[#ff6371]"],
                         ].map(([label, value, tone]) => (
-                            <div key={label} className="flex items-center justify-between border-b border-[#31405f] pb-4">
-                                <p className="text-[16px] text-white">{label}</p>
+                            <div key={label} className="flex items-center justify-between border-b border-[#381C14] pb-4">
+                                <p className="text-[16px] text-[#D9C4AA]">{label}</p>
                                 <p className={["text-[16px] font-black", tone].join(" ")}>{value}</p>
                             </div>
                         ))}
                         <div className="flex items-center justify-between pt-2">
-                            <p className="text-[17px] font-black text-white">Total</p>
-                            <p className="text-[20px] font-black text-[#2f6cf6]">{formatMoney(netSalary)}</p>
+                            <p className="text-[17px] font-black text-[#FBFAF6]">Total</p>
+                            <p className="text-[20px] font-black text-[#FBFAF6]">{formatMoney(netSalary)}</p>
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <p className="mb-4 px-1 text-[13px] font-black uppercase tracking-[0.18em] text-[#9bb4dc]">Payslip History</p>
-                    <div className="overflow-hidden rounded-[28px] bg-[#1d2840]">
+                    <p className="mb-4 px-1 text-[13px] font-black uppercase tracking-[0.18em] text-[#D9C4AA]">Payslip History</p>
+                    <div className="overflow-hidden rounded-[28px] border border-[#381C14] bg-[#24110c] shadow-[0_12px_28px_rgba(0,0,0,0.4)]">
                         {payroll.length ? payroll.map((item, index) => {
                             const current = index === 0;
 
                             return (
-                                <div key={item._id} className={["flex items-center gap-4 px-5 py-4", index < payroll.length - 1 ? "border-b border-[#31405f]" : ""].join(" ")}>
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-[#334766] text-[#8ca2c6]">
+                                <div key={item._id} className={["flex items-center gap-4 px-5 py-4", index < payroll.length - 1 ? "border-b border-[#381C14]" : ""].join(" ")}>
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-[18px] border border-[#381C14] bg-[#1a0d09] text-[#D9C4AA]">
                                         <FiFileText className="h-5 w-5" />
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <p className="text-[16px] font-black text-white">{formatMonthYear(item.month, item.year)}</p>
-                                        <p className="mt-1 text-[13px] text-[#8fb0dd]">{formatMoney(item.netSalary)}</p>
+                                        <p className="text-[16px] font-black text-[#FBFAF6]">{formatMonthYear(item.month, item.year)}</p>
+                                        <p className="mt-1 text-[13px] text-[#D9C4AA]">{formatMoney(item.netSalary)}</p>
                                     </div>
-                                    <span className={["rounded-full px-4 py-1.5 text-[12px] font-bold", current ? "bg-[#214f9b] text-[#77a6ff]" : item.status === "paid" ? "bg-[#0d6c63] text-[#17e0a0]" : "bg-[#5a4a1f] text-[#ffc400]"].join(" ")}>
+                                    <span className={["rounded-full px-4 py-1.5 text-[12px] font-bold", current ? "bg-[#962A22]/20 border border-[#962A22]/40 text-[#FBFAF6]" : item.status === "paid" ? "bg-[#0d6c63] text-[#17e0a0]" : "bg-[#5a4a1f] text-[#ffc400]"].join(" ")}>
                                         {current ? "Current" : item.status === "paid" ? "Paid" : "Generated"}
                                     </span>
                                 </div>
                             );
                         }) : (
-                            <div className="px-5 py-8 text-center text-[14px] text-[#8fb0dd]">
+                            <div className="px-5 py-8 text-center text-[14px] text-[#D9C4AA]">
                                 No payroll records available yet.
                             </div>
                         )}

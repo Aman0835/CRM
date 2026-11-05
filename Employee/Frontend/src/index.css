@@ -4,19 +4,31 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+  --color-burgundy: #962A22;
+  --color-burgundy-hover: #7d221b;
+  --color-burgundy-dark: #641913;
+  --color-deep-brown: #381C14;
+  --color-champagne: #D9C4AA;
+  --color-ivory: #FBFAF6;
+  --color-taupe: #AE9475;
+  --color-sand: #E9D5BD;
+  --color-cream: #F7F0E1;
+}
+
 :root {
   --font-family: "Inter", sans-serif;
-  --primary-color: #4f46e5;
-  --secondary-color: #6366f1;
-  --light-primary-color: #e0e7ff;
-  --background-color: #ffffff;
-  --sidebar-background: #f3f4f6;
-  --text-primary-color: #111827;
-  --text-secondary-color: #6b7280;
-  --border-color: #e5e7eb;
-  --card-background: #ffffff;
-  --card-border-color: #e5e7eb;
-  --shadow-color: rgba(0, 0, 0, 0.05);
+  --primary-color: #962A22;
+  --secondary-color: #AE9475;
+  --light-primary-color: #F7F0E1;
+  --background-color: #FBFAF6;
+  --sidebar-background: #F7F0E1;
+  --text-primary-color: #381C14;
+  --text-secondary-color: #AE9475;
+  --border-color: #E9D5BD;
+  --card-background: #FBFAF6;
+  --card-border-color: #D9C4AA;
+  --shadow-color: rgba(56, 28, 20, 0.08);
 }
 
 html {
@@ -25,15 +37,15 @@ html {
 
 html.dark {
   color-scheme: dark;
-  --light-primary-color: rgba(59, 130, 246, 0.22);
-  --background-color: #020617;
-  --sidebar-background: #0f172a;
-  --text-primary-color: #f8fafc;
-  --text-secondary-color: #94a3b8;
-  --border-color: rgba(148, 163, 184, 0.18);
-  --card-background: #111827;
-  --card-border-color: rgba(148, 163, 184, 0.14);
-  --shadow-color: rgba(0, 0, 0, 0.3);
+  --light-primary-color: rgba(150, 42, 34, 0.25);
+  --background-color: #1a0d09;
+  --sidebar-background: #25120c;
+  --text-primary-color: #FBFAF6;
+  --text-secondary-color: #D9C4AA;
+  --border-color: rgba(217, 196, 170, 0.2);
+  --card-background: #2b150f;
+  --card-border-color: rgba(217, 196, 170, 0.22);
+  --shadow-color: rgba(0, 0, 0, 0.4);
 }
 
 /* Global dark mode: prevent inputs going white on focus */
@@ -41,9 +53,10 @@ html.dark {
 .dark input:not([type="checkbox"]):not([type="radio"]):focus,
 .dark select:focus,
 .dark textarea:focus {
-  background-color: #1e293b !important;
-  color: #f8fafc !important;
-  caret-color: #f8fafc;
+  background-color: #2b150f !important;
+  color: #FBFAF6 !important;
+  caret-color: #D9C4AA;
+  border-color: #962A22 !important;
 }
 
 .dark input:-webkit-autofill,
@@ -51,9 +64,9 @@ html.dark {
 .dark input:-webkit-autofill:focus,
 .dark textarea:-webkit-autofill,
 .dark select:-webkit-autofill {
-  -webkit-text-fill-color: #f8fafc !important;
-  -webkit-box-shadow: 0 0 0 1000px #1e293b inset !important;
-  caret-color: #f8fafc;
+  -webkit-text-fill-color: #FBFAF6 !important;
+  -webkit-box-shadow: 0 0 0 1000px #2b150f inset !important;
+  caret-color: #FBFAF6;
 }
 
 body {
@@ -67,8 +80,8 @@ body {
 
 html.dark body {
   background:
-    radial-gradient(circle at top, rgba(59, 130, 246, 0.16), transparent 32%),
-    linear-gradient(180deg, #020617 0%, #0b1120 45%, #020617 100%);
+    radial-gradient(circle at top, rgba(150, 42, 34, 0.22), transparent 38%),
+    linear-gradient(180deg, #130805 0%, #1e0e0a 50%, #110604 100%);
 }
 
 button,

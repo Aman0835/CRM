@@ -45,14 +45,14 @@ const CustomSelect = ({ value, onChange, options, placeholder }) => {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="mt-1.5 h-11 w-full flex items-center justify-between rounded-2xl border border-[#243552] bg-[#141e31] px-3 text-xs text-white outline-none focus:border-[#2f6cf6] transition-colors"
+        className="mt-1.5 h-11 w-full flex items-center justify-between rounded-2xl border border-[#381C14] bg-[#1a0d09] px-3 text-xs text-[#FBFAF6] outline-none focus:border-[#962A22] transition-colors"
       >
         <span className="truncate">{value || placeholder}</span>
-        <FiChevronDown className={`text-[#7d93ba] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+        <FiChevronDown className={`text-[#D9C4AA] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
       </button>
       
       {isOpen && (
-        <div className="absolute z-50 mt-2 w-full max-h-60 overflow-y-auto rounded-2xl border border-[#243552] bg-[#141e31] py-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="absolute z-50 mt-2 w-full max-h-60 overflow-y-auto rounded-2xl border border-[#381C14] bg-[#24110c] py-1.5 shadow-[0_8px_30px_rgba(0,0,0,0.6)] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {options.map((opt) => (
             <button
               key={opt}
@@ -61,7 +61,7 @@ const CustomSelect = ({ value, onChange, options, placeholder }) => {
                 onChange(opt);
                 setIsOpen(false);
               }}
-              className={`w-full text-left px-4 py-2.5 text-xs transition-colors hover:bg-[#1a263d] ${value === opt ? "text-[#2f6cf6] font-bold bg-[#1a263d]" : "text-[#93aacf]"}`}
+              className={`w-full text-left px-4 py-2.5 text-xs transition-colors hover:bg-[#381C14] ${value === opt ? "text-[#FBFAF6] font-bold bg-[#962A22]" : "text-[#E9D5BD]"}`}
             >
               {opt}
             </button>
@@ -185,39 +185,39 @@ export default function CreateLeadPage() {
             type="button"
             onClick={handleBack}
             aria-label="Go back"
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#182338] text-[#8ea4cb] hover:text-white active:scale-95 transition-all"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#381C14] bg-[#24110c] text-[#D9C4AA] hover:text-[#FBFAF6] active:scale-95 transition-all"
           >
             <FiArrowLeft className="h-5 w-5" />
           </button>
           <div>
-            <h1 className="text-[20px] font-black text-white">Create New Lead</h1>
-            <p className="text-[12px] text-[#7d93ba]">Client & First Conversation</p>
+            <h1 className="text-[20px] font-black text-[#FBFAF6]">Create New Lead</h1>
+            <p className="text-[12px] text-[#D9C4AA]">Client & First Conversation</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* SECTION 1: CLIENT INFORMATION */}
-          <div className="rounded-[28px] border border-[#243552] bg-[#1d2840] p-5 shadow-[0_12px_28px_rgba(0,0,0,0.25)] space-y-4">
-            <div className="flex items-center gap-2 border-b border-[#23334d] pb-3">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#273857] text-[#60a5fa]">
+          <div className="rounded-[28px] border border-[#381C14] bg-[#24110c] p-5 shadow-[0_12px_28px_rgba(0,0,0,0.4)] space-y-4">
+            <div className="flex items-center gap-2 border-b border-[#381C14] pb-3">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#381C14] text-[#D9C4AA]">
                 <FiUser className="h-4 w-4" />
               </div>
-              <h2 className="text-[14px] font-bold text-white uppercase tracking-wider">
+              <h2 className="text-[14px] font-bold text-[#FBFAF6] uppercase tracking-wider">
                 Client Information
               </h2>
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
-                Full Name <span className="text-red-400">*</span>
+              <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#D9C4AA]">
+                Full Name <span className="text-[#962A22]">*</span>
               </label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => handleChange("name", e.target.value)}
                 placeholder="e.g. Rajkumar Mishra"
-                className={`mt-1.5 h-11 w-full rounded-2xl border bg-[#141e31] px-4 text-xs text-white placeholder-[#506385] outline-none focus:border-[#2f6cf6] ${
-                  errors.name ? "border-red-500" : "border-[#243552]"
+                className={`mt-1.5 h-11 w-full rounded-2xl border bg-[#1a0d09] px-4 text-xs text-[#FBFAF6] placeholder-[#AE9475] outline-none focus:border-[#962A22] transition-colors ${
+                  errors.name ? "border-red-500" : "border-[#381C14]"
                 }`}
               />
               {errors.name && <p className="mt-1 text-[11px] text-red-400">{errors.name}</p>}
@@ -225,23 +225,23 @@ export default function CreateLeadPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
-                  Phone <span className="text-red-400">*</span>
+                <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#D9C4AA]">
+                  Phone <span className="text-[#962A22]">*</span>
                 </label>
                 <input
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => handleChange("phone", e.target.value)}
                   placeholder="+91 98765 43210"
-                  className={`mt-1.5 h-11 w-full rounded-2xl border bg-[#141e31] px-3.5 text-xs text-white placeholder-[#506385] outline-none focus:border-[#2f6cf6] ${
-                    errors.phone ? "border-red-500" : "border-[#243552]"
+                  className={`mt-1.5 h-11 w-full rounded-2xl border bg-[#1a0d09] px-3.5 text-xs text-[#FBFAF6] placeholder-[#AE9475] outline-none focus:border-[#962A22] transition-colors ${
+                    errors.phone ? "border-red-500" : "border-[#381C14]"
                   }`}
                 />
                 {errors.phone && <p className="mt-1 text-[11px] text-red-400">{errors.phone}</p>}
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
+                <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#D9C4AA]">
                   Location
                 </label>
                 <input
@@ -249,25 +249,25 @@ export default function CreateLeadPage() {
                   value={formData.location}
                   onChange={(e) => handleChange("location", e.target.value)}
                   placeholder="e.g. Thane West"
-                  className="mt-1.5 h-11 w-full rounded-2xl border border-[#243552] bg-[#141e31] px-3.5 text-xs text-white placeholder-[#506385] outline-none focus:border-[#2f6cf6]"
+                  className="mt-1.5 h-11 w-full rounded-2xl border border-[#381C14] bg-[#1a0d09] px-3.5 text-xs text-[#FBFAF6] placeholder-[#AE9475] outline-none focus:border-[#962A22] transition-colors"
                 />
               </div>
             </div>
           </div>
 
           {/* SECTION 2: REQUIREMENTS */}
-          <div className="rounded-[28px] border border-[#243552] bg-[#1d2840] p-5 shadow-[0_12px_28px_rgba(0,0,0,0.25)] space-y-4">
-            <div className="flex items-center gap-2 border-b border-[#23334d] pb-3">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#273857] text-[#34d399]">
+          <div className="rounded-[28px] border border-[#381C14] bg-[#24110c] p-5 shadow-[0_12px_28px_rgba(0,0,0,0.4)] space-y-4">
+            <div className="flex items-center gap-2 border-b border-[#381C14] pb-3">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#381C14] text-[#E9D5BD]">
                 <FiHome className="h-4 w-4" />
               </div>
-              <h2 className="text-[14px] font-bold text-white uppercase tracking-wider">
+              <h2 className="text-[14px] font-bold text-[#FBFAF6] uppercase tracking-wider">
                 Requirements
               </h2>
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
+              <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#D9C4AA]">
                 Project Interested In
               </label>
               <input
@@ -275,13 +275,13 @@ export default function CreateLeadPage() {
                 value={formData.project}
                 onChange={(e) => handleChange("project", e.target.value)}
                 placeholder="e.g. Dosti West County, Lodha Crown..."
-                className="mt-1.5 h-11 w-full rounded-2xl border border-[#243552] bg-[#141e31] px-4 text-xs text-white placeholder-[#506385] outline-none focus:border-[#2f6cf6]"
+                className="mt-1.5 h-11 w-full rounded-2xl border border-[#381C14] bg-[#1a0d09] px-4 text-xs text-[#FBFAF6] placeholder-[#AE9475] outline-none focus:border-[#962A22] transition-colors"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
+                <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#D9C4AA]">
                   Configuration
                 </label>
                 <CustomSelect 
@@ -293,7 +293,7 @@ export default function CreateLeadPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
+                <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#D9C4AA]">
                   Budget Range
                 </label>
                 <CustomSelect 
@@ -306,7 +306,7 @@ export default function CreateLeadPage() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
+              <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#D9C4AA]">
                 Lead Source (CP Firm)
               </label>
               <input
@@ -314,34 +314,34 @@ export default function CreateLeadPage() {
                 value={formData.source}
                 onChange={(e) => handleChange("source", e.target.value)}
                 placeholder="e.g. ABC CP Firm"
-                className="mt-1.5 h-11 w-full rounded-2xl border border-[#243552] bg-[#141e31] px-4 text-xs text-white placeholder-[#506385] outline-none focus:border-[#2f6cf6]"
+                className="mt-1.5 h-11 w-full rounded-2xl border border-[#381C14] bg-[#1a0d09] px-4 text-xs text-[#FBFAF6] placeholder-[#AE9475] outline-none focus:border-[#962A22] transition-colors"
               />
             </div>
           </div>
 
           {/* SECTION 3: FIRST INTERACTION */}
-          <div className="rounded-[28px] border border-[#243552] bg-[#1d2840] p-5 shadow-[0_12px_28px_rgba(0,0,0,0.25)] space-y-4">
-            <div className="flex items-center gap-2 border-b border-[#23334d] pb-3">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#273857] text-[#fbbf24]">
+          <div className="rounded-[28px] border border-[#381C14] bg-[#24110c] p-5 shadow-[0_12px_28px_rgba(0,0,0,0.4)] space-y-4">
+            <div className="flex items-center gap-2 border-b border-[#381C14] pb-3">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#381C14] text-[#D9C4AA]">
                 <FiFileText className="h-4 w-4" />
               </div>
-              <h2 className="text-[14px] font-bold text-white uppercase tracking-wider">
+              <h2 className="text-[14px] font-bold text-[#FBFAF6] uppercase tracking-wider">
                 First Interaction
               </h2>
             </div>
 
             {/* Notes / What client said */}
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
-                What did the client say? <span className="text-red-400">*</span>
+              <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#D9C4AA]">
+                What did the client say? <span className="text-[#962A22]">*</span>
               </label>
               <textarea
                 rows={3}
                 value={formData.clientResponse}
                 onChange={(e) => handleChange("clientResponse", e.target.value)}
                 placeholder="e.g. Interested in 2 BHK, family wants a site visit this Sunday..."
-                className={`mt-1.5 w-full resize-none rounded-2xl border bg-[#141e31] p-3 text-xs text-white placeholder-[#506385] outline-none focus:border-[#2f6cf6] ${
-                  errors.clientResponse ? "border-red-500" : "border-[#243552]"
+                className={`mt-1.5 w-full resize-none rounded-2xl border bg-[#1a0d09] p-3 text-xs text-[#FBFAF6] placeholder-[#AE9475] outline-none focus:border-[#962A22] transition-colors ${
+                  errors.clientResponse ? "border-red-500" : "border-[#381C14]"
                 }`}
               />
               {errors.clientResponse && (
@@ -355,7 +355,7 @@ export default function CreateLeadPage() {
                     key={chip}
                     type="button"
                     onClick={() => handleQuickChip(chip)}
-                    className="rounded-full border border-[#2b3c58] bg-[#141e31] px-2.5 py-1 text-[10px] text-[#93aacf] hover:border-[#3b5278] hover:text-white"
+                    className="rounded-full border border-[#381C14] bg-[#1a0d09] px-2.5 py-1 text-[10px] text-[#E9D5BD] hover:border-[#962A22] hover:text-[#FBFAF6] transition-colors"
                   >
                     + {chip}
                   </button>
@@ -365,8 +365,8 @@ export default function CreateLeadPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
-                  Outcome <span className="text-red-400">*</span>
+                <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#D9C4AA]">
+                  Outcome <span className="text-[#962A22]">*</span>
                 </label>
                 <CustomSelect 
                   value={formData.outcome}
@@ -377,8 +377,8 @@ export default function CreateLeadPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#7d93ba]">
-                  Next Action <span className="text-red-400">*</span>
+                <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-[#D9C4AA]">
+                  Next Action <span className="text-[#962A22]">*</span>
                 </label>
                 <CustomSelect 
                   value={formData.nextAction}
@@ -405,7 +405,7 @@ export default function CreateLeadPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[#2f6cf6] text-[15px] font-bold text-white shadow-[0_12px_28px_rgba(47,108,246,0.4)] active:scale-[0.98] disabled:opacity-60"
+              className="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[#962A22] hover:bg-[#7e221b] text-[15px] font-bold text-[#FBFAF6] shadow-[0_12px_28px_rgba(150,42,34,0.4)] border border-[#D9C4AA]/20 active:scale-[0.98] disabled:opacity-60 transition-all cursor-pointer"
             >
               {submitting ? (
                 <span>Creating Lead...</span>

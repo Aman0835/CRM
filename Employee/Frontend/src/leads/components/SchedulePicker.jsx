@@ -55,17 +55,17 @@ export default function SchedulePicker({
     : "";
 
   return (
-    <div className="rounded-2xl border border-[#23334d] bg-[#141e31] p-3.5 space-y-3">
+    <div className="rounded-2xl border border-[#381C14] bg-[#1a0d09] p-3.5 space-y-3">
       {/* Title & Clear Action */}
       <div className="flex items-center justify-between">
-        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#fbbf24] flex items-center gap-1.5">
-          <FiCalendar className="text-amber-400 text-xs" /> {title}
+        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#D9C4AA] flex items-center gap-1.5">
+          <FiCalendar className="text-[#962A22] text-xs" /> {title}
         </p>
         {date && optional && (
           <button
             type="button"
             onClick={() => onDateChange("")}
-            className="text-[10px] text-red-400 hover:text-red-300 flex items-center gap-0.5 cursor-pointer"
+            className="text-[10px] text-[#962A22] hover:text-red-400 flex items-center gap-0.5 cursor-pointer"
           >
             <FiX className="text-xs" /> Clear Schedule
           </button>
@@ -75,8 +75,8 @@ export default function SchedulePicker({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         {/* Date Selector (Calendar) */}
         <div>
-          <label className="text-[10px] uppercase font-bold text-[#8ba2c8] mb-1 flex items-center gap-1">
-            <FiCalendar className="text-[#2f6cf6]" /> Calendar Date
+          <label className="text-[10px] uppercase font-bold text-[#D9C4AA] mb-1 flex items-center gap-1">
+            <FiCalendar className="text-[#962A22]" /> Calendar Date
           </label>
           <div
             onClick={() => {
@@ -88,11 +88,11 @@ export default function SchedulePicker({
             }}
             className={`relative flex items-center gap-2 h-11 w-full rounded-xl border px-3 cursor-pointer transition select-none ${
               date
-                ? "border-[#2f6cf6] bg-[#101b2f] text-white shadow-sm"
-                : "border-[#243552] bg-[#101827] text-slate-400 hover:border-[#2f6cf6]"
+                ? "border-[#962A22] bg-[#24110c] text-[#FBFAF6] shadow-sm"
+                : "border-[#381C14] bg-[#24110c] text-[#AE9475] hover:border-[#962A22]"
             }`}
           >
-            <FiCalendar className={`shrink-0 text-sm ${date ? "text-[#2f6cf6]" : "text-slate-400"}`} />
+            <FiCalendar className={`shrink-0 text-sm ${date ? "text-[#962A22]" : "text-[#AE9475]"}`} />
             <span className="text-xs flex-1 truncate font-medium">
               {date ? formattedDate : "Choose Date from Calendar"}
             </span>
@@ -115,8 +115,8 @@ export default function SchedulePicker({
               onClick={() => handleDatePreset(0)}
               className={`px-2 py-0.5 rounded-md border text-[10px] transition cursor-pointer ${
                 date === todayStr
-                  ? "bg-[#2f6cf6] border-[#2f6cf6] text-white font-bold"
-                  : "bg-[#182337] border-[#253652] text-slate-300 hover:text-white"
+                  ? "bg-[#962A22] border-[#962A22] text-[#FBFAF6] font-bold"
+                  : "bg-[#24110c] border-[#381C14] text-[#E9D5BD] hover:text-[#FBFAF6]"
               }`}
             >
               Today
@@ -124,14 +124,14 @@ export default function SchedulePicker({
             <button
               type="button"
               onClick={() => handleDatePreset(1)}
-              className="px-2 py-0.5 rounded-md bg-[#182337] border border-[#253652] text-[10px] text-slate-300 hover:text-white transition cursor-pointer"
+              className="px-2 py-0.5 rounded-md bg-[#24110c] border border-[#381C14] text-[10px] text-[#E9D5BD] hover:text-[#FBFAF6] transition cursor-pointer"
             >
               Tomorrow
             </button>
             <button
               type="button"
               onClick={() => handleDatePreset(2)}
-              className="px-2 py-0.5 rounded-md bg-[#182337] border border-[#253652] text-[10px] text-slate-300 hover:text-white transition cursor-pointer"
+              className="px-2 py-0.5 rounded-md bg-[#24110c] border border-[#381C14] text-[10px] text-[#E9D5BD] hover:text-[#FBFAF6] transition cursor-pointer"
             >
               +2 Days
             </button>
@@ -140,19 +140,19 @@ export default function SchedulePicker({
 
         {/* Time Selector (Round Clock Trigger) */}
         <div>
-          <label className="text-[10px] uppercase font-bold text-[#8ba2c8] mb-1 flex items-center gap-1">
-            <FiClock className="text-amber-400" /> Clock Time
+          <label className="text-[10px] uppercase font-bold text-[#D9C4AA] mb-1 flex items-center gap-1">
+            <FiClock className="text-[#D9C4AA]" /> Clock Time
           </label>
           <button
             type="button"
             onClick={() => setIsClockOpen(true)}
-            className="flex items-center gap-2 h-11 w-full rounded-xl border border-[#243552] bg-[#101827] px-3 cursor-pointer hover:border-[#2f6cf6] active:scale-[0.99] transition select-none text-white text-left"
+            className="flex items-center gap-2 h-11 w-full rounded-xl border border-[#381C14] bg-[#24110c] px-3 cursor-pointer hover:border-[#962A22] active:scale-[0.99] transition select-none text-[#FBFAF6] text-left"
           >
-            <FiClock className="shrink-0 text-sm text-amber-400" />
-            <span className="text-xs flex-1 truncate font-bold text-white">
+            <FiClock className="shrink-0 text-sm text-[#D9C4AA]" />
+            <span className="text-xs flex-1 truncate font-bold text-[#FBFAF6]">
               {time ? formatTime24To12(time) : "Tap to open clock"}
             </span>
-            <span className="text-[10px] font-semibold text-[#38bdf8] bg-[#142646] px-2 py-0.5 rounded-lg border border-[#223e72]">
+            <span className="text-[10px] font-semibold text-[#D9C4AA] bg-[#381C14] px-2 py-0.5 rounded-lg border border-[#962A22]/40">
               Change
             </span>
           </button>
@@ -166,8 +166,8 @@ export default function SchedulePicker({
                 onClick={() => onTimeChange(t)}
                 className={`shrink-0 px-2 py-0.5 rounded-md border text-[10px] transition cursor-pointer ${
                   formatTime24To12(time) === t
-                    ? "bg-[#2f6cf6] border-[#2f6cf6] text-white font-bold"
-                    : "bg-[#182337] border-[#253652] text-slate-300 hover:text-white"
+                    ? "bg-[#962A22] border-[#962A22] text-[#FBFAF6] font-bold"
+                    : "bg-[#24110c] border-[#381C14] text-[#E9D5BD] hover:text-[#FBFAF6]"
                 }`}
               >
                 {t}

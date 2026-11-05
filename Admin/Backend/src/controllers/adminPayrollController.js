@@ -53,13 +53,15 @@ export const generatePayroll = async (req, res) => {
         }
       }
 
-      const baseSalary = employee.perDayPayout && employee.perDayPayout > 0
-        ? Math.round(employee.perDayPayout * presentDays)
-        : (employee.monthlySalary || 0);
+      const dailyRate = (employee.perDayPayout && employee.perDayPayout > 0)
+        ? employee.perDayPayout
+        : (employee.monthlySalary && employee.monthlySalary > 0
+          ? Math.round(employee.monthlySalary / 30)
+          : 1100);
+
+      const baseSalary = Math.round(dailyRate * presentDays);
       const overtimeAmount = Math.round(totalOvertimeHours * (settings.overtimeRate || 25));
-      const deductions = employee.perDayPayout && employee.perDayPayout > 0
-        ? 0 // Per-day employees are only paid for days worked
-        : Math.round(absentDays * (settings.leaveDeduction || 100));
+      const deductions = 0; // Salary calculated strictly from days present (dailyRate * presentDays)
       const netSalary = Math.max(0, baseSalary + overtimeAmount - deductions);
 
       const payroll = await Payroll.findOneAndUpdate(
@@ -72,6 +74,8 @@ export const generatePayroll = async (req, res) => {
           employeeId: employee.employeeId,
           month: Number(month),
           year: Number(year),
+          dailyRate,
+          presentDays,
           baseSalary,
           overtimeAmount,
           deductions,

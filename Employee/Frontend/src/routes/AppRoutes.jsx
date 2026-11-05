@@ -7,6 +7,8 @@ import { useAuth } from "../context/AuthContext";
 const Login       = lazy(() => import("../pages/Login/Login"));
 const Dashboard   = lazy(() => import("../pages/Dashboard"));
 const Attendance  = lazy(() => import("../pages/Attendance"));
+const VisitsPage       = lazy(() => import("../pages/Visits/VisitsPage"));
+const CreateVisitPage  = lazy(() => import("../pages/Visits/CreateVisitPage"));
 
 const Payroll     = lazy(() => import("../pages/Payroll"));
 const Profile     = lazy(() => import("../pages/Profile"));
@@ -133,12 +135,29 @@ export default function AppRoutes() {
                 />
 
                 <Route
-                    path="/payroll"
+                    path="/visits"
                     element={
                         <ProtectedRoute>
-                            <Payroll />
+                            <VisitsPage />
                         </ProtectedRoute>
                     }
+                />
+                <Route
+                    path="/visits/new"
+                    element={
+                        <ProtectedRoute>
+                            <CreateVisitPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/visit-form"
+                    element={<Navigate to="/visits/new" replace />}
+                />
+
+                <Route
+                    path="/payroll"
+                    element={<Navigate to="/profile?tab=salary" replace />}
                 />
 
 

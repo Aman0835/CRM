@@ -191,10 +191,24 @@ export default function EmployeeDetail() {
     const attendanceRate = totalDays > 0 ? ((present + halfDay) / totalDays * 100).toFixed(1) : "—";
     const totalHours = logs.reduce((sum, l) => sum + (l.workingHours || 0), 0).toFixed(1);
 
+    const joinDateObj = (employee.joiningDate || employee.createdAt)
+        ? new Date(employee.joiningDate || employee.createdAt)
+        : null;
+
+    const daysSinceJoining = (() => {
+        if (!joinDateObj || isNaN(joinDateObj.getTime())) return null;
+        const today = new Date();
+        const joinedMidnight = new Date(joinDateObj.getFullYear(), joinDateObj.getMonth(), joinDateObj.getDate());
+        const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const diffTime = todayMidnight.getTime() - joinedMidnight.getTime();
+        const diffDays = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+        return diffDays === 0 ? "Joined today" : `${diffDays} days working`;
+    })();
+
     const infoRow = (label, value) => (
-        <div className="flex justify-between items-center py-2.5 border-b border-slate-100 dark:border-slate-800 last:border-0">
-            <span className="text-xs text-slate-400 dark:text-slate-500">{label}</span>
-            <span className="text-xs font-semibold text-slate-800 dark:text-slate-100 text-right max-w-[60%] truncate">{value || "—"}</span>
+        <div className="flex justify-between items-center py-2.5 border-b border-slate-100 dark:border-slate-800 last:border-0 gap-3">
+            <span className="text-xs text-slate-400 dark:text-slate-500 shrink-0">{label}</span>
+            <div className="text-xs font-semibold text-slate-800 dark:text-slate-100 text-right flex items-center justify-end gap-2 flex-wrap">{value || "—"}</div>
         </div>
     );
 
@@ -301,7 +315,21 @@ export default function EmployeeDetail() {
                             </div>
                         </div>
                         {infoRow("Status", employee.status)}
-                        {infoRow("Member Since", new Date(employee.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }))}
+                        {infoRow(
+                            "Member Since",
+                            joinDateObj ? (
+                                <span className="inline-flex items-center gap-2 flex-wrap justify-end">
+                                    <span>
+                                        {joinDateObj.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                                    </span>
+                                    {daysSinceJoining && (
+                                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30">
+                                            {daysSinceJoining}
+                                        </span>
+                                    )}
+                                </span>
+                            ) : "—"
+                        )}
                     </div>
                 </div>
             </div>

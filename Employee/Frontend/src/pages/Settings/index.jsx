@@ -12,13 +12,13 @@ function ToggleSwitch({ checked, onChange }) {
             type="button"
             onClick={() => onChange(!checked)}
             className={[
-                "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200",
-                checked ? "bg-blue-600" : "bg-slate-200 dark:bg-slate-700",
+                "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 cursor-pointer",
+                checked ? "bg-[#962A22]" : "bg-[#381C14]",
             ].join(" ")}
         >
             <span
                 className={[
-                    "inline-block h-4 w-4 rounded-full bg-white shadow transform transition-transform duration-200",
+                    "inline-block h-4 w-4 rounded-full bg-[#FBFAF6] shadow transform transition-transform duration-200",
                     checked ? "translate-x-6" : "translate-x-1",
                 ].join(" ")}
             />
@@ -28,15 +28,15 @@ function ToggleSwitch({ checked, onChange }) {
 
 function SettingRow({ icon: Icon, label, description, children }) {
     return (
-        <div className="flex items-center justify-between py-4 border-b border-slate-100 dark:border-slate-700/50 last:border-0">
+        <div className="flex items-center justify-between py-4 border-b border-[#381C14] last:border-0">
             <div className="flex items-start gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-400 shrink-0 mt-0.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#381C14] bg-[#1a0d09] text-[#D9C4AA] shrink-0 mt-0.5">
                     <Icon className="text-base" />
                 </div>
                 <div>
-                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{label}</p>
+                    <p className="text-sm font-semibold text-[#FBFAF6]">{label}</p>
                     {description && (
-                        <p className="text-xs text-slate-400 mt-0.5">{description}</p>
+                        <p className="text-xs text-[#D9C4AA] mt-0.5">{description}</p>
                     )}
                 </div>
             </div>
@@ -96,9 +96,9 @@ export default function Settings() {
         <DashboardLayout title="Settings" subtitle="Manage your preferences and account settings">
             <div className="max-w-2xl space-y-6">
                 {/* Appearance */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.08)] dark:border-slate-700/60 dark:bg-slate-800/60 dark:shadow-none">
-                    <h3 className="mb-1 text-sm font-bold text-slate-700 dark:text-slate-300">Appearance</h3>
-                    <p className="mb-4 text-xs text-slate-400">Customize how the portal looks</p>
+                <div className="rounded-2xl border border-[#381C14] bg-[#24110c] p-6 shadow-[0_16px_36px_rgba(0,0,0,0.3)]">
+                    <h3 className="mb-1 text-sm font-bold text-[#FBFAF6]">Appearance</h3>
+                    <p className="mb-4 text-xs text-[#D9C4AA]">Customize how the portal looks</p>
 
                     <SettingRow
                         icon={theme === "dark" ? FiMoon : FiSun}
@@ -110,9 +110,9 @@ export default function Settings() {
                 </div>
 
                 {/* Notifications */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.08)] dark:border-slate-700/60 dark:bg-slate-800/60 dark:shadow-none">
-                    <h3 className="mb-1 text-sm font-bold text-slate-700 dark:text-slate-300">Notifications</h3>
-                    <p className="mb-4 text-xs text-slate-400">Choose what you want to be notified about (UI only)</p>
+                <div className="rounded-2xl border border-[#381C14] bg-[#24110c] p-6 shadow-[0_16px_36px_rgba(0,0,0,0.3)]">
+                    <h3 className="mb-1 text-sm font-bold text-[#FBFAF6]">Notifications</h3>
+                    <p className="mb-4 text-xs text-[#D9C4AA]">Choose what you want to be notified about (UI only)</p>
 
                     <SettingRow
                         icon={FiBell}
@@ -147,9 +147,9 @@ export default function Settings() {
                 </div>
 
                 {/* Language */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.08)] dark:border-slate-700/60 dark:bg-slate-800/60 dark:shadow-none">
-                    <h3 className="mb-1 text-sm font-bold text-slate-700 dark:text-slate-300">Language</h3>
-                    <p className="mb-4 text-xs text-slate-400">Select your preferred language (UI only)</p>
+                <div className="rounded-2xl border border-[#381C14] bg-[#24110c] p-6 shadow-[0_16px_36px_rgba(0,0,0,0.3)]">
+                    <h3 className="mb-1 text-sm font-bold text-[#FBFAF6]">Language</h3>
+                    <p className="mb-4 text-xs text-[#D9C4AA]">Select your preferred language (UI only)</p>
 
                     <SettingRow
                         icon={FiGlobe}
@@ -159,7 +159,7 @@ export default function Settings() {
                         <select
                             value={language}
                             onChange={(e) => setLanguage(e.target.value)}
-                            className="text-sm border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="text-sm border border-[#381C14] rounded-xl px-3 py-2 bg-[#1a0d09] text-[#FBFAF6] focus:outline-none focus:border-[#962A22]"
                         >
                             <option value="en">English</option>
                             <option value="hi">Hindi</option>
@@ -170,13 +170,13 @@ export default function Settings() {
                 </div>
 
                 {/* Security */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.08)] dark:border-slate-700/60 dark:bg-slate-800/60 dark:shadow-none">
-                    <h3 className="mb-1 text-sm font-bold text-slate-700 dark:text-slate-300">Security</h3>
-                    <p className="mb-4 text-xs text-slate-400">Update your login password</p>
+                <div className="rounded-2xl border border-[#381C14] bg-[#24110c] p-6 shadow-[0_16px_36px_rgba(0,0,0,0.3)]">
+                    <h3 className="mb-1 text-sm font-bold text-[#FBFAF6]">Security</h3>
+                    <p className="mb-4 text-xs text-[#D9C4AA]">Update your login password</p>
 
                     <button
                         onClick={() => setShowPasswordModal(true)}
-                        className="flex items-center gap-2 h-10 px-5 rounded-xl bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/40 text-blue-600 dark:text-blue-400 text-sm font-semibold hover:bg-blue-100 dark:hover:bg-blue-950/30 transition"
+                        className="flex items-center gap-2 h-10 px-5 rounded-xl bg-[#1a0d09] border border-[#381C14] text-[#D9C4AA] hover:text-[#FBFAF6] text-sm font-semibold transition cursor-pointer"
                     >
                         <FiLock className="text-sm" />
                         Change Password
@@ -184,13 +184,13 @@ export default function Settings() {
                 </div>
 
                 {/* Danger Zone */}
-                <div className="rounded-2xl border border-red-200 bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.08)] dark:border-red-900/40 dark:bg-slate-800/60 dark:shadow-none">
-                    <h3 className="text-sm font-bold text-red-600 dark:text-red-400 mb-1">Account</h3>
-                    <p className="text-xs text-slate-400 mb-4">Sign out of your employee portal account</p>
+                <div className="rounded-2xl border border-[#962A22]/30 bg-[#24110c] p-6 shadow-[0_16px_36px_rgba(0,0,0,0.3)]">
+                    <h3 className="text-sm font-bold text-red-400 mb-1">Account</h3>
+                    <p className="text-xs text-[#D9C4AA] mb-4">Sign out of your employee portal account</p>
 
                     <button
                         onClick={handleLogout}
-                        className="flex items-center gap-2 h-10 px-5 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm font-semibold hover:bg-red-100 dark:hover:bg-red-950/30 transition"
+                        className="flex items-center gap-2 h-10 px-5 rounded-xl bg-[#962A22]/15 border border-[#962A22]/30 text-red-400 text-sm font-semibold hover:bg-[#962A22]/25 transition cursor-pointer"
                     >
                         <FiLogOut className="text-sm" />
                         Logout
@@ -199,11 +199,11 @@ export default function Settings() {
             </div>
 
             {showPasswordModal && (
-                <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/70 px-4 pb-8 backdrop-blur-sm">
-                    <div className="w-full max-w-sm rounded-[28px] bg-white p-6 shadow-[0_20px_50px_rgba(15,23,42,0.24)] dark:bg-slate-900 dark:shadow-[0_20px_50px_rgba(0,0,0,0.45)]">
+                <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/75 px-4 pb-8 backdrop-blur-sm">
+                    <div className="w-full max-w-sm rounded-[28px] border border-[#381C14] bg-[#24110c] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.7)] text-[#FBFAF6]">
                         <div className="mb-4 flex items-center justify-between">
-                            <h2 className="text-base font-bold text-slate-900 dark:text-white">Change Password</h2>
-                            <button type="button" onClick={() => setShowPasswordModal(false)} className="text-slate-500">
+                            <h2 className="text-base font-bold text-[#FBFAF6]">Change Password</h2>
+                            <button type="button" onClick={() => setShowPasswordModal(false)} className="text-[#D9C4AA]">
                                 <FiX className="h-5 w-5" />
                             </button>
                         </div>
@@ -214,17 +214,17 @@ export default function Settings() {
                                 { key: "confirm", label: "Confirm Password", visible: showConfirm, toggle: () => setShowConfirm((prev) => !prev) },
                             ].map(({ key, label, visible, toggle }) => (
                                 <div key={key}>
-                                    <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">{label}</label>
+                                    <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-[#D9C4AA]">{label}</label>
                                     <div className="relative">
                                         <input
                                             type={visible ? "text" : "password"}
                                             autoComplete={key === "current" ? "current-password" : "new-password"}
                                             value={passwordForm[key]}
                                             onChange={(event) => setPasswordForm((prev) => ({ ...prev, [key]: event.target.value }))}
-                                            className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 pr-11 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-800 dark:bg-slate-800 dark:text-white"
+                                            className="h-12 w-full rounded-2xl border border-[#381C14] bg-[#1a0d09] px-4 pr-11 text-sm text-[#FBFAF6] outline-none focus:border-[#962A22]"
                                             required
                                         />
-                                        <button type="button" onClick={toggle} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">
+                                        <button type="button" onClick={toggle} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#D9C4AA]">
                                             {visible ? <FiEyeOff className="h-4 w-4" /> : <FiEye className="h-4 w-4" />}
                                         </button>
                                     </div>
@@ -234,14 +234,14 @@ export default function Settings() {
                                 <button
                                     type="button"
                                     onClick={() => setShowPasswordModal(false)}
-                                    className="h-12 flex-1 rounded-2xl bg-slate-200 text-sm font-semibold text-slate-900 transition hover:bg-slate-300 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
+                                    className="h-12 flex-1 rounded-2xl border border-[#381C14] bg-[#1a0d09] text-sm font-semibold text-[#D9C4AA] transition hover:text-[#FBFAF6]"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={savingPassword}
-                                    className="h-12 flex-1 rounded-2xl bg-blue-500 text-sm font-semibold text-white transition hover:bg-blue-400 disabled:opacity-60"
+                                    className="h-12 flex-1 rounded-2xl bg-[#962A22] hover:bg-[#7e221b] border border-[#D9C4AA]/20 text-sm font-semibold text-[#FBFAF6] transition disabled:opacity-60 cursor-pointer"
                                 >
                                     {savingPassword ? "Updating..." : "Update"}
                                 </button>

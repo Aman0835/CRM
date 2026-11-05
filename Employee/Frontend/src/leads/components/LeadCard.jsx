@@ -11,16 +11,16 @@ export default function LeadCard({ lead, onClick, onDelete }) {
   return (
     <div
       onClick={onClick}
-      className="group relative cursor-pointer overflow-hidden rounded-[24px] border border-[#243552] bg-[#1d2840] p-4.5 shadow-[0_12px_28px_rgba(0,0,0,0.25)] transition-all duration-200 active:scale-[0.98] hover:border-[#38517c]"
+      className="group relative cursor-pointer overflow-hidden rounded-[24px] border border-[#381C14] bg-[#24110c] p-4.5 shadow-[0_12px_28px_rgba(0,0,0,0.3)] transition-all duration-200 active:scale-[0.98] hover:border-[#962A22]/50"
     >
       {/* Top Header: Name, Status & Delete */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-[17px] font-black text-white group-hover:text-blue-200">
+          <h3 className="truncate text-[17px] font-black text-[#FBFAF6] group-hover:text-[#E9D5BD]">
             {lead.name}
           </h3>
           {lead.location && (
-            <p className="mt-0.5 truncate text-[12px] text-[#7d93ba]">
+            <p className="mt-0.5 truncate text-[12px] text-[#D9C4AA]">
               {lead.location}
             </p>
           )}
@@ -37,7 +37,7 @@ export default function LeadCard({ lead, onClick, onDelete }) {
               }}
               aria-label="Delete lead"
               title="Delete lead"
-              className="flex h-7 w-7 items-center justify-center rounded-full bg-red-500/0 border border-transparent text-[#506385] hover:bg-red-500/15 hover:border-red-500/30 hover:text-red-400 active:scale-95 transition-all"
+              className="flex h-7 w-7 items-center justify-center rounded-full bg-red-500/0 border border-transparent text-[#AE9475] hover:bg-red-500/15 hover:border-red-500/30 hover:text-red-400 active:scale-95 transition-all"
             >
               <FiTrash2 className="h-3.5 w-3.5" />
             </button>
@@ -47,16 +47,16 @@ export default function LeadCard({ lead, onClick, onDelete }) {
 
       {/* Project & Requirements */}
       {(lead.project || lead.configuration || lead.budget) && (
-        <div className="mt-3 rounded-[16px] bg-[#141d2e] px-3.5 py-2.5">
+        <div className="mt-3 rounded-[16px] bg-[#1a0d09] border border-[#381C14]/60 px-3.5 py-2.5">
           {lead.project && (
-            <p className="text-[13px] font-bold text-[#9db4db]">
+            <p className="text-[13px] font-bold text-[#FBFAF6]">
               {lead.project}
             </p>
           )}
-          <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[12px] font-medium text-[#7088ae]">
+          <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[12px] font-medium text-[#D9C4AA]">
             {lead.configuration && <span>{lead.configuration}</span>}
             {lead.configuration && lead.budget && <span>•</span>}
-            {lead.budget && <span className="font-semibold text-[#cbd5e1]">{lead.budget}</span>}
+            {lead.budget && <span className="font-semibold text-[#E9D5BD]">{lead.budget}</span>}
           </div>
         </div>
       )}
@@ -67,10 +67,10 @@ export default function LeadCard({ lead, onClick, onDelete }) {
           <a
             href={`tel:${lead.phone}`}
             onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-[#233555] px-3 py-1.5 text-[12px] font-semibold text-blue-300 transition-colors hover:bg-blue-600 hover:text-white"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-[#381C14] px-3 py-1.5 text-[12px] font-semibold text-[#E9D5BD] border border-[#AE9475]/30 transition-colors hover:bg-[#962A22] hover:text-[#FBFAF6]"
             title="Call Client"
           >
-            <FiPhone className="h-3.5 w-3.5 text-blue-400" />
+            <FiPhone className="h-3.5 w-3.5 text-[#D9C4AA]" />
             <span>{lead.phone}</span>
           </a>
 
@@ -89,23 +89,23 @@ export default function LeadCard({ lead, onClick, onDelete }) {
       )}
 
       {/* Follow-up & Latest Interaction Box */}
-      <div className="mt-3 space-y-2 border-t border-[#23334d] pt-3">
+      <div className="mt-3 space-y-2 border-t border-[#381C14] pt-3">
         {followUp && (
           <div className="flex items-center justify-between text-[12px]">
-            <span className="flex items-center gap-1.5 font-semibold text-[#fbbf24]">
-              <FiCalendar className="h-3.5 w-3.5" />
+            <span className="flex items-center gap-1.5 font-semibold text-[#E9D5BD]">
+              <FiCalendar className="h-3.5 w-3.5 text-[#D9C4AA]" />
               <span>Next Follow-up</span>
             </span>
-            <span className="font-bold text-white">
+            <span className="font-bold text-[#FBFAF6]">
               {followUp.date} • {followUp.time}
             </span>
           </div>
         )}
 
         {latestResponse && (
-          <div className="rounded-xl bg-[#152033] px-3 py-2 text-[12px]">
-            <span className="font-semibold text-[#7d93ba]">Latest: </span>
-            <span className="italic text-[#cbd5e1]">
+          <div className="rounded-xl bg-[#1a0d09] border border-[#381C14] px-3 py-2 text-[12px]">
+            <span className="font-semibold text-[#D9C4AA]">Latest: </span>
+            <span className="italic text-[#FBFAF6]">
               &ldquo;{latestResponse.length > 70 ? `${latestResponse.slice(0, 70)}...` : latestResponse}&rdquo;
             </span>
           </div>
@@ -113,7 +113,7 @@ export default function LeadCard({ lead, onClick, onDelete }) {
       </div>
 
       {/* Card arrow footer */}
-      <div className="mt-3 flex items-center justify-end text-[11px] font-bold text-[#4f83f8] group-hover:translate-x-1 transition-transform">
+      <div className="mt-3 flex items-center justify-end text-[11px] font-bold text-[#E9D5BD] group-hover:text-[#FBFAF6] group-hover:translate-x-1 transition-all">
         <span className="mr-1">View Details</span>
         <FiArrowRight className="h-3.5 w-3.5" />
       </div>

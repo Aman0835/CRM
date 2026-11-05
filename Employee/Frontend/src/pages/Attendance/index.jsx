@@ -62,9 +62,9 @@ function getDateStatus(dateKey, todayKey, attendanceMap, leaveSet) {
 function getDayTone(status) {
     if (status === "absent") return "bg-[#ff3942] text-white";
     if (status === "leave") return "bg-[#f7a30b] text-white";
-    if (status === "today") return "bg-[#356ef6] text-white shadow-[inset_0_0_0_2px_rgba(255,255,255,0.08)]";
+    if (status === "today") return "bg-[#962A22] text-[#FBFAF6] shadow-[inset_0_0_0_2px_rgba(217,196,170,0.4)]";
     if (status === "present") return "bg-[#16c88f] text-white";
-    return "text-[#50627f]";
+    return "text-[#AE9475]";
 }
 
 export default function Attendance() {
@@ -114,28 +114,28 @@ export default function Attendance() {
         <DashboardLayout>
             <div className="space-y-5 pb-4 pt-2">
                 <div className="px-1">
-                    <h1 className="text-[22px] font-black text-white">Attendance</h1>
-                    <p className="mt-1 text-[14px] text-[#7d93ba]">{monthTitle}</p>
+                    <h1 className="text-[22px] font-black text-[#FBFAF6]">Attendance</h1>
+                    <p className="mt-1 text-[14px] text-[#D9C4AA]">{monthTitle}</p>
                 </div>
 
                 {employee?.assignedOffice && (
-                    <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-[#1d2840] border border-[#2e3f64] text-xs text-[#8ca3c7]">
-                        <FiMapPin className="text-blue-400 shrink-0 text-base" />
+                    <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-[#24110c] border border-[#381C14] text-xs text-[#D9C4AA]">
+                        <FiMapPin className="text-[#962A22] shrink-0 text-base" />
                         <div>
-                            <span className="font-semibold text-white">
+                            <span className="font-semibold text-[#FBFAF6]">
                                 {employee.assignedOffice.officeName || "Assigned Office"}
                             </span>
-                            <span className="mx-1.5 text-slate-500">·</span>
-                            <span>Geofence Radius: <strong className="text-blue-400">{employee.assignedOffice.allowedRadius || 100}m</strong></span>
-                            <p className="text-[11px] text-[#63799f] line-clamp-1 mt-0.5">{employee.assignedOffice.address}</p>
+                            <span className="mx-1.5 text-[#AE9475]">·</span>
+                            <span>Geofence Radius: <strong className="text-[#FBFAF6]">{employee.assignedOffice.allowedRadius || 100}m</strong></span>
+                            <p className="text-[11px] text-[#AE9475] line-clamp-1 mt-0.5">{employee.assignedOffice.address}</p>
                         </div>
                     </div>
                 )}
 
-                <div className="rounded-[28px] bg-[#1d2840] p-5">
+                <div className="rounded-[28px] border border-[#381C14] bg-[#24110c] p-5 shadow-[0_12px_28px_rgba(0,0,0,0.4)]">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h2 className="text-[16px] font-black text-white">
+                            <h2 className="text-[16px] font-black text-[#FBFAF6]">
                                 Today · {today.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                             </h2>
                             {todayAttendance?.locationVerified && (
@@ -144,39 +144,39 @@ export default function Attendance() {
                                 </span>
                             )}
                         </div>
-                        <span className={["rounded-full px-4 py-2 text-[13px] font-bold", todayAttendance?.status === "Present" ? "bg-[#0d6c63] text-[#17e0a0]" : "bg-[#5a4a1f] text-[#ffc400]"].join(" ")}>
+                        <span className={["rounded-full px-4 py-2 text-[13px] font-bold", todayAttendance?.status === "Present" ? "bg-[#14cf95]/20 text-[#14cf95] border border-[#14cf95]/30" : "bg-[#962A22]/20 text-[#FBFAF6] border border-[#962A22]/40"].join(" ")}>
                             {todayAttendance?.status ?? "Pending"}
                         </span>
                     </div>
                     <div className="mt-5 grid grid-cols-3 gap-3">
                         {[
                             ["Check In", formatTime(todayAttendance?.checkIn), "text-[#16e0a0]"],
-                            ["Check Out", formatTime(todayAttendance?.checkOut), "text-[#7286a7]"],
-                            ["Hours", formatHours(workedHours), "text-[#50a0ff]"],
+                            ["Check Out", formatTime(todayAttendance?.checkOut), "text-[#D9C4AA]"],
+                            ["Hours", formatHours(workedHours), "text-[#FBFAF6]"],
                         ].map(([label, value, tone]) => (
-                            <div key={label} className="rounded-[20px] bg-[#2b3a55] px-4 py-4 text-center">
+                            <div key={label} className="rounded-[20px] border border-[#381C14]/60 bg-[#1a0d09] px-4 py-4 text-center">
                                 <p className={["text-[16px] font-black", tone].join(" ")}>{value}</p>
-                                <p className="mt-1 text-[12px] text-[#7386a7]">{label}</p>
+                                <p className="mt-1 text-[12px] text-[#D9C4AA]">{label}</p>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <div className="rounded-[28px] bg-[#1d2840] p-5">
+                <div className="rounded-[28px] border border-[#381C14] bg-[#24110c] p-5 shadow-[0_12px_28px_rgba(0,0,0,0.4)]">
                     <div className="mb-5 flex items-center justify-between">
-                        <h2 className="text-[16px] font-black text-white">{monthTitle}</h2>
+                        <h2 className="text-[16px] font-black text-[#FBFAF6]">{monthTitle}</h2>
                         <div className="flex gap-2">
                             <button
                                 type="button"
                                 onClick={() => setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
-                                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#334766] text-[#92a7c8]"
+                                className="flex h-10 w-10 items-center justify-center rounded-full border border-[#381C14] bg-[#1a0d09] text-[#D9C4AA] hover:text-[#FBFAF6] transition-colors"
                             >
                                 <FiChevronLeft className="h-4 w-4" />
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
-                                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#334766] text-[#92a7c8]"
+                                className="flex h-10 w-10 items-center justify-center rounded-full border border-[#381C14] bg-[#1a0d09] text-[#D9C4AA] hover:text-[#FBFAF6] transition-colors"
                             >
                                 <FiChevronRight className="h-4 w-4" />
                             </button>
@@ -185,7 +185,7 @@ export default function Attendance() {
 
                     <div className="grid grid-cols-7 gap-y-3 text-center">
                         {days.map((day, index) => (
-                            <div key={`${day}-${index}`} className="text-[13px] font-bold text-[#7088ae]">{day}</div>
+                            <div key={`${day}-${index}`} className="text-[13px] font-bold text-[#D9C4AA]">{day}</div>
                         ))}
                         {getMonthGrid(currentMonth).map((day, index) => {
                             const dateKey = day
@@ -209,12 +209,12 @@ export default function Attendance() {
                         })}
                     </div>
 
-                    <div className="mt-5 flex flex-wrap gap-5 text-[12px] text-[#8ba0c2]">
+                    <div className="mt-5 flex flex-wrap gap-5 text-[12px] text-[#D9C4AA]">
                         {[
                             ["#16c88f", "Present"],
                             ["#ff3942", "Absent"],
                             ["#f7a30b", "Leave"],
-                            ["#356ef6", "Today"],
+                            ["#962A22", "Today"],
                         ].map(([color, label]) => (
                             <div key={label} className="flex items-center gap-2">
                                 <span className="h-3 w-3 rounded-full" style={{ backgroundColor: color }} />
@@ -225,21 +225,21 @@ export default function Attendance() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="rounded-[24px] bg-[#082f36] p-5">
+                    <div className="rounded-[24px] border border-[#381C14] bg-[#24110c] p-5 shadow-[0_8px_20px_rgba(0,0,0,0.3)]">
                         <p className="text-[20px] font-black text-[#16e0a0]">{sameMonth(today, currentMonth) ? presentDays : monthAttendance.filter((item) => item.status === "Present").length}</p>
-                        <p className="mt-3 text-[14px] text-[#cfe4ff]">Present Days</p>
+                        <p className="mt-3 text-[14px] text-[#D9C4AA]">Present Days</p>
                     </div>
-                    <div className="rounded-[24px] bg-[#311926] p-5">
+                    <div className="rounded-[24px] border border-[#381C14] bg-[#24110c] p-5 shadow-[0_8px_20px_rgba(0,0,0,0.3)]">
                         <p className="text-[20px] font-black text-[#ff6371]">{sameMonth(today, currentMonth) ? absentDays : monthAttendance.filter((item) => item.status === "Absent").length}</p>
-                        <p className="mt-3 text-[14px] text-[#cfe4ff]">Absent Days</p>
+                        <p className="mt-3 text-[14px] text-[#D9C4AA]">Absent Days</p>
                     </div>
-                    <div className="rounded-[24px] bg-[#2b2218] p-5">
+                    <div className="rounded-[24px] border border-[#381C14] bg-[#24110c] p-5 shadow-[0_8px_20px_rgba(0,0,0,0.3)]">
                         <p className="text-[20px] font-black text-[#ffc400]">{leaveDays}</p>
-                        <p className="mt-3 text-[14px] text-[#cfe4ff]">Leave Days</p>
+                        <p className="mt-3 text-[14px] text-[#D9C4AA]">Leave Days</p>
                     </div>
-                    <div className="rounded-[24px] bg-[#112341] p-5">
-                        <p className="text-[20px] font-black text-[#4a93ff]">{Math.round(totalHours)}h</p>
-                        <p className="mt-3 text-[14px] text-[#cfe4ff]">Total Hours</p>
+                    <div className="rounded-[24px] border border-[#381C14] bg-[#24110c] p-5 shadow-[0_8px_20px_rgba(0,0,0,0.3)]">
+                        <p className="text-[20px] font-black text-[#FBFAF6]">{Math.round(totalHours)}h</p>
+                        <p className="mt-3 text-[14px] text-[#D9C4AA]">Total Hours</p>
                     </div>
                 </div>
             </div>

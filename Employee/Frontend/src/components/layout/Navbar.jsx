@@ -4,19 +4,19 @@ import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import {
-    FiHome, FiBriefcase, FiUser, FiSettings, FiLogOut
+    FiHome, FiBriefcase, FiMapPin, FiUser, FiSettings, FiLogOut
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import * as notificationService from "../../services/notificationService";
 import { joinRoom, subscribeNotification, subscribeRealtime } from "../../services/realtime";
 
 const mobileNav = [
-    { to: "/dashboard",  label: "Dashboard",  icon: FiHome },
-    { to: "/attendance", label: "Attendance", icon: FiCalendar },
-    { to: "/leads",      label: "Leads",      icon: FiBriefcase },
-    { to: "/payroll",    label: "Payroll",    icon: FiBriefcase },
-    { to: "/profile",    label: "Profile",    icon: FiUser },
-    { to: "/settings",   label: "Settings",   icon: FiSettings },
+    { to: "/dashboard",  label: "Dashboard",   icon: FiHome },
+    { to: "/leads",      label: "Leads",       icon: FiBriefcase },
+    { to: "/visits",     label: "Site Visits", icon: FiMapPin },
+    { to: "/attendance", label: "Attendance",  icon: FiCalendar },
+    { to: "/profile",    label: "Profile",     icon: FiUser },
+    { to: "/settings",   label: "Settings",    icon: FiSettings },
 ];
 
 export default function Navbar() {
@@ -200,11 +200,11 @@ export default function Navbar() {
 
     return (
         <>
-            <header className="relative z-30 flex items-center justify-between px-6 md:px-8 py-3 bg-white border-b border-slate-200 h-16 shrink-0 dark:bg-slate-900 dark:border-slate-800">
+            <header className="relative z-30 flex items-center justify-between px-6 md:px-8 py-3 bg-[#1a0d09] border-b border-[#381C14] h-16 shrink-0 text-[#FBFAF6]">
                 {/* Mobile Menu Button */}
                 <button
                     type="button"
-                    className="lg:hidden text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                    className="lg:hidden text-[#D9C4AA] hover:text-[#FBFAF6]"
                     onClick={() => setMobileOpen(true)}
                     aria-label="Open menu"
                 >
@@ -213,9 +213,9 @@ export default function Navbar() {
 
                 {/* Page greeting on desktop */}
                 <div className="hidden lg:block">
-                    <p className="text-sm text-slate-400 dark:text-slate-500">
+                    <p className="text-sm text-[#AE9475]">
                         Welcome back,{" "}
-                        <span className="font-semibold text-slate-700 dark:text-slate-200">
+                        <span className="font-semibold text-[#FBFAF6]">
                             {employee?.firstName ?? ""}
                         </span>
                     </p>
@@ -227,12 +227,12 @@ export default function Navbar() {
                     <button
                         type="button"
                         onClick={toggleTheme}
-                        className="text-slate-500 hover:text-slate-700 transition dark:text-slate-400 dark:hover:text-slate-200"
+                        className="text-[#D9C4AA] hover:text-[#FBFAF6] transition"
                         title="Toggle Theme"
                         aria-label="Toggle theme"
                     >
                         {theme === "dark"
-                            ? <FiSun className="text-lg text-amber-500" />
+                            ? <FiSun className="text-lg text-[#D9C4AA]" />
                             : <FiMoon className="text-lg" />
                         }
                     </button>
@@ -242,13 +242,13 @@ export default function Navbar() {
                         <button
                             type="button"
                             onClick={() => setNotifOpen(prev => !prev)}
-                            className="relative text-slate-500 hover:text-slate-700 transition dark:text-slate-400 dark:hover:text-slate-200 p-1"
+                            className="relative text-[#D9C4AA] hover:text-[#FBFAF6] transition p-1 cursor-pointer"
                             title="Notifications"
                             aria-label="Notifications"
                         >
                             <FiBell className="text-lg" />
                             {unreadCount > 0 && (
-                                <span className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white border border-white dark:border-slate-900">
+                                <span className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#962A22] text-[9px] font-bold text-[#FBFAF6] border border-[#381C14]">
                                     {unreadCount > 9 ? "9+" : unreadCount}
                                 </span>
                             )}
@@ -256,14 +256,14 @@ export default function Navbar() {
 
                         {/* Dropdown Menu */}
                         {notifOpen && (
-                            <div className="absolute right-0 top-11 z-50 w-80 sm:w-96 rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
-                                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30">
+                            <div className="absolute right-0 top-11 z-50 w-80 sm:w-96 rounded-2xl border border-[#381C14] bg-[#24110c] shadow-2xl overflow-hidden text-[#FBFAF6]">
+                                <div className="flex items-center justify-between px-4 py-3 border-b border-[#381C14] bg-[#1a0d09]">
                                     <div className="flex items-center gap-2">
-                                        <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                                        <h3 className="text-xs font-bold text-[#FBFAF6]">
                                             Notifications
                                         </h3>
                                         {unreadCount > 0 && (
-                                            <span className="rounded-full bg-blue-100 text-blue-600 px-2 py-0.5 text-[10px] font-bold dark:bg-blue-950/50 dark:text-blue-400">
+                                            <span className="rounded-full bg-[#962A22]/20 border border-[#962A22]/40 text-[#FBFAF6] px-2 py-0.5 text-[10px] font-bold">
                                                 {unreadCount} new
                                             </span>
                                         )}
@@ -272,14 +272,14 @@ export default function Navbar() {
                                         <button
                                             type="button"
                                             onClick={handleMarkAllRead}
-                                            className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 transition"
+                                            className="text-[11px] font-semibold text-[#D9C4AA] hover:text-[#FBFAF6] transition cursor-pointer"
                                         >
                                             Mark all read
                                         </button>
                                     )}
                                 </div>
 
-                                <div className="max-h-80 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60">
+                                <div className="max-h-80 overflow-y-auto divide-y divide-[#381C14]/60">
                                     {notifications.length > 0 ? (
                                         notifications.map((n) => (
                                             <div
@@ -287,16 +287,11 @@ export default function Navbar() {
                                                 onClick={() => handleNotificationClick(n)}
                                                 className={`flex items-start gap-3 p-3.5 transition cursor-pointer ${
                                                     !n.read
-                                                        ? "bg-blue-50/40 dark:bg-blue-950/20"
-                                                        : "hover:bg-slate-50 dark:hover:bg-slate-850"
+                                                        ? "bg-[#962A22]/10"
+                                                        : "hover:bg-[#381C14]/40"
                                                 }`}
                                             >
-                                                <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold ${
-                                                    n.type === "leave" ? "bg-purple-100 text-purple-600 dark:bg-purple-950/50 dark:text-purple-400" :
-                                                    n.type === "attendance" ? "bg-amber-100 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400" :
-                                                    n.type === "holiday" ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400" :
-                                                    "bg-blue-100 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400"
-                                                }`}>
+                                                <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold bg-[#381C14] text-[#D9C4AA]">
                                                     {n.type === "attendance" ? <FiAlertTriangle /> :
                                                      n.type === "leave" ? <FiClock /> :
                                                      n.type === "holiday" ? <FiCalendar /> : <FiInfo />}
@@ -304,24 +299,24 @@ export default function Navbar() {
 
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between gap-2">
-                                                        <p className={`text-xs font-bold truncate ${!n.read ? "text-slate-900 dark:text-slate-50" : "text-slate-700 dark:text-slate-300"}`}>
+                                                        <p className={`text-xs font-bold truncate ${!n.read ? "text-[#FBFAF6]" : "text-[#D9C4AA]"}`}>
                                                             {n.title}
                                                         </p>
                                                         {!n.read && (
-                                                            <span className="h-2 w-2 rounded-full bg-blue-600 shrink-0" />
+                                                            <span className="h-2 w-2 rounded-full bg-[#962A22] shrink-0" />
                                                         )}
                                                     </div>
-                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed line-clamp-2">
+                                                    <p className="text-[11px] text-[#AE9475] mt-0.5 leading-relaxed line-clamp-2">
                                                         {n.message}
                                                     </p>
-                                                    <p className="text-[9px] text-slate-400 dark:text-slate-500 mt-1">
+                                                    <p className="text-[9px] text-[#D9C4AA]/70 mt-1">
                                                         {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} · {new Date(n.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                                                     </p>
                                                 </div>
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="p-6 text-center text-xs text-slate-400 dark:text-slate-500">
+                                        <div className="p-6 text-center text-xs text-[#AE9475]">
                                             No notifications right now.
                                         </div>
                                     )}
@@ -336,10 +331,10 @@ export default function Navbar() {
                             <img
                                 src={employee.profileImage}
                                 alt={employee.firstName}
-                                className="h-8 w-8 rounded-full object-cover border-2 border-blue-200 dark:border-blue-900"
+                                className="h-8 w-8 rounded-full object-cover border-2 border-[#D9C4AA]/30"
                             />
                         ) : (
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white text-xs font-semibold">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#962A22] text-[#FBFAF6] text-xs font-semibold border border-[#D9C4AA]/30">
                                 {initials}
                             </div>
                         )}
@@ -351,17 +346,17 @@ export default function Navbar() {
             {mobileOpen && (
                 <div className="fixed inset-0 z-50 lg:hidden">
                     <div
-                        className="absolute inset-0 bg-black/40"
+                        className="absolute inset-0 bg-black/75 backdrop-blur-xs"
                         onClick={() => setMobileOpen(false)}
                     />
-                    <aside className="absolute left-0 top-0 h-full w-72 bg-white dark:bg-slate-900 flex flex-col shadow-2xl">
-                        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-slate-800">
-                            <span className="text-base font-bold text-slate-800 dark:text-slate-100">
+                    <aside className="absolute left-0 top-0 h-full w-72 bg-[#1a0d09] border-r border-[#381C14] flex flex-col shadow-2xl text-[#FBFAF6]">
+                        <div className="flex items-center justify-between px-6 py-5 border-b border-[#381C14] bg-[#24110c]">
+                            <span className="text-base font-bold text-[#FBFAF6]">
                                 Dosti — Employee
                             </span>
                             <button
                                 onClick={() => setMobileOpen(false)}
-                                className="text-slate-500 dark:text-slate-400"
+                                className="text-[#D9C4AA] hover:text-[#FBFAF6]"
                                 aria-label="Close menu"
                             >
                                 <FiX className="text-xl" />
@@ -378,8 +373,8 @@ export default function Navbar() {
                                         [
                                             "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition",
                                             isActive
-                                                ? "bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400"
-                                                : "text-slate-500 hover:bg-slate-50 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800/40",
+                                                ? "bg-[#962A22]/20 text-[#FBFAF6] font-semibold border-l-2 border-[#962A22]"
+                                                : "text-[#D9C4AA] hover:bg-[#24110c] hover:text-[#FBFAF6]",
                                         ].join(" ")
                                     }
                                 >
@@ -389,10 +384,10 @@ export default function Navbar() {
                             ))}
                         </nav>
 
-                        <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+                        <div className="p-4 border-t border-[#381C14] bg-[#24110c]">
                             <button
                                 onClick={handleLogout}
-                                className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition"
+                                className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-red-400 hover:bg-[#962A22]/20 transition"
                             >
                                 <FiLogOut className="text-base" />
                                 Logout
