@@ -19,8 +19,8 @@ import {
   FiExternalLink,
 } from "react-icons/fi";
 import {
-  BarChart,
-  Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -261,7 +261,7 @@ export default function VisitsPage() {
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
               <div>
                 <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                  7-Day Visit Momentum
+                  Monthly Visit Momentum
                 </h3>
                 <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                   Comparison of scheduled vs completed client visits
@@ -279,7 +279,7 @@ export default function VisitsPage() {
 
             <div className="h-[250px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data.trend} barGap={4}>
+                <LineChart data={data.trend} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.15)" />
                   <XAxis dataKey="date" stroke="#64748b" fontSize={11} tickLine={false} />
                   <YAxis stroke="#64748b" fontSize={11} tickLine={false} allowDecimals={false} />
@@ -292,9 +292,23 @@ export default function VisitsPage() {
                       fontSize: "12px",
                     }}
                   />
-                  <Bar dataKey="Scheduled" fill="#8b5cf6" radius={[6, 6, 0, 0]} maxBarSize={32} />
-                  <Bar dataKey="Completed" fill="#10b981" radius={[6, 6, 0, 0]} maxBarSize={32} />
-                </BarChart>
+                  <Line
+                    type="monotone"
+                    dataKey="Scheduled"
+                    stroke="#a855f7"
+                    strokeWidth={3}
+                    dot={{ r: 3, fill: "#a855f7", strokeWidth: 0 }}
+                    activeDot={{ r: 5 }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="Completed"
+                    stroke="#10b981"
+                    strokeWidth={3}
+                    dot={{ r: 3, fill: "#10b981", strokeWidth: 0 }}
+                    activeDot={{ r: 5 }}
+                  />
+                </LineChart>
               </ResponsiveContainer>
             </div>
           </div>
@@ -413,7 +427,7 @@ export default function VisitsPage() {
                 <option value="all">All Dates</option>
                 <option value="today">Today</option>
                 <option value="week">Past 7 Days</option>
-                <option value="month">Past 30 Days</option>
+                <option value="month">Current Month</option>
               </select>
             </div>
           </div>

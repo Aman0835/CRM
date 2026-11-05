@@ -11,17 +11,6 @@ import * as employeeService from "../../../services/employeeService";
 import { getLeads } from "../../../services/leadService";
 import { subscribeRealtime } from "../../../services/realtime";
 
-const ACTIVE_LEAD_STATUSES = [
-    "New",
-    "Contacted",
-    "Interested",
-    "Follow-up",
-    "Visit Scheduled",
-    "Visit Completed",
-    "Negotiation",
-    "Booking",
-];
-
 const isSameCalendarDay = (dateA, dateB) => {
     const a = new Date(dateA);
     const b = new Date(dateB);
@@ -36,6 +25,10 @@ export function useDashboard() {
     const [employees, setEmployees] = useState([]);
     const [leads, setLeads] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [selectedMonth, setSelectedMonth] = useState(() => {
+        const now = new Date();
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    });
 
     const fetchDashboardData = async (isInitial = false) => {
         try {
@@ -64,18 +57,28 @@ export function useDashboard() {
         return unsubscribe;
     }, []);
 
-    const today = new Date();
+    const [selectedYear, selectedMonthNumber] = selectedMonth.split("-").map(Number);
+    const selectedMonthStart = new Date(selectedYear, selectedMonthNumber - 1, 1);
+    const selectedMonthEnd = new Date(selectedYear, selectedMonthNumber, 0, 23, 59, 59, 999);
     const leadList = Array.isArray(leads) ? leads : [];
-    const activePipeline = leadList.filter((lead) => !["Won", "Lost"].includes(lead.status)).length;
-    const totalLeads = leadList.length;
-    const newLeads = leadList.filter((lead) => lead.status === "New").length;
-    const qualifiedLeads = leadList.filter((lead) => ACTIVE_LEAD_STATUSES.includes(lead.status)).length;
-    const visitsScheduled = leadList.filter((lead) => lead.status === "Visit Scheduled").length;
-    const followUpsToday = leadList.filter((lead) => {
+    const isInSelectedMonth = (value) => {
+        if (!value) return false;
+        const date = new Date(value);
+        return date >= selectedMonthStart && date <= selectedMonthEnd;
+    };
+    const monthlyLeads = leadList.filter((lead) => isInSelectedMonth(lead.createdAt));
+    const activePipeline = monthlyLeads.filter((lead) => !["Won", "Lost"].includes(lead.status)).length;
+    const totalLeads = monthlyLeads.length;
+    const visitsScheduled = monthlyLeads.filter((lead) => lead.status === "Visit Scheduled" && isInSelectedMonth(lead.updatedAt)).length;
+    const visitCount = monthlyLeads.filter((lead) => (
+        ["Visit Scheduled", "Visit Completed"].includes(lead.status) &&
+        isInSelectedMonth(lead.updatedAt)
+    )).length;
+    const followUpsToday = monthlyLeads.filter((lead) => {
         if (!lead.nextFollowUp?.date) return false;
-        return isSameCalendarDay(new Date(lead.nextFollowUp.date), today);
+        return isInSelectedMonth(lead.nextFollowUp.date);
     }).length;
-    const wonLeads = leadList.filter((lead) => lead.status === "Won").length;
+    const wonLeads = monthlyLeads.filter((lead) => lead.status === "Won" && isInSelectedMonth(lead.updatedAt)).length;
     const conversionRate = totalLeads > 0 ? Math.round((wonLeads / totalLeads) * 100) : 0;
 
     const metrics = [
@@ -83,7 +86,7 @@ export function useDashboard() {
             label: "Total Leads",
             value: totalLeads,
             subtext: `${activePipeline} active in pipeline`,
-            growth: "+12% this month",
+            growth: "Selected month",
             icon: FiUsers,
             path: "/leads",
             iconBg: "bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30",
@@ -91,10 +94,10 @@ export function useDashboard() {
             glowColor: "bg-blue-500/5",
         },
         {
-            label: "Qualified Leads",
-            value: qualifiedLeads,
-            subtext: `${newLeads} new this cycle`,
-            growth: "Strong pipeline",
+            label: "Visit Count",
+            value: visitCount,
+            subtext: `${visitsScheduled} scheduled this month`,
+            growth: "Selected month",
             icon: FiUserCheck,
             path: "/leads",
             iconBg: "bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30",
@@ -105,7 +108,7 @@ export function useDashboard() {
             label: "Visits Scheduled",
             value: visitsScheduled,
             subtext: "Ready for in-store visits",
-            growth: "Needs follow-up",
+            growth: "Selected month",
             icon: FiCalendar,
             path: "/visits",
             iconBg: "bg-violet-50 text-violet-600 border border-violet-100 dark:bg-violet-950/20 dark:text-violet-400 dark:border-violet-900/30",
@@ -113,10 +116,10 @@ export function useDashboard() {
             glowColor: "bg-violet-500/5",
         },
         {
-            label: "Follow-ups Today",
+            label: "Follow-ups",
             value: followUpsToday,
             subtext: "Client touchpoints",
-            growth: "Stay proactive",
+            growth: "Selected month",
             icon: FiClock,
             path: "/leads",
             iconBg: "bg-amber-50 text-amber-600 border border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30",
@@ -127,7 +130,7 @@ export function useDashboard() {
             label: "Conversion Rate",
             value: `${conversionRate}%`,
             subtext: `${wonLeads} won leads`,
-            growth: "+4.7% uplift",
+            growth: "Selected month",
             icon: FiTrendingUp,
             path: "/leads",
             iconBg: "bg-cyan-50 text-cyan-600 border border-cyan-100 dark:bg-cyan-950/20 dark:text-cyan-400 dark:border-cyan-900/30",
@@ -136,16 +139,14 @@ export function useDashboard() {
         },
     ];
 
-    const getWeeklyProductivityData = () => {
-        const last6Days = Array.from({ length: 6 }, (_, index) => {
-            const date = new Date();
-            date.setDate(today.getDate() - (5 - index));
-            return date;
-        });
+    const getMonthlyProductivityData = () => {
+        const daysInMonth = new Date(selectedYear, selectedMonthNumber, 0).getDate();
+        const monthDays = Array.from({ length: daysInMonth }, (_, index) => (
+            new Date(selectedYear, selectedMonthNumber - 1, index + 1)
+        ));
 
-        return last6Days.map((date) => {
-            const label = date.toLocaleDateString("en-US", { weekday: "short" });
-            const dayKey = date.toDateString();
+        return monthDays.map((date) => {
+            const label = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
             const newLeadCount = leadList.filter((lead) => {
                 if (!lead.createdAt) return false;
@@ -158,23 +159,17 @@ export function useDashboard() {
                 return isSameCalendarDay(new Date(lead.updatedAt), date);
             }).length;
 
-            const followUpCount = leadList.filter((lead) => {
-                if (!lead.nextFollowUp?.date) return false;
-                return isSameCalendarDay(new Date(lead.nextFollowUp.date), date);
-            }).length;
-
             return {
                 name: label,
                 "New Leads": newLeadCount,
                 "Visits": visitCount,
-                "Follow-ups": followUpCount,
             };
         });
     };
 
     const getTopLeadSources = () => {
         return Object.entries(
-            leadList.reduce((acc, lead) => {
+            monthlyLeads.reduce((acc, lead) => {
                 const source = (lead.source || "Direct").trim() || "Direct";
                 acc[source] = (acc[source] || 0) + 1;
                 return acc;
@@ -189,28 +184,58 @@ export function useDashboard() {
             .slice(0, 3);
     };
 
-    const getUpcomingFollowUps = () => {
+    const getMonthlyVisits = () => {
+        return monthlyLeads
+            .filter((lead) => (
+                ["Visit Scheduled", "Visit Completed"].includes(lead.status) &&
+                isInSelectedMonth(lead.updatedAt)
+            ))
+            .map((lead) => ({
+                name: lead.name || "Unnamed client",
+                project: lead.project || lead.location || "General visit",
+                status: lead.status,
+                date: lead.updatedAt,
+            }))
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .slice(0, 5);
+    };
+
+    const allEmployees = employees.map((employee) => ({
+        name: `${employee.firstName || ""} ${employee.lastName || ""}`.trim() || "Unnamed employee",
+        employeeId: employee.employeeId || "—",
+        status: employee.status || "active",
+    }));
+
+    const getTodaySiteVisits = () => {
         return leadList
-            .filter((lead) => lead.nextFollowUp?.date && !["Won", "Lost"].includes(lead.status))
+            .filter((lead) => (
+                lead.status === "Visit Scheduled" &&
+                lead.nextFollowUp?.date &&
+                isSameCalendarDay(lead.nextFollowUp.date, new Date())
+            ))
             .map((lead) => {
                 const followUpDate = new Date(lead.nextFollowUp.date);
                 return {
-                    time: followUpDate.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+                    time: followUpDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
                     client: lead.name,
-                    service: lead.project || lead.source || "Follow-up call",
+                    service: lead.project || lead.location || "Site visit",
                     status: lead.status,
+                    sortDate: followUpDate.getTime(),
                 };
             })
-            .sort((a, b) => new Date(a.time) - new Date(b.time))
-            .slice(0, 4);
+            .sort((a, b) => a.sortDate - b.sortDate);
     };
 
     return {
         loading,
         metrics,
-        weeklyData: getWeeklyProductivityData(),
+        selectedMonth,
+        setSelectedMonth,
+        weeklyData: getMonthlyProductivityData(),
         topLeadSources: getTopLeadSources(),
         topBarbers: getTopLeadSources(),
-        upcomingAppointments: getUpcomingFollowUps(),
+        monthlyVisits: getMonthlyVisits(),
+        allEmployees,
+        upcomingAppointments: getTodaySiteVisits(),
     };
 }

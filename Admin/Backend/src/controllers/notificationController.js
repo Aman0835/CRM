@@ -61,6 +61,9 @@ export const getAdminNotifications = async (req, res) => {
 // GET Employee Notifications
 export const getEmployeeNotifications = async (req, res) => {
   try {
+    res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    res.set("Pragma", "no-cache");
+    res.set("Expires", "0");
     const rawId = (req.params.employeeId || "").trim();
     const employeeId = rawId;
     const idRegex = new RegExp(`^${rawId}$`, "i");

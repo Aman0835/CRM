@@ -1,17 +1,15 @@
-import { FiClock, FiTrendingUp } from "react-icons/fi";
+import { FiClock, FiMapPin, FiUsers } from "react-icons/fi";
 
 export default function DashboardBottomRow({
   upcomingAppointments = [],
-  topBarbers = [],
-  topLeadSources,
+  monthlyVisits = [],
+  allEmployees = [],
 }) {
-  const sources = topLeadSources || topBarbers || [];
-
   return (
-    <section className="grid gap-6 lg:grid-cols-2">
+    <section className="grid gap-6 lg:grid-cols-3">
       <div className="panel-surface rounded-3xl p-6 shadow-sm">
         <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-4">
-          Today’s Follow-ups
+          Today’s Site Visits
         </h3>
         <div className="space-y-3">
           {upcomingAppointments.map((appointment, i) => (
@@ -43,7 +41,7 @@ export default function DashboardBottomRow({
           ))}
           {upcomingAppointments.length === 0 && (
             <p className="text-center text-xs text-slate-400 dark:text-slate-500 py-8">
-              No follow-ups scheduled for today yet.
+              No site visits scheduled for today.
             </p>
           )}
         </div>
@@ -51,12 +49,12 @@ export default function DashboardBottomRow({
 
       <div className="panel-surface rounded-3xl p-6 shadow-sm">
         <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-4">
-          Top Lead Sources
+          Top Visits
         </h3>
         <div className="space-y-3.5">
-          {sources.map((source, index) => (
+          {monthlyVisits.map((visit, index) => (
             <div
-              key={source.name}
+              key={`${visit.name}-${visit.date}-${index}`}
               className="flex items-center justify-between p-3 rounded-2xl border border-slate-100 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-950/20">
               <div className="flex items-center gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 text-xs font-semibold text-violet-600 dark:bg-violet-950/40 dark:text-violet-400">
@@ -64,22 +62,50 @@ export default function DashboardBottomRow({
                 </div>
                 <div>
                   <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                    {source.name}
+                    {visit.name}
                   </p>
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
-                    {source.label}
+                    {visit.project}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-1 text-xs text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-950/30 px-2 py-1 rounded-lg">
-                <FiTrendingUp className="text-[11px]" />
-                <span>{source.count}</span>
+              <div className="flex items-center gap-1 text-[10px] text-violet-600 font-bold bg-violet-50 dark:bg-violet-950/30 px-2 py-1 rounded-lg">
+                <FiMapPin className="text-[11px]" />
+                <span>{visit.status.replace("Visit ", "")}</span>
               </div>
             </div>
           ))}
-          {sources.length === 0 && (
+          {monthlyVisits.length === 0 && (
             <p className="text-center text-xs text-slate-450 dark:text-slate-500 py-6">
-              No lead sources recorded yet.
+              No visits recorded for this month.
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="panel-surface rounded-3xl p-6 shadow-sm">
+        <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-slate-800 dark:text-slate-100">
+          <FiUsers className="text-blue-500" />
+          All Employees
+        </h3>
+        <div className="max-h-80 space-y-3 overflow-y-auto pr-1">
+          {allEmployees.map((employee) => (
+            <div
+              key={employee.employeeId}
+              className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/50 p-3 dark:border-slate-800/60 dark:bg-slate-950/20"
+            >
+              <div>
+                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">{employee.name}</p>
+                <p className="mt-0.5 text-[10px] text-slate-400 dark:text-slate-500">{employee.employeeId}</p>
+              </div>
+              <span className="rounded-lg bg-emerald-50 px-2 py-1 text-[10px] font-bold capitalize text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400">
+                {employee.status.replace("_", " ")}
+              </span>
+            </div>
+          ))}
+          {allEmployees.length === 0 && (
+            <p className="py-6 text-center text-xs text-slate-400 dark:text-slate-500">
+              No employees found.
             </p>
           )}
         </div>

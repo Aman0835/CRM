@@ -1,7 +1,10 @@
 import api from "./api";
 
 export const getEmployeeNotifications = async (employeeId) => {
-    const response = await api.get(`/notifications/employee/${employeeId}`);
+    const response = await api.get(`/notifications/employee/${encodeURIComponent(employeeId)}`, {
+        params: { _t: Date.now() },
+        headers: { "Cache-Control": "no-cache" },
+    });
     return response.data;
 };
 

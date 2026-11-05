@@ -1,6 +1,6 @@
 import {
-  Bar,
-  BarChart,
+  Line,
+  LineChart,
   CartesianGrid,
   Legend,
   ResponsiveContainer,
@@ -12,26 +12,19 @@ import {
 const PRODUCTIVITY_COLORS = {
   "New Leads": "#3b82f6",
   Visits: "#8b5cf6",
-  "Follow-ups": "#10b981",
 };
 
-export default function DashboardCharts({ weeklyData = [] }) {
-  const latestDay = weeklyData[weeklyData.length - 1] ?? {};
+export default function DashboardCharts({ weeklyData = [], selectedMonth }) {
   const productivityBreakdown = [
     {
       name: "New Leads",
-      value: latestDay["New Leads"] ?? 0,
+      value: weeklyData.reduce((total, day) => total + (day["New Leads"] ?? 0), 0),
       color: PRODUCTIVITY_COLORS["New Leads"],
     },
     {
       name: "Visits",
-      value: latestDay.Visits ?? 0,
+      value: weeklyData.reduce((total, day) => total + (day.Visits ?? 0), 0),
       color: PRODUCTIVITY_COLORS.Visits,
-    },
-    {
-      name: "Follow-ups",
-      value: latestDay["Follow-ups"] ?? 0,
-      color: PRODUCTIVITY_COLORS["Follow-ups"],
     },
   ];
   const totalToday = productivityBreakdown.reduce((a, c) => a + c.value, 0);
@@ -45,11 +38,11 @@ export default function DashboardCharts({ weeklyData = [] }) {
               Productivity Trend
             </h3>
             <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-              Last 6 days · new leads, visits, and follow-ups
+              Current month · new leads and visits
             </p>
           </div>
           <span className="text-xs font-semibold text-slate-500 bg-slate-100 dark:bg-slate-800 dark:text-slate-400 px-2.5 py-1 rounded-lg">
-            {new Date().toLocaleDateString("en-US", {
+            {new Date(`${selectedMonth}-01T00:00:00`).toLocaleDateString("en-US", {
               month: "short",
               year: "numeric",
             })}
@@ -57,7 +50,7 @@ export default function DashboardCharts({ weeklyData = [] }) {
         </div>
         <div className="h-[280px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={weeklyData} barGap={4}>
+            <LineChart data={weeklyData} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
               <CartesianGrid
                 strokeDasharray="3 3"
                 vertical={false}
@@ -67,6 +60,10 @@ export default function DashboardCharts({ weeklyData = [] }) {
                 dataKey="name"
                 tickLine={false}
                 axisLine={false}
+                interval={0}
+                angle={-45}
+                textAnchor="end"
+                height={48}
                 tick={{ fill: "#64748b", fontSize: 11 }}
               />
               <YAxis
@@ -74,7 +71,7 @@ export default function DashboardCharts({ weeklyData = [] }) {
                 axisLine={false}
                 tick={{ fill: "#64748b", fontSize: 11 }}
               />
-              <Tooltip cursor={{ fill: "rgba(0,0,0,0.03)" }} />
+              <Tooltip cursor={{ stroke: "rgba(148, 163, 184, 0.3)" }} />
               <Legend
                 verticalAlign="bottom"
                 height={36}
@@ -82,25 +79,23 @@ export default function DashboardCharts({ weeklyData = [] }) {
                 iconSize={8}
                 wrapperStyle={{ fontSize: 11 }}
               />
-              <Bar
+              <Line
+                type="monotone"
                 dataKey="New Leads"
-                fill="#3b82f6"
-                radius={[4, 4, 0, 0]}
-                maxBarSize={16}
+                stroke="#3b82f6"
+                strokeWidth={3}
+                dot={{ r: 3, fill: "#3b82f6", strokeWidth: 0 }}
+                activeDot={{ r: 5 }}
               />
-              <Bar
+              <Line
+                type="monotone"
                 dataKey="Visits"
-                fill="#8b5cf6"
-                radius={[4, 4, 0, 0]}
-                maxBarSize={16}
+                stroke="#8b5cf6"
+                strokeWidth={3}
+                dot={{ r: 3, fill: "#8b5cf6", strokeWidth: 0 }}
+                activeDot={{ r: 5 }}
               />
-              <Bar
-                dataKey="Follow-ups"
-                fill="#10b981"
-                radius={[4, 4, 0, 0]}
-                maxBarSize={16}
-              />
-            </BarChart>
+            </LineChart>
           </ResponsiveContainer>
         </div>
       </div>
@@ -108,10 +103,10 @@ export default function DashboardCharts({ weeklyData = [] }) {
       <div className="panel-surface rounded-3xl p-6 shadow-sm">
         <div className="border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
           <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">
-            Today’s Momentum
+            Selected Month Summary
           </h3>
           <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-            Lead activity summary
+            Lead and visit totals
           </p>
         </div>
 

@@ -12,7 +12,12 @@ export function useDashboard() {
     const [payroll, setPayroll] = useState([]);
     const [leads, setLeads] = useState([]);
     const [reminders, setReminders] = useState([]);
-    const [leadsSummary, setLeadsSummary] = useState({ totalLeads: 0, totalActive: 0, totalLost: 0, todaysFollowUps: 0 });
+    const [leadsSummary, setLeadsSummary] = useState({
+        totalLeads: 0,
+        totalActive: 0,
+        totalLost: 0,
+        todaysFollowUps: 0,
+    });
 
     const fetchAll = useCallback(async (isInitial = false) => {
         if (!employee?.employeeId) return;

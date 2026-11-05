@@ -656,8 +656,9 @@ export const getVisitsAnalytics = async (req, res) => {
       const start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       visitLeadsQuery.updatedAt = { $gte: start };
     } else if (timeRange === "month") {
-      const start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-      visitLeadsQuery.updatedAt = { $gte: start };
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+      visitLeadsQuery.updatedAt = { $gte: start, $lte: end };
     }
 
     const [allVisitLeads, totalAllLeads, visitInteractions] = await Promise.all([
@@ -686,11 +687,11 @@ export const getVisitsAnalytics = async (req, res) => {
 
     const conversionRate = completed > 0 ? Math.round((wonFromVisits / completed) * 100) : 0;
 
-    // Trend calculation: last 7 days visits scheduled vs completed
-    const daysTrend = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date();
-      d.setDate(now.getDate() - (6 - i));
-      const dayLabel = d.toLocaleDateString("en-US", { weekday: "short" });
+    // Trend calculation: every day in the current calendar month
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const daysTrend = Array.from({ length: daysInMonth }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth(), i + 1);
+      const dayLabel = d.toLocaleDateString("en-US", { day: "numeric", month: "short" });
       const dayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate());
       const dayEnd = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
 
@@ -823,4 +824,3 @@ export const updateVisitStatus = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-

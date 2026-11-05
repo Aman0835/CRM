@@ -293,38 +293,38 @@ export default function Dashboard() {
                 </div>
 
                 <div className="relative overflow-hidden rounded-[30px] bg-[linear-gradient(135deg,#2d63ea_0%,#4e8cf6_100%)] px-6 py-6 shadow-[0_22px_50px_rgba(47,108,246,0.35)] cursor-pointer hover:scale-[1.02] transition-transform" onClick={() => navigate("/leads")}>
-                    <div className="absolute right-5 top-5 flex h-14 w-14 items-center justify-center rounded-[18px] bg-white/12">
+                    <div className="absolute right-6 top-6 flex h-14 w-14 items-center justify-center rounded-[18px] bg-white/12">
                         <FiBriefcase className="h-7 w-7 text-white" />
                     </div>
-                    <p className="text-[12px] font-black uppercase tracking-[0.22em] text-[#bfd2ff]">Pipeline Summary</p>
-                    <div className="mt-3 flex items-center gap-3">
-                        <span className="text-[28px] font-black text-white leading-none">
+                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#bfd2ff]">Pipeline Summary</p>
+                    <div className="mt-3 flex items-baseline gap-3">
+                        <span className="text-[30px] font-black leading-none text-white">
                             {leadsSummary?.totalLeads || 0}
                         </span>
-                        <span className="text-[14px] font-bold text-[#d5e2ff] mt-1">Total Leads</span>
+                        <span className="text-[13px] font-bold text-[#d5e2ff]">Total Leads</span>
                     </div>
-                    <div className="mt-7 grid grid-cols-2 gap-y-5 gap-x-4">
-                        <div className="border-r border-white/20 pr-3">
-                            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#d5e2ff]">Active</p>
-                            <div className="flex items-center gap-2 mt-2">
+                    <div className="mt-7 grid grid-cols-2 gap-x-6 gap-y-6">
+                        <div className="border-r border-white/20 pr-5">
+                            <p className="min-h-[14px] text-[10px] font-black uppercase leading-[1.25] tracking-[0.16em] text-[#d5e2ff]">Active</p>
+                            <div className="mt-2 flex items-center gap-2">
                                 <span className="h-2 w-2 rounded-full bg-[#1de58e]" />
                                 <p className="text-[16px] font-black text-white leading-none">{leadsSummary?.totalActive || 0}</p>
                             </div>
                         </div>
                         <div>
-                            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#d5e2ff]">Lost</p>
-                            <div className="flex items-center gap-2 mt-2">
+                            <p className="min-h-[14px] text-[10px] font-black uppercase leading-[1.25] tracking-[0.16em] text-[#d5e2ff]">Lost</p>
+                            <div className="mt-2 flex items-center gap-2">
                                 <span className="h-2 w-2 rounded-full bg-[#ff2e3b]" />
                                 <p className="text-[16px] font-black text-white leading-none">{leadsSummary?.totalLost || 0}</p>
                             </div>
                         </div>
-                        <div className="border-r border-white/20 pr-3">
-                            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#d5e2ff]">Follow-ups Today</p>
-                            <p className="mt-2 text-[16px] font-black text-white leading-none">{leadsSummary?.todaysFollowUps || 0}</p>
+                        <div className="border-r border-white/20 pr-5">
+                            <p className="min-h-[25px] text-[10px] font-black uppercase leading-[1.25] tracking-[0.16em] text-[#d5e2ff]">Follow-ups<br />Today</p>
+                            <p className="mt-2 text-[16px] font-black leading-none text-white">{leadsSummary?.todaysFollowUps || 0}</p>
                         </div>
                         <div>
-                            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#d5e2ff]">Pending Reminders</p>
-                            <p className="mt-2 text-[16px] font-black text-white leading-none">{reminders?.length || 0}</p>
+                            <p className="min-h-[25px] text-[10px] font-black uppercase leading-[1.25] tracking-[0.16em] text-[#d5e2ff]">Pending<br />Reminders</p>
+                            <p className="mt-2 text-[16px] font-black leading-none text-white">{reminders?.length || 0}</p>
                         </div>
                     </div>
                 </div>

@@ -30,13 +30,55 @@ export default function Navbar() {
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const notifRef = useRef(null);
+    const knownNotificationIds = useRef(new Set());
+    const hasLoadedNotifications = useRef(false);
+
+    const showNotificationAlert = (notification) => {
+        if (!notification?.title || !notification?.message) return;
+
+        toast(
+            (t) => (
+                <div className="flex flex-col gap-1 cursor-pointer" onClick={() => { toast.dismiss(t.id); setNotifOpen(true); }}>
+                    <div className="flex items-center gap-2">
+                        <span className="font-bold text-xs text-white">{notification.title}</span>
+                        <span className="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold uppercase">Reminder</span>
+                    </div>
+                    <span className="text-[11px] text-slate-300 leading-snug">{notification.message}</span>
+                </div>
+            ),
+            {
+                icon: "⏰",
+                duration: 9000,
+                style: {
+                    background: "#0f172a",
+                    border: "1px solid #334155",
+                    color: "#f8fafc",
+                    padding: "12px 16px",
+                    borderRadius: "16px",
+                    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.4)",
+                },
+            }
+        );
+
+        if ("Notification" in window && Notification.permission === "granted") {
+            new Notification(notification.title, { body: notification.message });
+        }
+    };
 
     const fetchNotifications = async () => {
         if (!employee?.employeeId) return;
         try {
             const res = await notificationService.getEmployeeNotifications(employee.employeeId);
             if (res.success) {
-                setNotifications(res.data || []);
+                const nextNotifications = res.data || [];
+                if (hasLoadedNotifications.current) {
+                    nextNotifications
+                        .filter((notification) => !notification.read && !knownNotificationIds.current.has(notification._id))
+                        .forEach(showNotificationAlert);
+                }
+                nextNotifications.forEach((notification) => knownNotificationIds.current.add(notification._id));
+                hasLoadedNotifications.current = true;
+                setNotifications(nextNotifications);
                 setUnreadCount(res.unreadCount || 0);
             }
         } catch (err) {
@@ -68,31 +110,7 @@ export default function Navbar() {
 
             if (appliesToMe) {
                 fetchNotifications();
-                if (data?.title && data?.message) {
-                    toast(
-                        (t) => (
-                            <div className="flex flex-col gap-1 cursor-pointer" onClick={() => { toast.dismiss(t.id); setNotifOpen(true); }}>
-                                <div className="flex items-center gap-2">
-                                    <span className="font-bold text-xs text-white">{data.title}</span>
-                                    <span className="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold uppercase">Reminder</span>
-                                </div>
-                                <span className="text-[11px] text-slate-300 leading-snug">{data.message}</span>
-                            </div>
-                        ),
-                        {
-                            icon: "⏰",
-                            duration: 9000,
-                            style: {
-                                background: "#0f172a",
-                                border: "1px solid #334155",
-                                color: "#f8fafc",
-                                padding: "12px 16px",
-                                borderRadius: "16px",
-                                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.4)",
-                            },
-                        }
-                    );
-                }
+                showNotificationAlert(data);
             }
         });
         return () => {
