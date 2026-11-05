@@ -27,6 +27,7 @@ export default function Employees() {
         payoutOptions, handleAddPayout,
         sourcingManager, setSourcingManager, sourcingManagerOptions, handleAddSourcingManager, handleRemoveSourcing,
         password, setPassword, status, setStatus,
+        assignedOffice, setAssignedOffice, officeLocations,
     } = useEmployees();
 
     return (
@@ -163,6 +164,9 @@ export default function Employees() {
                 setPassword={setPassword}
                 status={status}
                 setStatus={setStatus}
+                assignedOffice={assignedOffice}
+                setAssignedOffice={setAssignedOffice}
+                officeLocations={officeLocations}
             />
         </DashboardLayout>
     );

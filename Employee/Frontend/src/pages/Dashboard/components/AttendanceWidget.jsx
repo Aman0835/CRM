@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { FiCheckCircle, FiClock, FiAlertCircle, FiX } from "react-icons/fi";
+import { FiCheckCircle, FiClock, FiAlertCircle, FiX, FiMapPin } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { useAuth } from "../../../context/AuthContext";
 import { checkIn, checkOut, requestEarlyCheckout } from "../../../services/attendanceService";
+import { getCurrentPosition } from "../../../utils/geoUtils";
 
 function formatTime(dateStr) {
     if (!dateStr) return "--:--";
@@ -41,6 +42,7 @@ function LiveTimer({ checkInTime }) {
 export default function AttendanceWidget({ todayAttendance, onRefresh }) {
     const { employee } = useAuth();
     const [loading, setLoading] = useState(false);
+    const [statusNote, setStatusNote] = useState("");
 
     // Early checkout request modal state
     const [earlyModalOpen, setEarlyModalOpen] = useState(false);
@@ -52,22 +54,57 @@ export default function AttendanceWidget({ todayAttendance, onRefresh }) {
 
     const handleCheckIn = async () => {
         setLoading(true);
+        setStatusNote("Fetching GPS location...");
         try {
-            await checkIn(employee.employeeId);
-            toast.success("Checked in successfully");
+            let locationData = {};
+            try {
+                const pos = await getCurrentPosition();
+                locationData = {
+                    latitude: pos.latitude,
+                    longitude: pos.longitude,
+                    accuracy: pos.accuracy,
+                };
+            } catch (geoErr) {
+                toast.error(geoErr.message || "Failed to retrieve GPS location");
+                setLoading(false);
+                setStatusNote("");
+                return;
+            }
+
+            setStatusNote("Verifying office location...");
+            await checkIn(employee.employeeId, locationData);
+            toast.success("Checked in successfully (Location Verified)");
         } catch (error) {
             toast.error(error?.response?.data?.message ?? "Check-in failed");
         } finally {
             onRefresh?.();
             setLoading(false);
+            setStatusNote("");
         }
     };
 
     const handleCheckOut = async () => {
         setLoading(true);
+        setStatusNote("Fetching GPS location...");
         try {
-            await checkOut(employee.employeeId);
-            toast.success("Checked out successfully");
+            let locationData = {};
+            try {
+                const pos = await getCurrentPosition();
+                locationData = {
+                    latitude: pos.latitude,
+                    longitude: pos.longitude,
+                    accuracy: pos.accuracy,
+                };
+            } catch (geoErr) {
+                toast.error(geoErr.message || "Failed to retrieve GPS location");
+                setLoading(false);
+                setStatusNote("");
+                return;
+            }
+
+            setStatusNote("Verifying office location...");
+            await checkOut(employee.employeeId, locationData);
+            toast.success("Checked out successfully (Location Verified)");
         } catch (error) {
             const data = error?.response?.data;
             if (data?.requiresEarlyApproval || data?.message?.includes("Early Checkout")) {
@@ -79,6 +116,7 @@ export default function AttendanceWidget({ todayAttendance, onRefresh }) {
         } finally {
             onRefresh?.();
             setLoading(false);
+            setStatusNote("");
         }
     };
 
@@ -161,6 +199,15 @@ export default function AttendanceWidget({ todayAttendance, onRefresh }) {
                 </div>
             )}
 
+            {employee?.assignedOffice && (
+                <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                    <FiMapPin className="text-blue-500 shrink-0" />
+                    <span className="truncate">
+                        Office: <strong className="text-slate-700 dark:text-slate-200">{employee.assignedOffice.officeName || "Assigned Office"}</strong> ({employee.assignedOffice.allowedRadius || 100}m)
+                    </span>
+                </div>
+            )}
+
             {!isCheckedOut && (
                 <button
                     type="button"
@@ -174,7 +221,7 @@ export default function AttendanceWidget({ todayAttendance, onRefresh }) {
                     ].join(" ")}
                 >
                     {isCheckedIn ? <FiCheckCircle className="h-4 w-4" /> : <FiClock className="h-4 w-4" />}
-                    {loading ? "Please wait..." : earlyStatus === "requested" ? "Early Checkout Requested" : isCheckedIn ? "Check Out" : "Check In"}
+                    {loading ? (statusNote || "Please wait...") : earlyStatus === "requested" ? "Early Checkout Requested" : isCheckedIn ? "Check Out (GPS Verified)" : "Check In (GPS Verified)"}
                 </button>
             )}
 

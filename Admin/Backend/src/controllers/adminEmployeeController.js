@@ -52,6 +52,7 @@ export const getEmployees = async (req, res) => {
     }
 
     const employees = await Employee.find(query)
+      .populate("assignedOffice")
       .skip((page - 1) * limit)
       .limit(Number(limit))
       .sort({ createdAt: -1 });
@@ -127,7 +128,7 @@ export const updateEmployeeStatus = async (req, res) => {
 // Get Employee By ID
 export const getEmployeeById = async (req, res) => {
   try {
-    const employee = await Employee.findById(req.params.id);
+    const employee = await Employee.findById(req.params.id).populate("assignedOffice");
 
     if (!employee) {
       return res.status(404).json({
@@ -302,7 +303,7 @@ export const updateEmployee = async (req, res) => {
         new: true,
         runValidators: true,
       }
-    );
+    ).populate("assignedOffice");
 
     if (!employee) {
       return res.status(404).json({

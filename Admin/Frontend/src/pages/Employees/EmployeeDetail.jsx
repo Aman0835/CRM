@@ -6,6 +6,7 @@ import DashboardLayout from "../../components/layout/DashboardLayout";
 import EmployeeFormModal from "./components/EmployeeFormModal";
 import * as employeeService from "../../services/employeeService";
 import * as attendanceService from "../../services/attendanceService";
+import api from "../../services/api";
 
 const statusColors = {
     active: "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900",
@@ -52,6 +53,17 @@ export default function EmployeeDetail() {
     const [sourcingManager, setSourcingManager] = useState("");
     const [password, setPassword] = useState("");
     const [status, setStatus] = useState("active");
+    const [assignedOffice, setAssignedOffice] = useState("");
+    const [officeLocations, setOfficeLocations] = useState([]);
+
+    const fetchOfficeLocations = async () => {
+        try {
+            const res = await api.get("/admin/locations");
+            if (res.data?.success) {
+                setOfficeLocations(res.data.data || []);
+            }
+        } catch {}
+    };
 
     const fetchEmployeeData = async (isInitial = false) => {
         try {
@@ -80,6 +92,7 @@ export default function EmployeeDetail() {
 
     useEffect(() => {
         fetchEmployeeData(true);
+        fetchOfficeLocations();
     }, [id]);
 
     const handleOpenEdit = () => {
@@ -94,6 +107,11 @@ export default function EmployeeDetail() {
         setSourcingManager(employee.sourcingManager || "");
         setPassword("");
         setStatus(employee.status || "active");
+        const officeId = typeof employee.assignedOffice === "object" && employee.assignedOffice !== null
+            ? employee.assignedOffice._id
+            : (employee.assignedOffice || "");
+        setAssignedOffice(officeId);
+        fetchOfficeLocations();
         setIsEditOpen(true);
     };
 
@@ -107,6 +125,7 @@ export default function EmployeeDetail() {
             sourcingManager: sourcingManager.trim(),
             perDayPayout: Number(perDayPayout) || 0,
             status,
+            assignedOffice: assignedOffice || null,
         };
 
         if (password && password.trim()) {
@@ -251,6 +270,19 @@ export default function EmployeeDetail() {
                         {infoRow("Employee Code", employee.employeeId)}
                         {infoRow("Vendor", employee.vendor || "Direct / Internal")}
                         {infoRow("Sourcing Manager", employee.sourcingManager || "Self / Direct")}
+                        {infoRow(
+                            "Assigned Office Location",
+                            employee.assignedOffice ? (
+                                <span className="inline-flex items-center gap-1.5 font-bold text-blue-600 dark:text-blue-400">
+                                    {employee.assignedOffice.officeName || "Office"}
+                                    <span className="text-[10px] text-slate-400 font-normal">
+                                        ({employee.assignedOffice.allowedRadius || 100}m radius)
+                                    </span>
+                                </span>
+                            ) : (
+                                <span className="text-slate-400 italic font-normal">None (Unrestricted GPS)</span>
+                            )
+                        )}
                         {infoRow("Per Day Payment", `₹${(employee.perDayPayout || (employee.monthlySalary ? Math.round(employee.monthlySalary / 30) : 0)).toLocaleString()} / day`)}
                         <div className="flex justify-between items-center py-2.5 border-b border-slate-100 dark:border-slate-800">
                             <span className="text-xs text-slate-400 dark:text-slate-500">Login Password</span>
@@ -379,6 +411,9 @@ export default function EmployeeDetail() {
                 setPassword={setPassword}
                 status={status}
                 setStatus={setStatus}
+                assignedOffice={assignedOffice}
+                setAssignedOffice={setAssignedOffice}
+                officeLocations={officeLocations}
             />
         </DashboardLayout>
     );

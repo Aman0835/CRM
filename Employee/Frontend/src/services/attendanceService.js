@@ -12,15 +12,17 @@ export const getTodayAttendance = async (employeeId) => {
     return response.data;
 };
 
-// Check In
-export const checkIn = async (employeeId) => {
-    const response = await api.post("/employee/attendance/check-in", { employeeId });
+// Check In with GPS Coordinates
+export const checkIn = async (employeeId, locationData = {}) => {
+    const payload = { employeeId, ...locationData };
+    const response = await api.post("/employee/attendance/check-in", payload);
     return response.data;
 };
 
-// Check Out
-export const checkOut = async (employeeId) => {
-    const response = await api.post("/employee/attendance/check-out", { employeeId });
+// Check Out with GPS Coordinates
+export const checkOut = async (employeeId, locationData = {}) => {
+    const payload = { employeeId, ...locationData };
+    const response = await api.post("/employee/attendance/check-out", payload);
     return response.data;
 };
 

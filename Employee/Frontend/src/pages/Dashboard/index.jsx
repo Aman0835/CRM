@@ -14,13 +14,15 @@ import {
     FiUser,
     FiBell,
     FiPlusCircle,
-    FiList
+    FiList,
+    FiMapPin
 } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/layout/DashboardLayout";
 import { useAuth } from "../../context/AuthContext";
 import { checkIn, checkOut } from "../../services/attendanceService";
+import { getCurrentPosition } from "../../utils/geoUtils";
 import { useDashboard } from "./hooks/useDashboard";
 import { cleanPhoneForWa } from "../../leads/utils/leadUtils";
 
@@ -187,18 +189,38 @@ export default function Dashboard() {
         ];
     }, [recentAttendance]);
 
+    const [locationStatusText, setLocationStatusText] = useState("");
+
     const handleCheckIn = async () => {
         if (!employee?.employeeId || checkedIn) return;
 
         setAttendanceAction("check-in");
+        setLocationStatusText("Requesting GPS location...");
         try {
-            await checkIn(employee.employeeId);
-            toast.success("Checked in successfully");
+            let locationData = {};
+            try {
+                const pos = await getCurrentPosition();
+                locationData = {
+                    latitude: pos.latitude,
+                    longitude: pos.longitude,
+                    accuracy: pos.accuracy,
+                };
+            } catch (geoErr) {
+                toast.error(geoErr.message || "Could not retrieve GPS coordinates");
+                setAttendanceAction("");
+                setLocationStatusText("");
+                return;
+            }
+
+            setLocationStatusText("Verifying geofence with server...");
+            await checkIn(employee.employeeId, locationData);
+            toast.success("Checked in successfully (Location Verified)");
         } catch (error) {
             toast.error(error?.response?.data?.message ?? "Check-in failed");
         } finally {
             await fetchAll();
             setAttendanceAction("");
+            setLocationStatusText("");
         }
     };
 
@@ -206,14 +228,32 @@ export default function Dashboard() {
         if (!employee?.employeeId || !checkedIn || checkedOut) return;
 
         setAttendanceAction("check-out");
+        setLocationStatusText("Requesting GPS location...");
         try {
-            await checkOut(employee.employeeId);
-            toast.success("Checked out successfully");
+            let locationData = {};
+            try {
+                const pos = await getCurrentPosition();
+                locationData = {
+                    latitude: pos.latitude,
+                    longitude: pos.longitude,
+                    accuracy: pos.accuracy,
+                };
+            } catch (geoErr) {
+                toast.error(geoErr.message || "Could not retrieve GPS coordinates");
+                setAttendanceAction("");
+                setLocationStatusText("");
+                return;
+            }
+
+            setLocationStatusText("Verifying geofence with server...");
+            await checkOut(employee.employeeId, locationData);
+            toast.success("Checked out successfully (Location Verified)");
         } catch (error) {
             toast.error(error?.response?.data?.message ?? "Check-out failed");
         } finally {
             await fetchAll();
             setAttendanceAction("");
+            setLocationStatusText("");
         }
     };
 
@@ -347,36 +387,78 @@ export default function Dashboard() {
                                     <p className="text-[15px] font-bold text-white">Since {formatTime(todayAttendance?.checkIn)}</p>
                                 </div>
                             </div>
-                            <span className="rounded-full bg-[#0d6c63] px-3 py-1 text-[12px] font-bold text-[#17e0a0]">
-                                {todayAttendance?.status ?? "Present"}
-                            </span>
+                            <div className="flex flex-col items-end gap-1">
+                                <span className="rounded-full bg-[#0d6c63] px-3 py-1 text-[12px] font-bold text-[#17e0a0]">
+                                    {todayAttendance?.status ?? "Present"}
+                                </span>
+                                {todayAttendance?.locationVerified && (
+                                    <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-400">
+                                        <FiCheck className="w-3 h-3" /> Location Verified
+                                    </span>
+                                )}
+                            </div>
                         </div>
-                        <p className="text-[12px] text-[#6f88b1] mb-4">Remember to check out before you leave.</p>
+
+                        {employee?.assignedOffice && (
+                            <div className="mb-3 flex items-center gap-1.5 text-xs text-[#8ca3c7] bg-[#121a2c] px-3 py-1.5 rounded-xl border border-[#273852]">
+                                <FiMapPin className="text-blue-400 shrink-0" />
+                                <span className="truncate">
+                                    Office: <strong className="text-white">{employee.assignedOffice.officeName || "Assigned Office"}</strong> ({employee.assignedOffice.allowedRadius || 100}m radius)
+                                </span>
+                            </div>
+                        )}
+
+                        <p className="text-[12px] text-[#6f88b1] mb-4">
+                            {locationStatusText || "Remember to check out before you leave."}
+                        </p>
                         <button
                             onClick={handleCheckOut}
                             disabled={attendanceAction !== ""}
-                            className="w-full py-3 rounded-[14px] bg-[#ff2e3b] text-white text-[14px] font-bold shadow-md hover:bg-[#db232f] transition-colors disabled:opacity-50"
+                            className="w-full py-3 rounded-[14px] bg-[#ff2e3b] text-white text-[14px] font-bold shadow-md hover:bg-[#db232f] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                         >
-                            {attendanceAction === "check-out" ? "Saving..." : "⬇ Check Out"}
+                            <FiMapPin className="w-4 h-4" />
+                            {attendanceAction === "check-out" ? (locationStatusText || "Saving...") : "⬇ Check Out (GPS Verified)"}
                         </button>
                     </div>
                 ) : (
                     /* 🔴 STATE 1: Not started */
                     <div className="rounded-[22px] bg-[#1a2438] border border-[#334766] p-5">
-                        <div className="mb-3">
-                            <p className="text-[12px] font-black uppercase tracking-[0.18em] text-[#6f88b1]">Attendance Status</p>
-                            <div className="flex items-center gap-2 mt-1">
-                                <span className="h-2 w-2 rounded-full bg-[#f8bf24]" />
-                                <p className="text-[15px] font-bold text-white">Not Checked In Yet</p>
+                        <div className="flex items-center justify-between mb-3">
+                            <div>
+                                <p className="text-[12px] font-black uppercase tracking-[0.18em] text-[#6f88b1]">Attendance Status</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className="h-2 w-2 rounded-full bg-[#f8bf24]" />
+                                    <p className="text-[15px] font-bold text-white">Not Checked In Yet</p>
+                                </div>
                             </div>
+                            <span className="rounded-full bg-slate-800 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                Geofenced
+                            </span>
                         </div>
-                        <p className="text-[12px] text-[#6f88b1] mb-4">Tap below to mark your attendance for today.</p>
+
+                        {employee?.assignedOffice ? (
+                            <div className="mb-3 flex items-center gap-1.5 text-xs text-[#8ca3c7] bg-[#121a2c] px-3 py-1.5 rounded-xl border border-[#273852]">
+                                <FiMapPin className="text-blue-400 shrink-0" />
+                                <span className="truncate">
+                                    Assigned Office: <strong className="text-white">{employee.assignedOffice.officeName}</strong> ({employee.assignedOffice.allowedRadius}m radius)
+                                </span>
+                            </div>
+                        ) : (
+                            <div className="mb-3 text-[11px] text-amber-400/90 bg-amber-950/30 px-3 py-1.5 rounded-xl border border-amber-900/40">
+                                No office assigned yet. Contact admin to assign your work location.
+                            </div>
+                        )}
+
+                        <p className="text-[12px] text-[#6f88b1] mb-4">
+                            {locationStatusText || "Tap below to verify GPS and mark your attendance."}
+                        </p>
                         <button
                             onClick={handleCheckIn}
                             disabled={attendanceAction !== ""}
-                            className="w-full py-3 rounded-[14px] bg-[#10bf85] text-white text-[14px] font-bold shadow-md hover:bg-[#0da673] transition-colors disabled:opacity-50"
+                            className="w-full py-3 rounded-[14px] bg-[#10bf85] text-white text-[14px] font-bold shadow-md hover:bg-[#0da673] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                         >
-                            {attendanceAction === "check-in" ? "Checking in..." : "⬆ Check In"}
+                            <FiMapPin className="w-4 h-4" />
+                            {attendanceAction === "check-in" ? (locationStatusText || "Verifying Location...") : "⬆ Check In (GPS Verified)"}
                         </button>
                     </div>
                 )}

@@ -38,7 +38,7 @@ router.post("/attendance/request-early-checkout", requestEarlyCheckout);
 // GET /api/employee/profile/me — get own profile
 router.get("/profile/me", async (req, res) => {
     try {
-        const employee = await Employee.findById(req.employee._id).select("-password");
+        const employee = await Employee.findById(req.employee._id).select("-password").populate("assignedOffice");
         if (!employee) return res.status(404).json({ success: false, message: "Employee not found" });
         res.status(200).json({ success: true, data: employee });
     } catch (error) {

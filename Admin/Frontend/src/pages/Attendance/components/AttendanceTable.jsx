@@ -1,5 +1,5 @@
 import React from "react";
-import { FiTrash2 } from "react-icons/fi";
+import { FiTrash2, FiMapPin, FiCheckCircle, FiAlertCircle } from "react-icons/fi";
 
 export default function AttendanceTable({ loading, filteredLogs, employees, onDelete }) {
     if (loading) {
@@ -18,6 +18,7 @@ export default function AttendanceTable({ loading, filteredLogs, employees, onDe
                         <th className="py-3 px-4">Barber</th>
                         <th className="py-3 px-4">Emp ID</th>
                         <th className="py-3 px-4">Date</th>
+                        <th className="py-3 px-4">Location</th>
                         <th className="py-3 px-4">Check In</th>
                         <th className="py-3 px-4">Check Out</th>
                         <th className="py-3 px-4">Working Hours</th>
@@ -28,6 +29,9 @@ export default function AttendanceTable({ loading, filteredLogs, employees, onDe
                 <tbody>
                     {filteredLogs.map((log) => {
                         const emp = employees.find(e => e.employeeId === log.employeeId);
+                        const hasLocation = Boolean(log.officeName || log.checkInLocation?.verified || log.locationVerified);
+                        const checkInDist = log.checkInLocation?.distance;
+
                         return (
                             <tr key={log._id} className="border-b border-slate-100 dark:border-slate-800/60 last:border-0 hover:bg-slate-50/80 dark:hover:bg-white/5 transition-colors">
                                 <td className="py-3.5 px-4 font-bold text-slate-800 dark:text-slate-200">
@@ -38,6 +42,25 @@ export default function AttendanceTable({ loading, filteredLogs, employees, onDe
                                 </td>
                                 <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400">
                                     {log.date}
+                                </td>
+                                <td className="py-3.5 px-4">
+                                    {hasLocation ? (
+                                        <div className="flex items-center gap-1.5" title={`Office: ${log.officeName || "Assigned Office"} | Distance: ${checkInDist !== null && checkInDist !== undefined ? Math.round(checkInDist) + "m" : "N/A"}`}>
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50">
+                                                <FiCheckCircle className="w-3 h-3 text-emerald-500 shrink-0" />
+                                                <span>{log.officeName || "Verified"}</span>
+                                            </span>
+                                            {checkInDist !== null && checkInDist !== undefined && (
+                                                <span className="text-[10px] text-slate-400 font-mono">
+                                                    ({Math.round(checkInDist)}m)
+                                                </span>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <span className="inline-flex items-center gap-1 text-[10px] text-slate-400 font-normal">
+                                            <span>Manual / Direct</span>
+                                        </span>
+                                    )}
                                 </td>
                                 <td className="py-3.5 px-4 text-emerald-600 dark:text-emerald-500 font-medium">
                                     {log.checkIn ? new Date(log.checkIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "-"}
@@ -70,7 +93,7 @@ export default function AttendanceTable({ loading, filteredLogs, employees, onDe
                     })}
                     {filteredLogs.length === 0 && (
                         <tr>
-                            <td colSpan="8" className="p-8 text-center text-sm text-slate-400 dark:text-slate-500">
+                            <td colSpan="9" className="p-8 text-center text-sm text-slate-400 dark:text-slate-500">
                                 No logs found for this date.
                             </td>
                         </tr>

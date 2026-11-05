@@ -14,8 +14,9 @@ import { Link, NavLink } from "react-router-dom";
 const mainNavigation = [
   { to: "/dashboard", label: "Dashboard", icon: FiHome },
   { to: "/employees", label: "Employees", icon: FiUsers },
+  { to: "/locations", label: "Office Locations", icon: FiMapPin },
   { to: "/leads", label: "Leads", icon: FiBriefcase },
-  { to: "/visits", label: "Visits", icon: FiMapPin },
+  { to: "/visits", label: "Visits", icon: FiClock },
   { to: "/attendance", label: "Attendance", icon: FiCalendar },
   { to: "/payroll", label: "Payroll", icon: FiBriefcase },
 ];
