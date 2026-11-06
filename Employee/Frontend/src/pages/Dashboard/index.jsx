@@ -26,6 +26,9 @@ import { getCurrentPosition } from "../../utils/geoUtils";
 import { useDashboard } from "./hooks/useDashboard";
 import { cleanPhoneForWa } from "../../leads/utils/leadUtils";
 import StatusBadge from "../../leads/components/StatusBadge";
+import CallzerWidget from "./components/CallzerWidget";
+import CallOutcomeModal from "../../components/calls/CallOutcomeModal";
+import { useCallTracker } from "../../hooks/useCallTracker";
 
 function formatTime(value) {
     if (!value) return "--:--";
@@ -130,6 +133,8 @@ export default function Dashboard() {
         reminders,
         fetchAll,
     } = useDashboard();
+
+    const { activeCall, startCall, closeCall } = useCallTracker(fetchAll);
 
     const checkedIn = Boolean(todayAttendance?.checkIn);
     const checkedOut = Boolean(todayAttendance?.checkOut);
@@ -367,6 +372,9 @@ export default function Dashboard() {
                     </div>
                 </div>
 
+                {/* ── Callzer Outbound Calling Analytics (Total Dialed & Total Connected) ── */}
+                <CallzerWidget />
+
                 <div className="grid grid-cols-4 gap-2">
                     <ActionButton
                         icon={FiPlusCircle}
@@ -585,16 +593,29 @@ export default function Dashboard() {
                                         </div>
                                         <div className="text-right flex items-center gap-2">
                                             {lead.phone && (
-                                                <a
-                                                    href={`https://wa.me/${cleanPhoneForWa(lead.phone)}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 hover:bg-[#25D366] hover:text-slate-950 transition-all active:scale-95 shadow-sm"
-                                                    title="Chat on WhatsApp"
-                                                >
-                                                    <FaWhatsapp className="h-4 w-4" />
-                                                </a>
+                                                <>
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            startCall(lead);
+                                                        }}
+                                                        className="flex h-8 w-8 items-center justify-center rounded-full bg-[#381C14] border border-[#AE9475]/30 text-[#E9D5BD] hover:bg-[#962A22] hover:text-[#FBFAF6] transition-all active:scale-95 shadow-sm cursor-pointer"
+                                                        title="Call Client"
+                                                    >
+                                                        <FiPhone className="h-3.5 w-3.5" />
+                                                    </button>
+                                                    <a
+                                                        href={`https://wa.me/${cleanPhoneForWa(lead.phone)}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 hover:bg-[#25D366] hover:text-slate-950 transition-all active:scale-95 shadow-sm"
+                                                        title="Chat on WhatsApp"
+                                                    >
+                                                        <FaWhatsapp className="h-4 w-4" />
+                                                    </a>
+                                                </>
                                             )}
                                             <StatusBadge status={lead.status} size="xs" />
                                         </div>
@@ -628,16 +649,29 @@ export default function Dashboard() {
                                         </div>
                                         <div className="text-right flex items-center gap-2">
                                             {lead.phone && (
-                                                <a
-                                                    href={`https://wa.me/${cleanPhoneForWa(lead.phone)}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 hover:bg-[#25D366] hover:text-slate-950 transition-all active:scale-95 shadow-sm"
-                                                    title="Chat on WhatsApp"
-                                                >
-                                                    <FaWhatsapp className="h-4 w-4" />
-                                                </a>
+                                                <>
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            startCall(lead);
+                                                        }}
+                                                        className="flex h-8 w-8 items-center justify-center rounded-full bg-[#381C14] border border-[#AE9475]/30 text-[#E9D5BD] hover:bg-[#962A22] hover:text-[#FBFAF6] transition-all active:scale-95 shadow-sm cursor-pointer"
+                                                        title="Call Client"
+                                                    >
+                                                        <FiPhone className="h-3.5 w-3.5" />
+                                                    </button>
+                                                    <a
+                                                        href={`https://wa.me/${cleanPhoneForWa(lead.phone)}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 hover:bg-[#25D366] hover:text-slate-950 transition-all active:scale-95 shadow-sm"
+                                                        title="Chat on WhatsApp"
+                                                    >
+                                                        <FaWhatsapp className="h-4 w-4" />
+                                                    </a>
+                                                </>
                                             )}
                                             <p className="text-[14px] font-bold text-[#E9D5BD]">{lead.nextFollowUp?.time || "Today"}</p>
                                         </div>
@@ -650,6 +684,15 @@ export default function Dashboard() {
                     </div>
                 </div>
             </div>
+
+            {/* Callzer Post-Call Outcome Modal */}
+            {activeCall && (
+                <CallOutcomeModal
+                    callData={activeCall}
+                    onClose={closeCall}
+                    onComplete={closeCall}
+                />
+            )}
         </DashboardLayout>
     );
 }

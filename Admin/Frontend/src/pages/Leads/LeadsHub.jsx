@@ -4,7 +4,20 @@ import { Link, useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/layout/DashboardLayout";
 import { getLeads } from "../../services/leadService";
 import { getEmployees } from "../../services/employeeService";
-import { FiPhone, FiBriefcase, FiUser, FiCalendar, FiClock, FiChevronRight, FiCheck, FiX } from "react-icons/fi";
+import { getCallAnalytics } from "../../services/callService";
+import {
+  FiPhone,
+  FiPhoneCall,
+  FiPhoneMissed,
+  FiBriefcase,
+  FiUser,
+  FiCalendar,
+  FiClock,
+  FiChevronRight,
+  FiCheck,
+  FiX,
+  FiTrendingUp,
+} from "react-icons/fi";
 import { motion } from "framer-motion";
 
 function maskPhone(phone = "") {
@@ -150,6 +163,38 @@ export default function LeadsHub() {
   const [employeeFilter, setEmployeeFilter] = useState("");
   const [employees, setEmployees] = useState([]);
 
+  // Callyzer Outbound Call Tracking State
+  const [callTimeRange, setCallTimeRange] = useState("today");
+  const [callAnalytics, setCallAnalytics] = useState({
+    totalDialed: 0,
+    totalConnected: 0,
+    notConnected: 0,
+    connectionRate: 0,
+    agentLeaderboard: [],
+  });
+  const [callLoading, setCallLoading] = useState(false);
+
+  const fetchCallStats = async () => {
+    try {
+      setCallLoading(true);
+      const res = await getCallAnalytics({
+        timeRange: callTimeRange,
+        employeeId: employeeFilter || undefined,
+      });
+      if (res?.success && res.data) {
+        setCallAnalytics(res.data);
+      }
+    } catch (err) {
+      console.error("Failed to load call analytics", err);
+    } finally {
+      setCallLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCallStats();
+  }, [callTimeRange, employeeFilter]);
+
   const fetchData = async () => {
     setLoading(true);
     setError(null);
@@ -245,6 +290,175 @@ export default function LeadsHub() {
               Clear
             </button>
           </form>
+        </div>
+
+        {/* Callyzer Outbound Call Tracking & Telecalling Analytics */}
+        <div className="mb-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-gradient-to-br from-white via-slate-50/50 to-white dark:from-slate-900 dark:via-slate-900/90 dark:to-slate-900 p-5 sm:p-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 border border-blue-500/20 shadow-xs">
+                <FiPhoneCall className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white">Callyzer Call Analytics</h2>
+                  <span className="rounded-full bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 text-[10px] font-black tracking-wider uppercase px-2 py-0.5 border border-blue-200 dark:border-blue-800">
+                    Live Telecalling
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Track total numbers dialed, successful connected calls, and team connection rate
+                </p>
+              </div>
+            </div>
+
+            {/* Time range pills */}
+            <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-2xl border border-slate-200/60 dark:border-slate-700 self-start sm:self-auto">
+              {[
+                { id: "today", label: "Today" },
+                { id: "week", label: "This Week" },
+                { id: "month", label: "This Month" },
+                { id: "all", label: "All Time" },
+              ].map((pill) => (
+                <button
+                  key={pill.id}
+                  type="button"
+                  onClick={() => setCallTimeRange(pill.id)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                    callTimeRange === pill.id
+                      ? "bg-white dark:bg-blue-600 text-slate-900 dark:text-white shadow-xs"
+                      : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                  }`}
+                >
+                  {pill.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 4 Metric Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-5">
+            {/* 1. Total Dialed */}
+            <div className="rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-white dark:bg-slate-950/40 p-4 shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  Total Dialed
+                </span>
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+                  <FiPhone className="h-4 w-4" />
+                </div>
+              </div>
+              <div className="mt-2 flex items-baseline gap-2">
+                <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+                  {callAnalytics.totalDialed || 0}
+                </span>
+                <span className="text-xs text-slate-400">outbound</span>
+              </div>
+              <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                Total dials initiated by agents
+              </p>
+            </div>
+
+            {/* 2. Total Connected */}
+            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-50/30 dark:bg-emerald-950/10 p-4 shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                  Total Connected
+                </span>
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100/60 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-300">
+                  <FiPhoneCall className="h-4 w-4" />
+                </div>
+              </div>
+              <div className="mt-2 flex items-baseline gap-2">
+                <span className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
+                  {callAnalytics.totalConnected || 0}
+                </span>
+                <span className="text-xs text-emerald-600/70 dark:text-emerald-400/70">answered</span>
+              </div>
+              <p className="mt-1 text-[11px] text-emerald-600/80 dark:text-emerald-400/80 truncate">
+                Client answered & conversation held
+              </p>
+            </div>
+
+            {/* 3. Not Connected */}
+            <div className="rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-white dark:bg-slate-950/40 p-4 shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  Not Connected
+                </span>
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-50 text-rose-500 dark:bg-rose-950/40 dark:text-rose-400">
+                  <FiPhoneMissed className="h-4 w-4" />
+                </div>
+              </div>
+              <div className="mt-2 flex items-baseline gap-2">
+                <span className="text-2xl sm:text-3xl font-black text-rose-500 dark:text-rose-400">
+                  {callAnalytics.notConnected || 0}
+                </span>
+                <span className="text-xs text-slate-400">missed/busy</span>
+              </div>
+              <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                Ringing, busy, or unreached
+              </p>
+            </div>
+
+            {/* 4. Connection Rate */}
+            <div className="rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-white dark:bg-slate-950/40 p-4 shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  Connection Rate
+                </span>
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400">
+                  <FiTrendingUp className="h-4 w-4" />
+                </div>
+              </div>
+              <div className="mt-2 flex items-baseline gap-2">
+                <span className="text-2xl sm:text-3xl font-black text-purple-600 dark:text-purple-400">
+                  {callAnalytics.connectionRate || 0}%
+                </span>
+                <span className="text-xs text-slate-400">efficiency</span>
+              </div>
+              <div className="mt-2 h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-500"
+                  style={{ width: `${Math.min(100, Math.max(0, callAnalytics.connectionRate || 0))}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Mini Agent Leaderboard */}
+          {callAnalytics.agentLeaderboard?.length > 0 && (
+            <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  Agent Telecalling Leaderboard
+                </span>
+                <span className="text-xs text-slate-400">
+                  {callAnalytics.agentLeaderboard.length} active agent{callAnalytics.agentLeaderboard.length > 1 ? "s" : ""}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {callAnalytics.agentLeaderboard.map((agent) => (
+                  <div
+                    key={agent.employeeId}
+                    className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/60"
+                  >
+                    <div className="min-w-0 pr-2">
+                      <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                        {agent.name}
+                      </p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                        <span className="font-semibold text-slate-700 dark:text-slate-300">{agent.totalDialed}</span> dialed · <span className="font-semibold text-emerald-600 dark:text-emerald-400">{agent.totalConnected}</span> connected
+                      </p>
+                    </div>
+                    <span className="shrink-0 text-xs font-black text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/40 px-2 py-0.5 rounded-lg border border-purple-200/50 dark:border-purple-800/50">
+                      {agent.connectionRate}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {loading && (

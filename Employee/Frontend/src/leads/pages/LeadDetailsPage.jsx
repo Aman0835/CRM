@@ -24,6 +24,8 @@ import InteractionTimeline from "../components/InteractionTimeline";
 import AddInteractionModal from "../components/AddInteractionModal";
 import { getLeadById, getLeadInteractions, deleteLead } from "../services/leadService";
 import { formatFollowUp, cleanPhoneForWa } from "../utils/leadUtils";
+import CallOutcomeModal from "../../components/calls/CallOutcomeModal";
+import { useCallTracker } from "../../hooks/useCallTracker";
 
 export default function LeadDetailsPage() {
   const { leadId } = useParams();
@@ -36,6 +38,10 @@ export default function LeadDetailsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const { activeCall, startCall, closeCall } = useCallTracker(() => {
+    fetchLeadData();
+  });
 
   const fetchLeadData = useCallback(async () => {
     if (!leadId) return;
@@ -153,13 +159,14 @@ export default function LeadDetailsPage() {
           <div className="flex items-center gap-2">
             {lead.phone && (
               <>
-                <a
-                  href={`tel:${lead.phone}`}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-[#381C14] bg-[#24110c] text-[#D9C4AA] hover:bg-[#962A22] hover:text-[#FBFAF6] transition-colors shadow-sm"
+                <button
+                  type="button"
+                  onClick={() => startCall(lead)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-[#381C14] bg-[#24110c] text-[#D9C4AA] hover:bg-[#962A22] hover:text-[#FBFAF6] transition-colors shadow-sm cursor-pointer"
                   title="Call Client"
                 >
                   <FiPhone className="h-4 w-4" />
-                </a>
+                </button>
                 <a
                   href={`https://wa.me/${cleanPhoneForWa(lead.phone)}`}
                   target="_blank"
@@ -203,14 +210,15 @@ export default function LeadDetailsPage() {
           <div className="flex flex-wrap items-center gap-2 pt-1">
             {lead.phone && (
               <>
-                <a
-                  href={`tel:${lead.phone}`}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#381C14] bg-[#1a0d09] px-3 py-1.5 text-xs font-semibold text-[#E9D5BD] hover:border-[#962A22] hover:text-[#FBFAF6] transition-colors"
+                <button
+                  type="button"
+                  onClick={() => startCall(lead)}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#381C14] bg-[#1a0d09] px-3 py-1.5 text-xs font-semibold text-[#E9D5BD] hover:border-[#962A22] hover:text-[#FBFAF6] transition-colors cursor-pointer"
                   title="Call Client"
                 >
                   <FiPhone className="h-3.5 w-3.5 text-[#D9C4AA]" />
                   <span>{lead.phone}</span>
-                </a>
+                </button>
 
                 <a
                   href={`https://wa.me/${cleanPhoneForWa(lead.phone)}`}
@@ -361,6 +369,18 @@ export default function LeadDetailsPage() {
           </div>
         )}
       </div>
+
+      {/* Callzer Post-Call Outcome Modal */}
+      {activeCall && (
+        <CallOutcomeModal
+          callData={activeCall}
+          onClose={closeCall}
+          onComplete={() => {
+            closeCall();
+            fetchLeadData();
+          }}
+        />
+      )}
     </DashboardLayout>
   );
 }

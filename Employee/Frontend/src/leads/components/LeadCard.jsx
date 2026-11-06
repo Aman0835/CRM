@@ -4,7 +4,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import StatusBadge from "./StatusBadge";
 import { formatFollowUp, cleanPhoneForWa } from "../utils/leadUtils";
 
-export default function LeadCard({ lead, onClick, onDelete }) {
+export default function LeadCard({ lead, onClick, onDelete, onCall }) {
   const followUp = formatFollowUp(lead?.nextFollowUp?.date, lead?.nextFollowUp?.time);
   const latestResponse = lead?.latestInteraction?.clientResponse;
 
@@ -66,7 +66,13 @@ export default function LeadCard({ lead, onClick, onDelete }) {
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <a
             href={`tel:${lead.phone}`}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onCall) {
+                e.preventDefault();
+                onCall(lead);
+              }
+            }}
             className="inline-flex items-center gap-1.5 rounded-xl bg-[#381C14] px-3 py-1.5 text-[12px] font-semibold text-[#E9D5BD] border border-[#AE9475]/30 transition-colors hover:bg-[#962A22] hover:text-[#FBFAF6]"
             title="Call Client"
           >

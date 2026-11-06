@@ -7,12 +7,16 @@ import {
   FiRefreshCw,
   FiUserPlus,
   FiAlertTriangle,
+  FiPhoneCall,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import DashboardLayout from "../../components/layout/DashboardLayout";
 import LeadCard from "../components/LeadCard";
 import { getMyLeads, deleteLead } from "../services/leadService";
+import { getCallAnalytics } from "../../services/callService";
 import { LEAD_STATUSES } from "../utils/leadUtils";
+import CallOutcomeModal from "../../components/calls/CallOutcomeModal";
+import { useCallTracker } from "../../hooks/useCallTracker";
 
 export default function MyLeadsPage() {
   const navigate = useNavigate();
@@ -22,6 +26,25 @@ export default function MyLeadsPage() {
   const [search, setSearch] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [summary, setSummary] = useState({ totalActive: 0, todaysFollowUps: 0 });
+  const [callStats, setCallStats] = useState({ totalDialed: 0, totalConnected: 0, connectionRate: 0 });
+
+  const fetchCallStats = async () => {
+    try {
+      const res = await getCallAnalytics({ timeRange: "today" });
+      if (res && res.success) {
+        setCallStats({
+          totalDialed: res.totalDialed || 0,
+          totalConnected: res.totalConnected || 0,
+          connectionRate: res.connectionRate || 0,
+        });
+      }
+    } catch {}
+  };
+
+  const { activeCall, startCall, closeCall } = useCallTracker(() => {
+    fetchLeads();
+    fetchCallStats();
+  });
 
   // Delete confirmation state
   const [leadToDelete, setLeadToDelete] = useState(null);
@@ -47,6 +70,10 @@ export default function MyLeadsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchCallStats();
+  }, []);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -120,6 +147,24 @@ export default function MyLeadsPage() {
             <FiPlus className="h-4 w-4" />
             <span>New Lead</span>
           </button>
+        </div>
+
+        {/* Callzer Today's Calling Strip */}
+        <div className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl bg-[#24110c] border border-[#381C14] shadow-sm text-xs mx-1">
+          <div className="flex items-center gap-2">
+            <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#962A22]/20 text-[#E9D5BD]">
+              <FiPhoneCall className="h-3.5 w-3.5" />
+            </div>
+            <span className="font-bold text-[#D9C4AA]">Today's Calling:</span>
+          </div>
+          <div className="flex items-center gap-2.5 font-mono font-bold">
+            <span className="text-[#FBFAF6]">{callStats.totalDialed} <span className="text-[10px] font-sans text-[#AE9475]">Dialed</span></span>
+            <span className="text-[#381C14]">•</span>
+            <span className="text-[#16e0a0]">{callStats.totalConnected} <span className="text-[10px] font-sans text-emerald-400/80">Connected</span></span>
+            <span className="rounded-full bg-[#381C14] px-2 py-0.5 text-[10px] text-[#E9D5BD] border border-[#AE9475]/30">
+              {callStats.connectionRate}%
+            </span>
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -207,6 +252,7 @@ export default function MyLeadsPage() {
                 lead={lead}
                 onClick={() => navigate(`/leads/${lead._id}`)}
                 onDelete={handleDeleteRequest}
+                onCall={startCall}
               />
             ))
           )}
@@ -217,7 +263,7 @@ export default function MyLeadsPage() {
       {leadToDelete && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm px-4 pb-6">
           <div
-            className="w-full max-w-[390px] rounded-[28px] border border-red-500/30 bg-[#1a1e2e] p-6 space-y-4 shadow-[0_-20px_60px_rgba(0,0,0,0.5)]"
+            className="w-full max-w-[390px] rounded-[28px] border border-[#381C14] bg-[#24110c] p-6 space-y-4 shadow-[0_-20px_60px_rgba(0,0,0,0.7)]"
             style={{ animation: "slideUp 0.25s ease-out" }}
           >
             <div className="flex items-center gap-3">
@@ -225,8 +271,8 @@ export default function MyLeadsPage() {
                 <FiAlertTriangle className="h-5 w-5 text-red-400" />
               </div>
               <div>
-                <h3 className="text-[16px] font-black text-white">Delete Lead?</h3>
-                <p className="text-[12px] text-[#8ea4cb] mt-0.5">This cannot be undone.</p>
+                <h3 className="text-[16px] font-black text-[#FBFAF6]">Delete Lead?</h3>
+                <p className="text-[12px] text-[#AE9475] mt-0.5">This cannot be undone.</p>
               </div>
             </div>
             <p className="text-[13px] text-[#D9C4AA] leading-relaxed">
@@ -252,6 +298,19 @@ export default function MyLeadsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Callzer Post-Call Outcome Modal */}
+      {activeCall && (
+        <CallOutcomeModal
+          callData={activeCall}
+          onClose={closeCall}
+          onComplete={() => {
+            closeCall();
+            fetchCallStats();
+            fetchLeads();
+          }}
+        />
       )}
     </DashboardLayout>
   );

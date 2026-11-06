@@ -22,6 +22,7 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import leadRoutes from "./routes/leadRoutes.js";
 import officeLocationRoutes from "./routes/officeLocationRoutes.js";
 import visitRoutes from "./routes/visitRoutes.js";
+import callRoutes from "./routes/callRoutes.js";
 
 dotenv.config();
 
@@ -115,6 +116,9 @@ app.use("/api/leads", leadRoutes);
 app.use("/api/employee/visits", visitRoutes);
 app.use("/api/visits", visitRoutes);
 app.use("/api/admin/visits", visitRoutes);
+app.use("/api/employee/calls", callRoutes);
+app.use("/api/calls", callRoutes);
+app.use("/api/admin/calls", callRoutes);
 
 io.on("connection", (socket) => {
   socket.on("join", (data) => {
