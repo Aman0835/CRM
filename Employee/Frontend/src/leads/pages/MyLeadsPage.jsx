@@ -149,21 +149,19 @@ export default function MyLeadsPage() {
           </button>
         </div>
 
-        {/* Callzer Today's Calling Strip */}
-        <div className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl bg-[#24110c] border border-[#381C14] shadow-sm text-xs mx-1">
-          <div className="flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#962A22]/20 text-[#E9D5BD]">
-              <FiPhoneCall className="h-3.5 w-3.5" />
-            </div>
-            <span className="font-bold text-[#D9C4AA]">Today's Calling:</span>
+        {/* Subtle Calling Stats Strip */}
+        <div className="flex items-center justify-between px-3.5 py-2 rounded-2xl bg-[#24110c] border border-[#381C14] text-xs mx-1">
+          <div className="flex items-center gap-1.5 text-xs text-[#AE9475]">
+            <FiPhone className="h-3 w-3" />
+            <span className="font-medium">Calls today:</span>
           </div>
-          <div className="flex items-center gap-2.5 font-mono font-bold">
-            <span className="text-[#FBFAF6]">{callStats.totalDialed} <span className="text-[10px] font-sans text-[#AE9475]">Dialed</span></span>
+          <div className="flex items-center gap-2 text-xs">
+            <span className="font-semibold text-[#FBFAF6]">{callStats.totalDialed} dialed</span>
             <span className="text-[#381C14]">•</span>
-            <span className="text-[#16e0a0]">{callStats.totalConnected} <span className="text-[10px] font-sans text-emerald-400/80">Connected</span></span>
-            <span className="rounded-full bg-[#381C14] px-2 py-0.5 text-[10px] text-[#E9D5BD] border border-[#AE9475]/30">
-              {callStats.connectionRate}%
-            </span>
+            <span className="font-semibold text-[#D9C4AA]">{callStats.totalConnected} connected</span>
+            {callStats.totalDialed > 0 && (
+              <span className="text-[10px] text-[#AE9475]">({callStats.connectionRate}%)</span>
+            )}
           </div>
         </div>
 

@@ -44,3 +44,4 @@ router.post("/:callId/outcome", logOutcome);
 router.get("/analytics", getCallAnalytics);
 
 export default router;
+

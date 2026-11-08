@@ -9,3 +9,4 @@ export const getCallAnalytics = async ({ timeRange = "today", employeeId } = {})
   const response = await api.get("/calls/analytics", { params });
   return response.data;
 };
+

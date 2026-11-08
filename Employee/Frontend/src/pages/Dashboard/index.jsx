@@ -372,9 +372,6 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* ── Callzer Outbound Calling Analytics (Total Dialed & Total Connected) ── */}
-                <CallzerWidget />
-
                 <div className="grid grid-cols-4 gap-2">
                     <ActionButton
                         icon={FiPlusCircle}
@@ -401,6 +398,9 @@ export default function Dashboard() {
                         onClick={() => navigate("/follow-ups")}
                     />
                 </div>
+
+                {/* Subtle Outbound Calling Strip */}
+                <CallzerWidget />
 
                 {/* ── Mandatory Site Visit Tagging Quick Card ── */}
                 <div

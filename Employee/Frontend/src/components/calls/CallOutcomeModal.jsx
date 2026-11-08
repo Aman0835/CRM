@@ -72,8 +72,8 @@ export default function CallOutcomeModal({ callData, onClose, onComplete }) {
               <FiPhoneCall className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D9C4AA]">
-                Callzer Tracker
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#D9C4AA]">
+                Call Outcome
               </p>
               <h3 className="truncate text-base font-black text-[#FBFAF6]">
                 {callData.leadName || "Call Outcome"}
@@ -193,3 +193,4 @@ export default function CallOutcomeModal({ callData, onClose, onComplete }) {
     </div>
   );
 }
+

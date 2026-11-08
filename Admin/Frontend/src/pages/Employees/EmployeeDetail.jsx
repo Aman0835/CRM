@@ -8,10 +8,6 @@ import {
     FiXCircle,
     FiEye,
     FiEyeOff,
-    FiPhone,
-    FiPhoneCall,
-    FiPhoneMissed,
-    FiTrendingUp,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import DashboardLayout from "../../components/layout/DashboardLayout";
@@ -347,6 +343,7 @@ export default function EmployeeDetail() {
                             </div>
                         </div>
                         {infoRow("Status", employee.status)}
+                        {infoRow("Calls (Outbound)", `${callStats.totalDialed || 0} dialed · ${callStats.totalConnected || 0} connected`)}
                         {infoRow(
                             "Member Since",
                             joinDateObj ? (
@@ -366,93 +363,15 @@ export default function EmployeeDetail() {
                 </div>
             </div>
 
-            {/* Callyzer Telecalling Performance */}
+            {/* Attendance & Activity Summary */}
             <div className="mt-6 panel-surface rounded-3xl p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-5">
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 border border-blue-500/20">
-                            <FiPhoneCall className="h-5 w-5" />
-                        </div>
-                        <div>
-                            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                                Callyzer Telecalling Performance
-                            </h3>
-                            <p className="text-xs text-slate-400">All-time dial tracking and client call conversions</p>
-                        </div>
-                    </div>
-                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-900">
-                        {callStats.connectionRate || 0}% Connection Rate
-                    </span>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div className="rounded-2xl bg-slate-50 dark:bg-slate-950/30 p-4 border border-slate-100 dark:border-slate-800">
-                        <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold block">
-                            Total Dialed
-                        </span>
-                        <div className="mt-2 flex items-baseline gap-1.5">
-                            <span className="text-2xl font-black text-slate-800 dark:text-slate-100">
-                                {callStats.totalDialed || 0}
-                            </span>
-                            <span className="text-xs text-slate-400">calls</span>
-                        </div>
-                        <p className="text-[11px] text-slate-400 mt-1">Outbound dials made</p>
-                    </div>
-
-                    <div className="rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 p-4 border border-emerald-100 dark:border-emerald-900/40">
-                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400 uppercase tracking-wider font-bold block">
-                            Total Connected
-                        </span>
-                        <div className="mt-2 flex items-baseline gap-1.5">
-                            <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
-                                {callStats.totalConnected || 0}
-                            </span>
-                            <span className="text-xs text-emerald-600/70 dark:text-emerald-400/70">answered</span>
-                        </div>
-                        <p className="text-[11px] text-emerald-600/80 dark:text-emerald-400/80 mt-1">Spoke with client</p>
-                    </div>
-
-                    <div className="rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 p-4 border border-rose-100 dark:border-rose-900/40">
-                        <span className="text-[10px] text-rose-500 dark:text-rose-400 uppercase tracking-wider font-bold block">
-                            Not Connected
-                        </span>
-                        <div className="mt-2 flex items-baseline gap-1.5">
-                            <span className="text-2xl font-black text-rose-500 dark:text-rose-400">
-                                {callStats.notConnected || 0}
-                            </span>
-                            <span className="text-xs text-slate-400">missed</span>
-                        </div>
-                        <p className="text-[11px] text-slate-400 mt-1">Busy / unanswered</p>
-                    </div>
-
-                    <div className="rounded-2xl bg-slate-50 dark:bg-slate-950/30 p-4 border border-slate-100 dark:border-slate-800">
-                        <span className="text-[10px] text-purple-600 dark:text-purple-400 uppercase tracking-wider font-bold block">
-                            Call Success Rate
-                        </span>
-                        <div className="mt-2 flex items-baseline gap-1.5">
-                            <span className="text-2xl font-black text-purple-600 dark:text-purple-400">
-                                {callStats.connectionRate || 0}%
-                            </span>
-                        </div>
-                        <div className="mt-2 h-1.5 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-                            <div
-                                className="h-full rounded-full bg-gradient-to-r from-blue-500 to-emerald-500"
-                                style={{ width: `${Math.min(100, Math.max(0, callStats.connectionRate || 0))}%` }}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Attendance Summary */}
-            <div className="mt-6 panel-surface rounded-3xl p-6 shadow-sm">
-                <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-5">Attendance Summary (All Time)</h3>
+                <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-5">Performance & Attendance Summary (All Time)</h3>
 
                 {totalDays === 0 ? (
                     <p className="text-sm text-slate-400 text-center py-8">No attendance records found for this employee.</p>
                 ) : (
                     <>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-6">
                             {[
                                 { label: "Total Days", value: totalDays, color: "text-slate-800 dark:text-slate-100" },
                                 { label: "Present", value: present, color: "text-emerald-600 dark:text-emerald-400" },
@@ -460,6 +379,8 @@ export default function EmployeeDetail() {
                                 { label: "Absent", value: absent, color: "text-red-500 dark:text-red-400" },
                                 { label: "On Leave", value: onLeave, color: "text-blue-500 dark:text-blue-400" },
                                 { label: "Attendance %", value: `${attendanceRate}%`, color: "text-blue-600 dark:text-blue-400" },
+                                { label: "Calls Dialed", value: callStats.totalDialed || 0, color: "text-slate-800 dark:text-slate-100" },
+                                { label: "Connected", value: callStats.totalConnected || 0, color: "text-emerald-600 dark:text-emerald-400" },
                             ].map(s => (
                                 <div key={s.label} className="rounded-2xl bg-slate-50 dark:bg-slate-950/20 p-3 border border-slate-100 dark:border-slate-800 text-center">
                                     <span className="text-[9px] text-slate-400 uppercase tracking-wider font-semibold block">{s.label}</span>

@@ -66,3 +66,4 @@ callLogSchema.index({ dialedAt: -1 });
 const CallLog = mongoose.model("CallLog", callLogSchema);
 
 export default CallLog;
+
