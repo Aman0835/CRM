@@ -19,3 +19,4 @@ router.post("/sync-all", syncAllData);
 router.get("/script-code", getScriptCode);
 
 export default router;
+

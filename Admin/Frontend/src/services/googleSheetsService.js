@@ -24,3 +24,4 @@ export const getScriptCode = async () => {
   const response = await api.get("/admin/sheets/script-code");
   return response.data;
 };
+

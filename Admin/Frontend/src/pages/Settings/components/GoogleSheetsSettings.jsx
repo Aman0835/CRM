@@ -22,6 +22,8 @@ import {
   getScriptCode,
 } from "../../../services/googleSheetsService";
 
+const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/1q1eh5NdebVBcRp31_FrVCBbHhAihqA-VJ1AtmF3I40g/edit?usp=sharing";
+
 export default function GoogleSheetsSettings() {
   const [webAppUrl, setWebAppUrl] = useState("");
   const [loading, setLoading] = useState(true);
@@ -200,15 +202,28 @@ export default function GoogleSheetsSettings() {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setShowGuide(!showGuide)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold transition self-start sm:self-auto cursor-pointer"
-        >
-          <FiCode className="text-emerald-500" />
-          <span>3-Min Setup Guide</span>
-          {showGuide ? <FiChevronUp /> : <FiChevronDown />}
-        </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <a
+            href={SPREADSHEET_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-bold transition hover:bg-emerald-100 dark:hover:bg-emerald-900/60"
+          >
+            <SiGooglesheets className="text-xs text-emerald-600 dark:text-emerald-400" />
+            <span>Open Google Sheet</span>
+            <FiExternalLink className="text-[10px]" />
+          </a>
+
+          <button
+            type="button"
+            onClick={() => setShowGuide(!showGuide)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold transition cursor-pointer"
+          >
+            <FiCode className="text-emerald-500" />
+            <span>Setup Guide</span>
+            {showGuide ? <FiChevronUp /> : <FiChevronDown />}
+          </button>
+        </div>
       </div>
 
       {/* Setup Guide Collapsible */}
@@ -233,16 +248,15 @@ export default function GoogleSheetsSettings() {
 
           <ol className="list-decimal list-inside space-y-2 text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
             <li>
-              Open a new blank spreadsheet at{" "}
+              Open your Google Spreadsheet:{" "}
               <a
-                href="https://sheets.new"
+                href={SPREADSHEET_URL}
                 target="_blank"
                 rel="noreferrer"
                 className="text-emerald-600 dark:text-emerald-400 font-bold underline inline-flex items-center gap-0.5"
               >
-                sheets.new <FiExternalLink className="text-[10px]" />
-              </a>{" "}
-              and name it (e.g. <em>"Dosti CRM Database"</em>).
+                Open Dosti CRM Spreadsheet <FiExternalLink className="text-[10px]" />
+              </a>
             </li>
             <li>
               In the top menu, click <strong>Extensions &gt; Apps Script</strong>.
@@ -387,3 +401,4 @@ export default function GoogleSheetsSettings() {
     </section>
   );
 }
+
