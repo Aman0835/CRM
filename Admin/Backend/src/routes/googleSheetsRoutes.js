@@ -6,11 +6,11 @@ import {
   syncAllData,
   getScriptCode,
 } from "../controllers/googleSheetsController.js";
-import adminAuth from "../middleware/adminAuth.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.use(adminAuth);
+router.use(authMiddleware);
 
 router.get("/config", getSheetConfig);
 router.post("/config", saveSheetConfig);
