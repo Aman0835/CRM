@@ -4,6 +4,7 @@ import Notification from "../models/Notification.js";
 import Settings from "../models/Settings.js";
 import { broadcastRealtime } from "../utils/realtime.js";
 import { calculateDistance, isValidCoordinate, isAccuracyAcceptable } from "../utils/geoUtils.js";
+import googleSheetsDb from "../services/googleSheetsDb.js";
 
 const format12HourTime = (timeStr) => {
   if (!timeStr) return "08:00 PM";
@@ -20,6 +21,9 @@ const format12HourTime = (timeStr) => {
 export const createAttendance = async (req, res) => {
   try {
     const attendance = await Attendance.create(req.body);
+
+    // Auto-sync attendance to online Google Sheet database
+    googleSheetsDb.syncAttendance(attendance, "insert");
 
     res.status(201).json({
       success: true,
@@ -156,6 +160,9 @@ export const checkIn = async (req, res) => {
       checkInLocation: checkInLocData,
       locationVerified: checkInLocData.verified,
     });
+
+    // Auto-sync check-in to online Google Sheet database
+    googleSheetsDb.syncAttendance(attendance, "insert");
 
     if (status === "Late") {
       try {
@@ -300,6 +307,9 @@ export const checkOut = async (req, res) => {
     }
 
     await attendance.save();
+
+    // Auto-sync check-out to online Google Sheet database
+    googleSheetsDb.syncAttendance(attendance, "update");
 
     req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "attendance", action: "updated", entity: "attendance", data: attendance });
 

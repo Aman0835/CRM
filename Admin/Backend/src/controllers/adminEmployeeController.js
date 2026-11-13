@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import Employee from "../models/Employee.js";
 import Settings from "../models/Settings.js";
 import { broadcastRealtime } from "../utils/realtime.js";
+import googleSheetsDb from "../services/googleSheetsDb.js";
 
 const generateEmployeeId = () => `EMP-${Math.floor(1000 + Math.random() * 9000)}`;
 
@@ -222,6 +223,9 @@ export const createEmployee = async (req, res) => {
 
     req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "employee", action: "created", entity: "employee", data: employeeResponse });
 
+    // Auto-sync new employee to online Google Sheet database
+    googleSheetsDb.syncEmployee(employeeResponse, "insert");
+
     res.status(201).json({
       success: true,
       message: "Employee created successfully",
@@ -325,6 +329,9 @@ export const updateEmployee = async (req, res) => {
 
     req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "employee", action: "updated", entity: "employee", data: empObj });
 
+    // Auto-sync updated employee to online Google Sheet database
+    googleSheetsDb.syncEmployee(empObj, "update");
+
     res.status(200).json({
       success: true,
       message: "Employee updated successfully",
@@ -350,6 +357,9 @@ export const deleteEmployee = async (req, res) => {
         message: "Employee not found",
       });
     }
+
+    // Auto-delete employee from online Google Sheet database
+    googleSheetsDb.deleteFromSheet("Employees", req.params.id);
 
     req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "employee", action: "deleted", entity: "employee", data: { id: req.params.id } });
 

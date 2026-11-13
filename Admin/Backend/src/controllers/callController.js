@@ -3,6 +3,7 @@ import Employee from "../models/Employee.js";
 import Interaction from "../models/Interaction.js";
 import Lead from "../models/Lead.js";
 import { broadcastRealtime } from "../utils/realtime.js";
+import googleSheetsDb from "../services/googleSheetsDb.js";
 
 function getDateRange(timeRange = "today") {
   const now = new Date();
@@ -72,6 +73,9 @@ export const logDial = async (req, res) => {
 
     await callLog.save();
 
+    // Auto-sync dialed call to online Google Sheet database
+    googleSheetsDb.syncCall(callLog, "insert");
+
     const io = req.app?.get("io");
     if (io) {
       broadcastRealtime(io, {
@@ -128,6 +132,9 @@ export const logOutcome = async (req, res) => {
     callLog.outcome = outcome.trim();
     callLog.notes = notes.trim();
     await callLog.save();
+
+    // Auto-sync updated call outcome to online Google Sheet database
+    googleSheetsDb.syncCall(callLog, "update");
 
     // If attached to a lead and outcome/notes were entered, synchronize with lead interaction
     if (callLog.leadId && (outcome || notes)) {

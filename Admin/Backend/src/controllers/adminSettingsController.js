@@ -43,6 +43,8 @@ export const updateSettings = async (req, res) => {
     if (checkOutTime !== undefined) settings.checkOutTime = checkOutTime;
     if (overtimeRate !== undefined) settings.overtimeRate = Number(overtimeRate);
     if (lateGraceMinutes !== undefined) settings.lateGraceMinutes = Number(lateGraceMinutes);
+    if (req.body.googleSheetWebAppUrl !== undefined) settings.googleSheetWebAppUrl = req.body.googleSheetWebAppUrl;
+    if (req.body.googleSheetEnabled !== undefined) settings.googleSheetEnabled = Boolean(req.body.googleSheetEnabled);
     if (Array.isArray(req.body.vendors)) settings.vendors = req.body.vendors;
     if (Array.isArray(req.body.sourcingManagers)) settings.sourcingManagers = req.body.sourcingManagers;
     if (Array.isArray(req.body.payoutOptions)) {

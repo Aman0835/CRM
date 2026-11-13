@@ -3,6 +3,7 @@ import Lead from "../models/Lead.js";
 import Interaction from "../models/Interaction.js";
 import { submitToGoogleForm, buildPreFilledGoogleFormUrl } from "../utils/googleFormSync.js";
 import { broadcastRealtime } from "../utils/realtime.js";
+import googleSheetsDb from "../services/googleSheetsDb.js";
 
 /**
  * POST /api/employee/visits
@@ -72,6 +73,9 @@ export const submitVisit = async (req, res) => {
       googleFormResponseStatus: formSubmission.status || 0,
       notes: notes || "",
     });
+
+    // Auto-sync Site Visit to online Google Sheet database
+    googleSheetsDb.syncVisit(visit, "insert");
 
     // If linked to a lead, update lead status & record an interaction
     if (leadId) {

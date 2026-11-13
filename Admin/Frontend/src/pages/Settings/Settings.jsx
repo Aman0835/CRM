@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import DashboardLayout from "../../components/layout/DashboardLayout";
 import api from "../../services/api";
 import TimeClockPicker from "./components/TimeClockPicker";
+import GoogleSheetsSettings from "./components/GoogleSheetsSettings";
 
 export default function Settings() {
     const [shopName, setShopName] = useState("Dosti Real Estate");
@@ -176,6 +177,9 @@ export default function Settings() {
                         </button>
                     </form>
                 </section>
+
+                {/* Google Sheet Online Database Integration */}
+                <GoogleSheetsSettings />
             </div>
         </DashboardLayout>
     );

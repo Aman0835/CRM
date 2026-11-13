@@ -2,6 +2,7 @@ import Employee from "../models/Employee.js";
 import Interaction from "../models/Interaction.js";
 import Lead from "../models/Lead.js";
 import { broadcastRealtime } from "../utils/realtime.js";
+import googleSheetsDb from "../services/googleSheetsDb.js";
 
 // Helper: Normalize phone numbers (strip spaces, hyphens, ensure clean format)
 const cleanPhone = (phone = "") => phone.replace(/[\s\-()]/g, "").trim();
@@ -129,6 +130,9 @@ export const createLead = async (req, res) => {
     });
 
     await initialInteraction.save();
+
+    // Auto-sync new lead to online Google Sheet database
+    googleSheetsDb.syncLead(savedLead, "insert");
 
     const io = req.app?.get("io");
     if (io) {
@@ -384,6 +388,9 @@ export const updateLead = async (req, res) => {
 
     const updated = await lead.save();
 
+    // Auto-sync updated lead to online Google Sheet database
+    googleSheetsDb.syncLead(updated, "update");
+
     res.status(200).json({
       success: true,
       message: "Lead updated successfully",
@@ -426,6 +433,9 @@ export const deleteLead = async (req, res) => {
 
     // Delete the lead itself
     await Lead.findByIdAndDelete(leadId);
+
+    // Auto-delete lead from online Google Sheet database
+    googleSheetsDb.deleteFromSheet("Leads", lead._id);
 
     const io = req.app?.get("io");
     if (io) {

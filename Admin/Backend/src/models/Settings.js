@@ -42,6 +42,15 @@ const settingsSchema = new mongoose.Schema(
       type: [Number],
       default: [950, 1000, 1100],
     },
+    googleSheetWebAppUrl: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    googleSheetEnabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

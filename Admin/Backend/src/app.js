@@ -23,6 +23,7 @@ import leadRoutes from "./routes/leadRoutes.js";
 import officeLocationRoutes from "./routes/officeLocationRoutes.js";
 import visitRoutes from "./routes/visitRoutes.js";
 import callRoutes from "./routes/callRoutes.js";
+import googleSheetsRoutes from "./routes/googleSheetsRoutes.js";
 
 dotenv.config();
 
@@ -107,6 +108,7 @@ app.use("/api/admin/locations", officeLocationRoutes);
 app.use("/api/admin/payroll", payrollRoutes);
 app.use("/api/admin/reports", reportRoutes);
 app.use("/api/admin/settings", settingsRoutes);
+app.use("/api/admin/sheets", googleSheetsRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 app.use("/api/employee/auth", employeeAuthRoutes);
