@@ -60,7 +60,9 @@ export default function ReminderProvider({ children }) {
           }
         });
       } catch (err) {
-        console.error("Failed to check reminders", err);
+        if (err?.response?.status !== 401) {
+          console.error("Failed to check reminders", err);
+        }
       }
     };
 

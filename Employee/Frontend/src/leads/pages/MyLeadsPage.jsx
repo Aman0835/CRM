@@ -7,6 +7,7 @@ import {
   FiRefreshCw,
   FiUserPlus,
   FiAlertTriangle,
+  FiPhone,
   FiPhoneCall,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
