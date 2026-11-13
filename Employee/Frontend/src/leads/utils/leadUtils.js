@@ -91,65 +91,70 @@ export const QUICK_RESPONSES = [
 ];
 
 export function getStatusStyle(status = "New") {
-  switch (status) {
-    case "New":
+  const norm = String(status || "").toLowerCase().trim();
+  switch (norm) {
+    case "new":
       return {
         bg: "bg-[#381C14]",
         text: "text-[#D9C4AA]",
         border: "border-[#381C14]",
         dot: "bg-[#D9C4AA]",
       };
-    case "Contacted":
+    case "contacted":
       return {
         bg: "bg-[#381C14]",
         text: "text-[#E9D5BD]",
         border: "border-[#D9C4AA]/30",
         dot: "bg-[#E9D5BD]",
       };
-    case "Interested":
+    case "interested":
       return {
         bg: "bg-[#064e3b]/50",
         text: "text-[#34d399]",
         border: "border-[#059669]/40",
         dot: "bg-[#10b981]",
       };
-    case "Follow-up":
+    case "follow-up":
+    case "follow up":
+    case "followup":
       return {
         bg: "bg-[#451a03]/60",
         text: "text-[#fbbf24]",
         border: "border-[#d97706]/40",
         dot: "bg-[#f59e0b]",
       };
-    case "Visit Scheduled":
+    case "visit scheduled":
+    case "visit-scheduled":
       return {
         bg: "bg-[#3b0764]/60",
         text: "text-[#c084fc]",
         border: "border-[#9333ea]/40",
         dot: "bg-[#a855f7]",
       };
-    case "Visit Completed":
+    case "visit completed":
+    case "visit-completed":
       return {
         bg: "bg-[#14532d]/60",
         text: "text-[#4ade80]",
         border: "border-[#16a34a]/40",
         dot: "bg-[#22c55e]",
       };
-    case "Negotiation":
+    case "negotiation":
       return {
         bg: "bg-[#431407]/60",
         text: "text-[#fb923c]",
         border: "border-[#ea580c]/40",
         dot: "bg-[#f97316]",
       };
-    case "Booking":
-    case "Won":
+    case "booking":
+    case "won":
       return {
         bg: "bg-[#064e3b]",
         text: "text-[#10b981]",
         border: "border-[#10b981]",
         dot: "bg-[#10b981]",
       };
-    case "Lost":
+    case "lost":
       return {
         bg: "bg-[#450a0a]/60",
         text: "text-[#f87171]",
@@ -158,10 +163,10 @@ export function getStatusStyle(status = "New") {
       };
     default:
       return {
-        bg: "bg-[#1e293b]",
-        text: "text-[#cbd5e1]",
-        border: "border-[#334155]",
-        dot: "bg-[#94a3b8]",
+        bg: "bg-[#381C14]",
+        text: "text-[#D9C4AA]",
+        border: "border-[#AE9475]/30",
+        dot: "bg-[#D9C4AA]",
       };
   }
 }

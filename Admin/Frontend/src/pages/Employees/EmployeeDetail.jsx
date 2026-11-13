@@ -230,7 +230,7 @@ export default function EmployeeDetail() {
         const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         const diffTime = todayMidnight.getTime() - joinedMidnight.getTime();
         const diffDays = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
-        return diffDays === 0 ? "Joined today" : `${diffDays} days working`;
+        return diffDays === 0 ? "Joined today" : diffDays === 1 ? "1 day working" : `${diffDays} days working`;
     })();
 
     const infoRow = (label, value) => (

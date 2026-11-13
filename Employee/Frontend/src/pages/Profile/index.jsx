@@ -152,16 +152,17 @@ export default function Profile() {
 
     // Calculate number of working days since joining
     const daysWorking = useMemo(() => {
-        if (!employee?.joiningDate) return null;
-        const joined = new Date(employee.joiningDate);
+        const rawDate = employee?.joiningDate || employee?.createdAt;
+        if (!rawDate) return null;
+        const joined = new Date(rawDate);
         if (isNaN(joined.getTime())) return null;
         const today = new Date();
         const joinedMidnight = new Date(joined.getFullYear(), joined.getMonth(), joined.getDate());
         const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         const diffTime = todayMidnight.getTime() - joinedMidnight.getTime();
         const diffDays = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
-        return diffDays === 0 ? "Joined today" : `${diffDays} days working`;
-    }, [employee?.joiningDate]);
+        return diffDays === 0 ? "Joined today" : diffDays === 1 ? "1 day working" : `${diffDays} days working`;
+    }, [employee?.joiningDate, employee?.createdAt]);
 
     const handleSaveProfile = async () => {
         setSavingProfile(true);
@@ -384,7 +385,7 @@ export default function Profile() {
                             <DetailRow
                                 icon={FiCalendar}
                                 label="Joined"
-                                value={employee?.joiningDate ? new Date(employee.joiningDate).toLocaleDateString("en-US", {
+                                value={(employee?.joiningDate || employee?.createdAt) ? new Date(employee.joiningDate || employee.createdAt).toLocaleDateString("en-US", {
                                     year: "numeric",
                                     month: "short",
                                     day: "numeric",
