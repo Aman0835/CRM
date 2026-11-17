@@ -15,6 +15,7 @@ import DashboardLayout from "../../components/layout/DashboardLayout";
 import LeadCard from "../components/LeadCard";
 import { getMyLeads, deleteLead } from "../services/leadService";
 import { getCallAnalytics } from "../../services/callService";
+import { getDeviceCallStats, isNativeApp } from "../../services/deviceCallLog";
 import { LEAD_STATUSES } from "../utils/leadUtils";
 import CallOutcomeModal from "../../components/calls/CallOutcomeModal";
 import { useCallTracker } from "../../hooks/useCallTracker";
@@ -30,6 +31,18 @@ export default function MyLeadsPage() {
   const [callStats, setCallStats] = useState({ totalDialed: 0, totalConnected: 0, connectionRate: 0 });
 
   const fetchCallStats = async () => {
+    if (isNativeApp()) {
+      const nativeStats = await getDeviceCallStats();
+      if (nativeStats && nativeStats.success) {
+        setCallStats({
+          totalDialed: nativeStats.totalDialed,
+          totalConnected: nativeStats.totalConnected,
+          connectionRate: nativeStats.connectionRate,
+        });
+        return;
+      }
+    }
+
     try {
       const res = await getCallAnalytics({ timeRange: "today" });
       if (res && res.success) {

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Dosti CRM</string>
+    <string name="title_activity_main">Dosti CRM</string>
+    <string name="package_name">com.dosti.crm.employee</string>
+    <string name="custom_url_scheme">com.dosti.crm.employee</string>
+</resources>

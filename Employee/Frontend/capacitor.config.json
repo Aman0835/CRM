@@ -1,0 +1,15 @@
+{
+  "appId": "com.dosti.crm.employee",
+  "appName": "Dosti CRM",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "backgroundColor": "#1a0d09"
+    }
+  }
+}

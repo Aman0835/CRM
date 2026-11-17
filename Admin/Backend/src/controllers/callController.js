@@ -305,3 +305,73 @@ export const getCallAnalytics = async (req, res) => {
   }
 };
 
+/**
+ * POST /api/calls/sync-device-log
+ * Sync real phone call logs captured by the Android APK
+ */
+export const syncDeviceLog = async (req, res) => {
+  try {
+    const user = req.employee || req.user;
+    if (!user || !user._id) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const { calls = [] } = req.body;
+    if (!Array.isArray(calls) || calls.length === 0) {
+      return res.status(200).json({ success: true, count: 0 });
+    }
+
+    const empDoc = await Employee.findById(user._id).select("firstName lastName name");
+    const empName = empDoc?.name || `${empDoc?.firstName || ""} ${empDoc?.lastName || ""}`.trim() || "Agent";
+
+    const { start, end } = getDateRange("today");
+    let inserted = 0;
+
+    for (const c of calls) {
+      if (c.type !== "outgoing") continue;
+      const callDate = c.date ? new Date(c.date) : new Date();
+      if (callDate < start || callDate > end) continue;
+
+      const rawNum = String(c.number || "").replace(/[^0-9]/g, "");
+      const last10 = rawNum.slice(-10);
+
+      const existing = await CallLog.findOne({
+        employeeId: user._id,
+        dialedAt: {
+          $gte: new Date(callDate.getTime() - 30000),
+          $lte: new Date(callDate.getTime() + 30000),
+        },
+      });
+
+      if (!existing) {
+        const lead = last10 ? await Lead.findOne({ phone: { $regex: last10 } }).select("name") : null;
+        const isConn = Number(c.duration || 0) > 0;
+
+        const newLog = await CallLog.create({
+          employeeId: user._id,
+          employeeName: empName,
+          leadId: lead?._id || null,
+          leadName: lead?.name || c.name || "Client",
+          phoneNumber: c.number,
+          status: isConn ? "connected" : "not_connected",
+          durationSeconds: Number(c.duration || 0),
+          outcome: isConn ? "Connected" : "No Answer",
+          dialedAt: callDate,
+        });
+
+        googleSheetsDb.syncCall(newLog).catch(() => {});
+        inserted++;
+      }
+    }
+
+    if (inserted > 0) {
+      req.app.get("io") && broadcastRealtime(req.app.get("io"), { type: "CALL_DIALED" });
+    }
+
+    return res.status(200).json({ success: true, inserted });
+  } catch (error) {
+    console.error("syncDeviceLog error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+

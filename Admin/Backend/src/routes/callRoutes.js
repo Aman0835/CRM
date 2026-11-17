@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import express from "express";
 import jwt from "jsonwebtoken";
-import { getCallAnalytics, logDial, logOutcome } from "../controllers/callController.js";
+import { getCallAnalytics, logDial, logOutcome, syncDeviceLog } from "../controllers/callController.js";
 
 dotenv.config();
 
@@ -40,6 +40,7 @@ const callAuth = (req, res, next) => {
 router.use(callAuth);
 
 router.post("/dial", logDial);
+router.post("/sync-device-log", syncDeviceLog);
 router.post("/:callId/outcome", logOutcome);
 router.get("/analytics", getCallAnalytics);
 
