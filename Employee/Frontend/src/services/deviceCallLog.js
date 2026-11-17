@@ -46,3 +46,4 @@ export async function syncDeviceCallsToBackend(employeeId) {
     return null;
   }
 }
+

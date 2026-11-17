@@ -124,3 +124,4 @@ public class CallLogPlugin extends Plugin {
         }
     }
 }
+

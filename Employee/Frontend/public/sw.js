@@ -23,8 +23,18 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  // Ignore non-GET requests and API backend calls
-  if (event.request.method !== "GET" || event.request.url.includes("/api/")) {
+  const url = event.request.url;
+
+  // Never intercept in local development, HMR scripts, or backend API calls
+  if (
+    event.request.method !== "GET" ||
+    url.includes("/api/") ||
+    url.includes("/@vite/") ||
+    url.includes("/@react-refresh") ||
+    url.includes("/src/") ||
+    url.includes("localhost") ||
+    url.includes("127.0.0.1")
+  ) {
     return;
   }
 
