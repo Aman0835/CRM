@@ -10,7 +10,6 @@ const Attendance  = lazy(() => import("../pages/Attendance"));
 const VisitsPage       = lazy(() => import("../pages/Visits/VisitsPage"));
 const CreateVisitPage  = lazy(() => import("../pages/Visits/CreateVisitPage"));
 
-const Payroll     = lazy(() => import("../pages/Payroll"));
 const Profile     = lazy(() => import("../pages/Profile"));
 const Settings    = lazy(() => import("../pages/Settings"));
 const NotFound    = lazy(() => import("../pages/NotFound/NotFound"));

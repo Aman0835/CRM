@@ -15,6 +15,7 @@ const LeadsHub = lazy(() => import("../pages/Leads/LeadsHub"));
 const LeadDetails = lazy(() => import("../pages/Leads/LeadDetails"));
 const Visits = lazy(() => import("../pages/Visits"));
 const Locations = lazy(() => import("../pages/Locations"));
+const Holidays = lazy(() => import("../pages/Holidays"));
 const Login = lazy(() => import("../pages/Login/Login"));
 const NotFound = lazy(() => import("../pages/NotFound/NotFound"));
 const AdminProfile = lazy(() => import("../pages/Profile"));
@@ -95,6 +96,15 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute>
               <Locations />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/holidays"
+          element={
+            <ProtectedRoute>
+              <Holidays />
             </ProtectedRoute>
           }
         />

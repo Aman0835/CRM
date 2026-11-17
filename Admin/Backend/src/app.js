@@ -21,6 +21,7 @@ import employeeRoutes from "./routes/employeeRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import leadRoutes from "./routes/leadRoutes.js";
 import officeLocationRoutes from "./routes/officeLocationRoutes.js";
+import adminHolidayRoutes from "./routes/adminHolidayRoutes.js";
 import visitRoutes from "./routes/visitRoutes.js";
 import callRoutes from "./routes/callRoutes.js";
 import googleSheetsRoutes from "./routes/googleSheetsRoutes.js";
@@ -104,6 +105,7 @@ app.use("/api/admin/dashboard", dashboardRoutes);
 app.use("/api/admin/employees", adminEmployeeRoutes);
 app.use("/api/admin/attendance", adminAttendanceRoutes);
 app.use("/api/admin/locations", officeLocationRoutes);
+app.use("/api/admin/holidays", adminHolidayRoutes);
 
 app.use("/api/admin/payroll", payrollRoutes);
 app.use("/api/admin/reports", reportRoutes);
