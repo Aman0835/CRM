@@ -56,10 +56,11 @@ export const getEmployees = async (req, res) => {
       .populate("assignedOffice")
       .skip((page - 1) * limit)
       .limit(Number(limit))
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     const formattedEmployees = employees.map((emp) => {
-      const obj = emp.toObject();
+      const obj = { ...emp };
       if (!obj.visiblePassword) {
         obj.visiblePassword = "Pass1234!";
       }

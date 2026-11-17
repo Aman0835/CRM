@@ -1,4 +1,22 @@
-const CACHE_NAME = "dosti-emp-v1";
+// Immediate cleanup if ever accidentally activated on localhost/development
+if (
+  typeof self !== "undefined" &&
+  self.location &&
+  (self.location.hostname === "localhost" ||
+    self.location.hostname === "127.0.0.1" ||
+    self.location.hostname.includes("192.168."))
+) {
+  self.addEventListener("install", () => self.skipWaiting());
+  self.addEventListener("activate", (event) => {
+    event.waitUntil(
+      caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k))))
+        .then(() => self.registration.unregister())
+        .then(() => self.clients.claim())
+    );
+  });
+}
+
+const CACHE_NAME = "dosti-emp-v2";
 const STATIC_ASSETS = ["/", "/index.html", "/manifest.json", "/favicon.svg", "/logo.svg"];
 
 self.addEventListener("install", (event) => {
@@ -33,16 +51,16 @@ self.addEventListener("fetch", (event) => {
     url.includes("/@react-refresh") ||
     url.includes("/src/") ||
     url.includes("localhost") ||
-    url.includes("127.0.0.1")
+    url.includes("127.0.0.1") ||
+    url.includes("192.168.")
   ) {
     return;
   }
 
-  // Handle fetch with graceful fallback so event.respondWith NEVER receives a rejected Promise
+  // Handle fetch gracefully
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
-        // Cache valid 200 responses for static assets and navigation
         if (
           networkResponse &&
           networkResponse.status === 200 &&
@@ -59,17 +77,19 @@ self.addEventListener("fetch", (event) => {
         const cached = await caches.match(event.request);
         if (cached) return cached;
 
-        // SPA Navigation fallback for offline / network glitches
+        // SPA Navigation fallback for offline
         if (event.request.mode === "navigate") {
           const indexFallback = await caches.match("/index.html");
           if (indexFallback) return indexFallback;
         }
 
-        return new Response("Network error", {
-          status: 503,
-          statusText: "Service Unavailable",
-          headers: new Headers({ "Content-Type": "text/plain" }),
-        });
+        return new Response(
+          '<!DOCTYPE html><html><body style="font-family:sans-serif;text-align:center;padding:50px;background:#16181d;color:#fff;"><h2>Offline</h2><p>Please check your connection and reload.</p></body></html>',
+          {
+            status: 200,
+            headers: new Headers({ "Content-Type": "text/html" }),
+          }
+        );
       })
   );
 });

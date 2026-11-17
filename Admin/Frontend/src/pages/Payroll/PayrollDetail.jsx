@@ -1,4 +1,3 @@
-import html2pdf from "html2pdf.js";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FiArrowLeft, FiDownload, FiPrinter } from "react-icons/fi";
@@ -308,9 +307,16 @@ export default function PayrollDetail() {
     }, 1000);
   };
 
-  const handleDownloadPDF = () => {
-    const exporter =
-      typeof html2pdf === "function" ? html2pdf : html2pdf && html2pdf.default;
+  const handleDownloadPDF = async () => {
+    let exporter;
+    try {
+      const html2pdfModule = await import("html2pdf.js");
+      exporter = html2pdfModule.default || html2pdfModule;
+    } catch (e) {
+      console.error("PDF load error:", e);
+      toast.error("Could not load PDF engine");
+      return;
+    }
     if (!exporter) {
       toast.error("PDF engine is not initialized");
       return;

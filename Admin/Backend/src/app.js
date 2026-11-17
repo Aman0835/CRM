@@ -1,4 +1,5 @@
 import cookieParser from "cookie-parser";
+import compression from "compression";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
@@ -78,6 +79,13 @@ app.use(
       callback(new Error(`CORS: ${origin} not allowed`));
     },
     credentials: true,
+  })
+);
+
+app.use(
+  compression({
+    threshold: 1024,
+    level: 6,
   })
 );
 

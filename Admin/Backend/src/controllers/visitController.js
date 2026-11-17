@@ -158,7 +158,8 @@ export const getEmployeeVisits = async (req, res) => {
     const visits = await Visit.find(query)
       .populate("leadId", "name phone status project")
       .sort({ createdAt: -1 })
-      .limit(100);
+      .limit(100)
+      .lean();
 
     res.status(200).json({
       success: true,
@@ -193,7 +194,8 @@ export const getAllVisits = async (req, res) => {
       .populate("employeeId", "firstName lastName employeeId")
       .populate("leadId", "name phone status project")
       .sort({ createdAt: -1 })
-      .limit(200);
+      .limit(200)
+      .lean();
 
     res.status(200).json({
       success: true,

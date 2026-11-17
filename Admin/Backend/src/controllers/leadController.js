@@ -190,7 +190,8 @@ export const getMyLeads = async (req, res) => {
       Lead.find(query)
         .sort({ updatedAt: -1, createdAt: -1 })
         .skip(skip)
-        .limit(Number(limit)),
+        .limit(Number(limit))
+        .lean(),
       Lead.countDocuments(query),
     ]);
 
@@ -256,7 +257,7 @@ export const getMyReminders = async (req, res) => {
       "nextFollowUp.date": { $lte: endOfToday, $ne: null }
     };
 
-    const reminders = await Lead.find(query).sort({ "nextFollowUp.date": 1 });
+    const reminders = await Lead.find(query).sort({ "nextFollowUp.date": 1 }).lean();
 
     res.status(200).json({
       success: true,
@@ -300,7 +301,8 @@ export const getAllLeads = async (req, res) => {
         .populate("assignedTo", "firstName lastName employeeId profileImage")
         .sort({ updatedAt: -1, createdAt: -1 })
         .skip(skip)
-        .limit(Number(limit)),
+        .limit(Number(limit))
+        .lean(),
       Lead.countDocuments(query),
     ]);
 
@@ -600,7 +602,8 @@ export const getLeadInteractions = async (req, res) => {
 
     const interactions = await Interaction.find({ leadId: lead._id })
       .populate("employeeId", "firstName lastName employeeId profileImage")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.status(200).json({
       success: true,
@@ -674,9 +677,10 @@ export const getVisitsAnalytics = async (req, res) => {
     const [allVisitLeads, totalAllLeads, visitInteractions] = await Promise.all([
       Lead.find(visitLeadsQuery)
         .populate("assignedTo", "firstName lastName employeeId profileImage")
-        .sort({ "nextFollowUp.date": 1, updatedAt: -1 }),
-      Lead.find().populate("assignedTo", "firstName lastName employeeId profileImage"),
-      Interaction.find({ type: "SITE_VISIT" }).populate("employeeId", "firstName lastName employeeId profileImage"),
+        .sort({ "nextFollowUp.date": 1, updatedAt: -1 })
+        .lean(),
+      Lead.find().select("status").lean(),
+      Interaction.find({ type: "SITE_VISIT" }).populate("employeeId", "firstName lastName employeeId profileImage").lean(),
     ]);
 
     const scheduled = totalAllLeads.filter((l) => l.status === "Visit Scheduled").length;

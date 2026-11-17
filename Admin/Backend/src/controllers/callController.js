@@ -230,13 +230,13 @@ export const getCallAnalytics = async (req, res) => {
     }
 
     const [callLogs, callInteractions] = await Promise.all([
-      CallLog.find(filter).sort({ dialedAt: -1 }).limit(100),
+      CallLog.find(filter).sort({ dialedAt: -1 }).limit(100).lean(),
       // Also query CALL interactions in the time window for any legacy or directly logged calls
       Interaction.find({
         type: "CALL",
         createdAt: { $gte: start, $lte: end },
         ...(filter.employeeId ? { employeeId: filter.employeeId } : {}),
-      }),
+      }).lean(),
     ]);
 
     // Count calls from CallLog
@@ -270,7 +270,7 @@ export const getCallAnalytics = async (req, res) => {
     // Agent leaderboard for admin
     let agentLeaderboard = [];
     if (isAdmin) {
-      const allEmployees = await Employee.find().select("firstName lastName name employeeId");
+      const allEmployees = await Employee.find().select("firstName lastName name employeeId").lean();
       agentLeaderboard = allEmployees.map((emp) => {
         const empCalls = callLogs.filter((c) => c.employeeId?.toString() === emp._id.toString());
         const dialed = empCalls.length;

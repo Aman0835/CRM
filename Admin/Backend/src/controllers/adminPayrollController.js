@@ -119,7 +119,7 @@ export const getPayrolls = async (req, res) => {
       year: -1,
       month: -1,
       createdAt: -1,
-    });
+    }).lean();
 
     res.status(200).json({
       success: true,
@@ -146,7 +146,7 @@ export const getPayrollByEmployee = async (req, res) => {
     }).sort({
       year: -1,
       month: -1,
-    });
+    }).lean();
 
     res.status(200).json({
       success: true,
@@ -173,7 +173,7 @@ export const getPayrollByMonthYear = async (req, res) => {
       year: Number(req.params.year),
     }).sort({
       employeeId: 1,
-    });
+    }).lean();
 
     res.status(200).json({
       success: true,

@@ -453,7 +453,7 @@ export const rejectEarlyCheckout = async (req, res) => {
 // Get All Attendance
 export const getAttendanceList = async (req, res) => {
   try {
-    const attendance = await Attendance.find().sort({ date: -1 });
+    const attendance = await Attendance.find().sort({ date: -1 }).lean();
 
     res.status(200).json({
       success: true,
@@ -473,7 +473,7 @@ export const getAttendanceList = async (req, res) => {
 export const getTodayAttendance = async (req, res) => {
   try {
     const today = new Date().toISOString().split("T")[0];
-    const attendance = await Attendance.find({ date: today });
+    const attendance = await Attendance.find({ date: today }).lean();
 
     res.status(200).json({
       success: true,
@@ -493,7 +493,7 @@ export const getTodayAttendance = async (req, res) => {
 export const getAttendanceByEmployee = async (req, res) => {
   try {
     const { employeeId } = req.params;
-    const attendance = await Attendance.find({ employeeId }).sort({ date: -1 });
+    const attendance = await Attendance.find({ employeeId }).sort({ date: -1 }).lean();
 
     res.status(200).json({
       success: true,
@@ -512,7 +512,7 @@ export const getAttendanceByEmployee = async (req, res) => {
 // Get Attendance Report
 export const getAttendanceReport = async (req, res) => {
   try {
-    const attendance = await Attendance.find();
+    const attendance = await Attendance.find().lean();
     res.status(200).json({
       success: true,
       data: attendance,
